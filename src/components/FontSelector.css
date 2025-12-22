@@ -1,0 +1,197 @@
+.font-selector {
+  position: relative;
+  width: 100%;
+}
+
+.font-selector-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 50px;
+}
+
+.font-selector-trigger:hover {
+  border-color: #4A9FD8;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.font-selector-value {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+  text-align: left;
+}
+
+.font-preview {
+  font-size: 1rem;
+  color: #e6eef8;
+  font-weight: 500;
+}
+
+.font-category {
+  font-size: 0.75rem;
+  color: #8da4bf;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.font-placeholder {
+  color: #8da4bf;
+  font-size: 1rem;
+}
+
+.font-selector-arrow {
+  color: #8da4bf;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+  margin-left: 1rem;
+}
+
+.font-selector-arrow.open {
+  transform: rotate(180deg);
+}
+
+.font-selector-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  right: 0;
+  background: rgba(10, 22, 40, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  max-height: 400px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.font-selector-search {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.font-selector-search svg {
+  color: #8da4bf;
+  flex-shrink: 0;
+}
+
+.font-search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #e6eef8;
+  font-size: 0.95rem;
+  outline: none;
+  padding: 0.5rem 0;
+}
+
+.font-search-input::placeholder {
+  color: #8da4bf;
+}
+
+.font-selector-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+  max-height: 320px;
+}
+
+.font-selector-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.font-selector-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.font-selector-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.font-selector-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.font-category-group {
+  margin-bottom: 0.5rem;
+}
+
+.font-category-header {
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #8da4bf;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.font-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.font-option:hover {
+  background: rgba(74, 159, 216, 0.1);
+  border-left-color: #4A9FD8;
+}
+
+.font-option.selected {
+  background: rgba(74, 159, 216, 0.15);
+  border-left-color: #4A9FD8;
+}
+
+.font-option.selected .font-option-name {
+  color: #4A9FD8;
+  font-weight: 600;
+}
+
+.font-option-name {
+  font-size: 1rem;
+  color: #e6eef8;
+  flex: 1;
+}
+
+.font-option svg {
+  color: #4A9FD8;
+  flex-shrink: 0;
+}
+
+.font-selector-empty {
+  padding: 2rem;
+  text-align: center;
+  color: #8da4bf;
+  font-size: 0.95rem;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .font-selector-dropdown {
+    max-height: 300px;
+  }
+
+  .font-selector-list {
+    max-height: 220px;
+  }
+}
+

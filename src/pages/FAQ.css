@@ -1,0 +1,26 @@
+.page-content {
+  min-height: calc(100vh - 200px);
+  padding: 4rem 0;
+  background: #071026;
+  color: #e6eef8;
+}
+
+.page-content .container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.page-content h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 2rem 0;
+  font-family: 'Orbitron', system-ui, sans-serif;
+}
+
+.page-content p {
+  color: #9fb0c8;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+

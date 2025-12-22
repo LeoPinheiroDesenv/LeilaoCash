@@ -1,0 +1,102 @@
+.hero{
+  background: radial-gradient(1200px 400px at 10% 10%, rgba(88,78,255,0.12), transparent), linear-gradient(180deg,#071026 0%, #0b1220 100%);
+  color: #e6eef8;
+  padding: 60px 0 80px;
+  text-align: center;
+}
+.hero-inner{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+.cashback-banner{
+  background: linear-gradient(90deg, #10b981, #34d399);
+  color: #021226;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 16px;
+  display: inline-block;
+  margin-bottom: 32px;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+.hero-title{
+  font-size: 60px;
+  margin: 16px 0 16px;
+  line-height: 60px;
+  font-weight: 700;
+  font-family: 'Orbitron', system-ui, sans-serif;
+}
+.hero-title span{
+  background: linear-gradient(90deg, #E55F52, #4A9FD8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  padding: 4px 12px;
+  border-radius: 8px;
+  display: inline-block;
+}
+.hero-sub{
+  opacity: 0.85;
+  margin-bottom: 32px;
+  font-size: 18px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 28px;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+.hero-search{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 32px auto;
+  max-width: 600px;
+  position: relative;
+}
+.hero-search .search-icon{
+  position: absolute;
+  left: 16px;
+  color: rgba(255,255,255,0.4);
+  pointer-events: none;
+}
+.hero-search input{
+  flex: 1;
+  padding: 16px 16px 16px 48px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  color: inherit;
+  font-size: 16px;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+.hero-search input::placeholder{
+  color: rgba(255,255,255,0.4);
+}
+.hero-search input:focus{
+  outline: none;
+  border-color: rgba(74,159,216,0.5);
+  background: rgba(255,255,255,0.08);
+}
+.hero-stats{
+  display: flex;
+  gap: 32px;
+  margin-top: 48px;
+  font-size: 15px;
+  justify-content: center;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+.hero-stats div{
+  background: rgba(255,255,255,0.03);
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.hero-stats strong{
+  display: block;
+  font-size: 20px;
+  margin-bottom: 4px;
+  color: #4A9FD8;
+  font-family: 'Orbitron', system-ui, sans-serif;
+  font-weight: 800;
+}

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LeilãoCash - Leilões Online com Cashback</title>
+    <meta name="description" content="Participe dos melhores leilões de eletrônicos e ganhe cashback em cada lance. Economize até 90% em produtos premium!" />
+    <meta name="author" content="LeilãoCash" />
+    <meta property="og:title" content="LeilãoCash - Leilões Online com Cashback" />
+    <meta property="og:description" content="Participe dos melhores leilões de eletrônicos e ganhe cashback em cada lance." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script>
+      // Capture errors that happen during module loading or app init so we can display them later
+      window.__appInitErrors = [];
+      window.addEventListener('error', function(e){
+        try{ console.error('window error', e.message, e.error); }catch(err){}
+        window.__appInitErrors.push({message: e.message, stack: e.error && e.error.stack ? e.error.stack : null, filename: e.filename, lineno: e.lineno, colno: e.colno});
+      });
+      window.addEventListener('unhandledrejection', function(e){
+        try{ console.error('unhandledrejection', e.reason); }catch(err){}
+        var msg = e.reason && e.reason.message ? e.reason.message : String(e.reason);
+        window.__appInitErrors.push({message: msg, stack: e.reason && e.reason.stack ? e.reason.stack : null});
+      });
+    </script>
+    <script type="module" src="assets/index-Cx6MrZHi.js"></script>
+    <link rel="stylesheet" crossorigin href="assets/index-uAgGnOcH.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- Diagnostic helper: shows overlay and logs if the React app doesn't initialize -->
+    <script>
+      console.log('diag: inline diagnostic script running');
+      (function(){
+        const body = document.body || document.getElementsByTagName('body')[0];
+        const diag = document.createElement('div');
+        diag.id = 'diag-app-fallback';
+        Object.assign(diag.style, {
+          position: 'fixed', inset: '0', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: '99999', background: 'rgba(0,0,0,0.85)', color: '#fff', fontSize: '16px', fontFamily: 'sans-serif'
+        });
+        diag.textContent = 'Aguardando inicialização do app...';
+        body.appendChild(diag);
+        // Remove overlay shortly after successful render; otherwise update message to instruct checking console
+        setTimeout(function(){ if(document.getElementById('root') && document.getElementById('root').children.length>0){ var e=document.getElementById('diag-app-fallback'); e&&e.remove(); } }, 2000);
+        setTimeout(function(){ if(document.getElementById('root') && document.getElementById('root').children.length===0){ var e=document.getElementById('diag-app-fallback'); e && (e.textContent = 'App não inicializado — abra Console (F12) para ver erros.'); } }, 3500);
+      })();
+    </script>
+    <noscript>
+      <div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:99999;background:#111;color:#fff;font-size:16px;font-family:sans-serif">
+        JavaScript está desativado no navegador — habilite JS e recarregue a página.
+      </div>
+    </noscript>
+  <!-- Cloudflare RUM script removed for local/dev environment to avoid POST to /cdn-cgi/run (404 on local Apache). -->
+</body>
+</html>

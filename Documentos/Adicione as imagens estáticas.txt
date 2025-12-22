@@ -1,0 +1,356 @@
+Adicione as imagens estáticas que estão no diretório "assets/images/"
+Nas sessões:
+"Em Destaque"
+"Ofertas Quentes"
+"Encerrando em Breve"
+
+
+
+
+
+
+
+
+Resolva este erro:
+Compiled with problems:
+×
+ERROR in ./src/App.js 9:0-49
+Module not found: Error: Can't resolve './assets/images/iPhone.jpeg' in '/var/www/html/LeilaoCash/src'
+ERROR in ./src/App.js 10:0-51
+Module not found: Error: Can't resolve './assets/images/MacBook.jpeg' in '/var/www/html/LeilaoCash/src'
+ERROR in ./src/App.js 11:0-51
+Module not found: Error: Can't resolve './assets/images/Samsung.jpeg' in '/var/www/html/LeilaoCash/src'
+ERROR in ./src/App.js 12:0-45
+Module not found: Error: Can't resolve './assets/images/iPad.jpeg' in '/var/www/html/LeilaoCash/src'
+ERROR in ./src/App.js 13:0-59
+Module not found: Error: Can't resolve './assets/images/PlayStation.jpeg' in '/var/www/html/LeilaoCash/src'
+ERROR in ./src/App.js 14:0-57
+Module not found: Error: Can't resolve './assets/images/AppleWatch.jpeg' in '/var/www/html/LeilaoCash/src'
+
+
+
+
+O link "Ver Leilão" deverá apontar para uma pagina exatamente igual a esta:
+https://dev.46digital.com.br/auction-cash-hub/produto/1
+Crie a pagina e todos os recursos necessários.
+
+
+
+As paginas foram criadas, mas estão incompletas, faça uma analise robusta e efetue as correções.
+
+
+Ainda incompleta, faça uma analise detalhada e efetue as correções.
+Mapeie todos os elementos da pagina, preciso que seja exatamente igual
+
+
+
+
+Analise minuciosamente esta pagina:
+https://dev.46digital.com.br/auction-cash-hub/
+copie todas as paginas para a aplicação.
+
+O fronend deve ser exatamente igual a este.
+
+
+Analise detalhadamente o layout, eis alguns pontos que não estão em conformidade:
+O tipo e o tamanho das fontes.
+falta algumas imagens de produtos.
+
+
+
+Você não consegue identificar o tipo de fonte do site, isso é decepcionante.  Utilize a fonte origial que estava nesta aplicação.
+O carrossel de produtos não está funcionando.
+Os ícones estão diferentes.
+O FRONTEND DEVE SER EXATAMENTE IGUAL
+Efetues as implementações e correções.
+
+
+
+
+    font-family: 'Orbitron', system-ui, sans-serif;
+	font-family: Orbitron, system-ui, sans-serif;
+
+
+
+
+
+A primeira imagem é o que foi requisitado.
+A segunda imagem é o que foi entregue.
+Está completamente diferente.
+
+
+
+Agora vamos copiar o dashboard do administrador.
+com as seguintes credenciais:
+email:admin@leilao.com
+senha: admin
+https://dev.46digital.com.br/auction-cash-hub/admin/dashboard
+
+Como ainda não implementamos o backend, crie uma pagina estática com a seguinte uri "/dashboard-admin"
+
+com as seguintes credenciais:
+email:user@leilao.com
+senha: user123
+seguinte uri "/dashboard-usuario"
+
+Mapeie todos os elementos da pagina, preciso que seja exatamente igual
+
+
+
+
+
+
+Você me informou que fez as implementações das paginas internas.
+Nada foi implementado nas paginas internas.
+Apenas uma mensagem está aparecendo:
+"Página em desenvolvimento. Esta seção permitirá visualizar, editar e gerenciar todos os usuários cadastrados na plataforma."
+
+
+
+
+
+
+
+
+
+
+
+31 995880093
+
+
+
+
+
+Adapte a nova identidade visual do projeto:
+A logo e as referências das cores estão no diretório visual/
+
+
+
+
+ADICIONAR SESSÃO DE CABEÇALHO:
+"Suba de Nível e Ganhe Mais!"
+	Com este texto:
+	"Participe das Vibes e conquiste prêmios especiais!
+
+Quanto mais você participa, mais você sobe de nível e desbloqueia benefícios incríveis! 
+
+Cadastre-se agora, faça seu primeiro Get e comece sua ascensão! Benefícios, recompensas e mais esperam por você.
+
+CTA> PARTICIPE AGORA		CTA> VEJA COMO FUNCIONA"
+
+
+Faça a correção, o item:
+"Suba de Nível e Ganhe Mais!"
+Deverá ser um item no menu do cabeçalho, ao lado de "Encerrado', ao clicar o usuário deverá ser direcionado ao conteúdo do item.
+
+
+Este conteúdo não deverá aparecer na pagina principal, quando o usuário clicar, deverá ir para uma pagina propria
+
+
+Adicione está sessão Abaixo de "Comece a ganhar Cashback agora!"
+Com estes textos:
+ADICIONAR SESSÃO DE PORQUE NOS ESCOLHER
+
+Por que comprar na VibeGet?
+
+1. Uma Nova Forma de Adquirir
+
+Ao invés de comprar de forma convencional, você participa de uma Vibe interativa onde o Get que você está disposto a investir é o que define sua chance de ganhar. Isso transforma cada Vibe em uma experiência emocionante!
+
+2. Cash Back Sempre ao Seu Lado
+
+Não importa se você ganha ou perde a Vibe, você sempre ganha Cash back! Mesmo não sendo o Champion Get, você recebe 40% de volta do valor que investiu, para continuar participando de mais Vibes. Mais oportunidades, mais chances de ganhar!
+
+3. Produtos Cobiçados
+
+Oferecemos uma ampla variedade de produtos que atendem aos mais diversos gostos. A cada Vibe, você tem a chance de adquirir itens que são realmente desejados por todos.
+
+4. Agilidade e Praticidade
+
+Nosso cadastro é rápido e gratuito, e a recarga de crédito pode ser feita de forma simples por Pix ou Cartão de Crédito. Tudo é feito para ser rápido, seguro e sem complicação, permitindo que você participe de Vibes sem perder tempo.
+
+
+
+
+Adicione estas informações na pagina de produtos:
+Visitas: X
+Tipo: X
+
+Nome do produto:
+
+Informações
+Local: X
+
+Dia da Vibe: X/X/202X
+
+Get
+Histórico de Gets: X Get(s)
+
+Valor Inicial: R$X,XXX.XX
+
+
+
+Ao invez de ter o icone da logo mais o texto, deixe apenas esta logo:
+"logo-vibeget.png"
+
+
+
+
+Dentro do diretório api/ crie a seguinte estrutura:
+aplicação api rest em Laravel 12
+Banco de dados Mysql
+Implemente o processo de login e autenticação
+Crie as estruturas para o projeto rodar com o docker
+
+
+
+
+Agora implemente para logar na aplicação:
+http://localhost:3000/login
+se o usuário for "is_admin==1" 
+http://localhost:3000/dashboard-admin
+se o usuário for "is_admin==0" 
+http://localhost:3000/dashboard-usuario
+Execute as implementações
+
+
+Faça as seguintes implementações:
+Em ambos dashboard o botão "btn-logout" deve fazer o logout.
+Quando logado, o Botão "Entrar" deve ser o link para o painel 
+o botão "Cadastrar" deve estar escrito "Sair"
+
+
+
+
+Faça as seguintes implementações:
+As cores, fontes, fundo, imagens estáticas
+Devem ser personalizáveis
+Crie um menu chamado /configuracoes no dashboard-admin 
+Crie os recursos necessários para que o administrador possa fazer isso.
+
+
+
+Faça as seguintes implementações:
+Dentro do menu /configuracoes
+As configurações responsáveis pelas cores e fontes deverá ser um submenu chamado "Layout"
+Crie outro submenu chamado "Textos"
+Para editar os seguintes textos:
+	como-funciona
+	Categorias
+	termos
+	faq
+	privacidade
+	regras
+	Contato
+	Ícones das redes sociais
+	O texto que aparece na home "primeira sessão do site"
+	suba-de-nivel
+	Por que comprar na VibeGet?
+
+Remova este componente:
+https://github.com/ckeditor/ckeditor5-react-example
+E utilize este
+template/src/pages/TermsConditionPage.jsx
+Observe como o componente funciona e se comporta e o implemente na aplicação principal
+
+Adicione o arquivo .env no front para setar o endereço do backend
+
+	
+	
+	nqmKQSwFy9.q
+	
+	
+	
+Em produção, apos logar e acessar a pagina de configurações, a aplicação volta para tela de login.
+Esta rota faz parte do conjunto de rotas do administrador e somente o admin deve ter acesso a ela.
+Corrija
+
+
+Ao acessar a tela de configurações, esta mensagem é exibida:
+'Unauthenticated"
+Analise e faça a correção.
+
+
+Em produção:
+https://leilao.verticos.com.br/dashboard-admin
+Ao acessar a pagina de configurações, esta mensagem é exibida, faça uma analise detalhada e efetue de maneira definitiva a correção
+
+
+Agora está retornando esta mensagem (imagem em anexo)
+o endereço da aplicação é:
+https://leilao.verticos.com.br
+o endereço da api é:
+https://apileilao.verticos.com.br
+faça uma analise detalhada e efetue de maneira definitiva a correção.
+
+
+Ao acessar o o endereço da api:
+https://apileilao.verticos.com.br
+Esta mensagem é exibida:
+404
+Not Found
+O correto seria a pagina inicial do laravel.
+faça uma analise detalhada e efetue de maneira definitiva a correção.
+
+
+
+Faça a seguinte implementação, na tela de configurações:
+dashboard-admin/configuracoes
+A opção de escolher a fonte, abra uma lista de fontes para que o administrador as escolha.
+Utilize o google fonts
+
+Faça a seguinte implementação, na tela de configurações:
+dashboard-admin/configuracoes
+Na edição dos textos das paginas, cada pagina deverá ser um tab, assim como "Paginas", "Home","Redes Sociais"
+
+
+Faça a seguinte implementação:
+dashboard-admin/usuarios
+Adicione a opção para o administrador cadastrar/editar/visualizar os usuários.
+Os tipos de usuários são:
+administradores secundários:
+	Ao criar este tipo de administrador o administrador principal deverá escolher quais as telas que este administrador secundário terá acesso.
+Usuário comum, que será o usuário que acessará esta tela:
+dashboard-usuario
+
+Faça a seguinte implementação:
+Adicione a opção para o administrador cadastrar os produtos:
+dashboard-admin/produtos
+Adicione a opção para o administrador cadastrar os leilões:
+dashboard-admin/leiloes
+Ao cadastrar um leilão o administrador deverá selecionar os produtos.
+Cada produto deverá estar em um leilão apenas
+
+
+
+O Site está listando produtos estáticos, corrija.
+Adicione a opção do usuário fazer o upload das imagens dos produtos.
+Adicione a opção para o administrador cadastrar as categorias dos produtos:
+Crie um seed das categorias 5
+Crie um seed dos produtos 20
+Crie um seed dos leiloes 3
+
+
+O Site está listando produtos que não estão cadastrados, corrija.
+O cadastro de categorias não está aparecendo no menu, corrija
+
+
+
+
+
+
+
+
+Erro ao fazer o upload da imagem:
+{
+    "success": false,
+    "message": "Erro de valida\u00e7\u00e3o",
+    "errors": {
+        "is_active": [
+            "validation.boolean"
+        ]
+    }
+}
+
+Cada produto poderá ter até 5 imagens.
+faça uma analise detalhada e efetue de maneira definitiva a correção.

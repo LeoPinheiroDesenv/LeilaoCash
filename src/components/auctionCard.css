@@ -1,0 +1,23 @@
+.card{background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));border-radius:16px;overflow:hidden;color:#e6eef8;box-shadow:0 8px 24px rgba(2,6,23,0.8);display:flex;flex-direction:column;transition:transform 0.2s,box-shadow 0.2s;border:1px solid rgba(255,255,255,0.05)}
+.card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(2,6,23,0.9)}
+.card-media{position:relative;height:200px;background:linear-gradient(120deg,#0e1724,#061226);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.media-placeholder{width:100%;height:100%;object-fit:cover;display:block}
+.badge{position:absolute;top:12px;left:12px;padding:6px 12px;border-radius:999px;font-weight:700;font-size:11px;z-index:2}
+.badge-hot{background:linear-gradient(90deg,#ff6b35,#ff8c42);color:#fff}
+.badge-danger{background:linear-gradient(90deg,#ff6b6b,#ff9a9a);color:#fff}
+.discount-badge{position:absolute;top:12px;right:12px;background:linear-gradient(90deg,#10b981,#34d399);color:#021226;padding:6px 10px;border-radius:8px;font-weight:700;font-size:12px;z-index:2}
+.card-body{padding:16px;display:flex;flex-direction:column;gap:10px}
+.card-title{font-size:14px;margin:0;font-weight:600;line-height:20px;color:#e6eef8;font-family:'Orbitron',system-ui,sans-serif}
+.price-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.card-price{color:#dff5ff;font-weight:800;font-size:20px}
+.card-old{color:#7a90a6;text-decoration:line-through;font-size:14px}
+.cashback-badge{background:linear-gradient(90deg,#0ea5a5,#06b6d4);color:#021226;padding:6px 10px;border-radius:8px;font-weight:700;display:inline-block;width:fit-content;font-size:12px}
+.timer{display:flex;align-items:center;gap:6px;color:#ff6b35;font-weight:700;font-size:12px;font-variant-numeric:tabular-nums;font-family:'Orbitron',system-ui,sans-serif}
+.timer svg{flex-shrink:0}
+.bids-count{color:#9fb0c8;font-size:13px;font-weight:500;display:flex;align-items:center;gap:6px}
+.bids-count svg{flex-shrink:0;opacity:0.7}
+.card-actions{display:flex;gap:8px;margin-top:4px}
+.btn-outline{background:transparent;border:1px solid rgba(255,255,255,0.1);padding:10px 16px;border-radius:10px;color:inherit;font-weight:500;cursor:pointer;transition:all 0.2s;flex:1;font-size:14px;text-decoration:none;display:block;text-align:center;font-family:'Inter',sans-serif}
+.btn-outline:hover{background:rgba(255,255,255,0.05);border-color:rgba(74,159,216,0.5);color:#4A9FD8}
+.btn-primary{background:linear-gradient(90deg,#E55F52,#4A9FD8);border:none;padding:10px 16px;border-radius:10px;color:#fff;font-weight:700;cursor:pointer;transition:transform 0.2s}
+.btn-primary:hover{transform:scale(1.02)}

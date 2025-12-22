@@ -1,0 +1,134 @@
+.site-header {
+    background: rgba(7, 16, 38, 0.8);
+    backdrop-filter: blur(24px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 16px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.site-header .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+}
+
+.logo-full {
+    height: 50px;
+    width: auto;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+
+.main-nav {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.nav-link {
+    color: #9fb0c8;
+    text-decoration: none;
+    font-weight: 400;
+    font-size: 15px;
+    transition: color 0.2s;
+    position: relative;
+    padding-bottom: 4px;
+    font-family: 'Inter', sans-serif;
+    white-space: nowrap;
+}
+
+.nav-link:hover {
+    color: #e6eef8;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 0;
+    background: linear-gradient(90deg, #E55F52, #4A9FD8);
+    transition: width 0.3s;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.btn-login, .btn-register {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+    display: inline-block;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-login {
+    background: transparent;
+    color: #9fb0c8;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-login:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #e6eef8;
+    border-color: rgba(74, 159, 216, 0.5);
+}
+
+.btn-register {
+    background: linear-gradient(90deg, #E55F52, #4A9FD8);
+    color: #fff;
+    border: none;
+}
+
+.btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(229, 95, 82, 0.4);
+}
+
+@media (max-width: 1200px) {
+    .main-nav {
+        gap: 1rem;
+    }
+    
+    .nav-link {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-nav {
+        display: none;
+    }
+    
+    .header-content {
+        gap: 1rem;
+    }
+}
