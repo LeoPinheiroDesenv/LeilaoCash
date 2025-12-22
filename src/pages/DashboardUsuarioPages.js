@@ -67,7 +67,10 @@ export const DashboardUsuarioMinhaConta = () => {
       setSaving(true);
       setMessage({ type: '', text: '' });
       
-      const response = await api.put('/auth/profile', formData);
+      // Remove email do formData antes de enviar, pois o backend não permite atualizar email
+      const { email, ...profileData } = formData;
+      
+      const response = await api.put('/auth/profile', profileData);
       if (response.data.success) {
         updateUser(response.data.data);
         setMessage({ type: 'success', text: 'Perfil atualizado com sucesso!' });
@@ -93,8 +96,8 @@ export const DashboardUsuarioMinhaConta = () => {
       return;
     }
 
-    if (passwordData.newPassword.length < 6) {
-      setMessage({ type: 'error', text: 'A senha deve ter pelo menos 6 caracteres' });
+    if (passwordData.newPassword.length < 8) {
+      setMessage({ type: 'error', text: 'A senha deve ter pelo menos 8 caracteres' });
       return;
     }
 
@@ -219,6 +222,8 @@ export const DashboardUsuarioMinhaConta = () => {
                 value={formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
                 required
+                disabled
+                title="O email não pode ser alterado"
               />
             </div>
           </div>
@@ -323,25 +328,25 @@ export const DashboardUsuarioMinhaConta = () => {
           </div>
           <div className="form-group">
             <label>Nova senha</label>
-            <input 
-              type="password" 
-              placeholder="••••••••"
-              value={passwordData.newPassword}
-              onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
-              required
-              minLength="6"
-            />
+              <input 
+                type="password" 
+                placeholder="••••••••"
+                value={passwordData.newPassword}
+                onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+                required
+                minLength="8"
+              />
           </div>
           <div className="form-group">
             <label>Confirmar nova senha</label>
-            <input 
-              type="password" 
-              placeholder="••••••••"
-              value={passwordData.confirmPassword}
-              onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
-              required
-              minLength="6"
-            />
+              <input 
+                type="password" 
+                placeholder="••••••••"
+                value={passwordData.confirmPassword}
+                onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                required
+                minLength="8"
+              />
           </div>
         </div>
         <button type="submit" className="btn-save" disabled={savingPassword}>
