@@ -1171,6 +1171,169 @@
   color: #ef4444;
 }
 
+/* Modal Styles for Buy Credits */
+.modal-description {
+  color: #9fb0c8;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.payment-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.payment-option-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #e6eef8;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.payment-option-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #4A9FD8;
+  transform: translateY(-2px);
+}
+
+.payment-option-btn svg {
+  color: #4A9FD8;
+}
+
+.payment-option-btn span {
+  font-weight: 600;
+}
+
+.btn-back {
+  background: none;
+  border: none;
+  color: #9fb0c8;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-back:hover {
+  color: #e6eef8;
+}
+
+.credit-card-form h3, .pix-payment h3 {
+  margin: 0 0 24px 0;
+  color: #e6eef8;
+  font-family: 'Orbitron', system-ui, sans-serif;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.btn-submit-payment {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  color: #021226;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 24px;
+  transition: transform 0.2s;
+}
+
+.btn-submit-payment:hover {
+  transform: translateY(-2px);
+}
+
+.input-with-button {
+  display: flex;
+  gap: 12px;
+}
+
+.input-with-button input {
+  flex: 1;
+}
+
+.btn-generate-pix {
+  padding: 0 20px;
+  background: #4A9FD8;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-generate-pix:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pix-content {
+  text-align: center;
+}
+
+.qr-code-placeholder {
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  display: inline-block;
+  margin: 16px 0;
+}
+
+.qr-code-placeholder img {
+  width: 200px;
+  height: 200px;
+}
+
+.pix-copy-paste {
+  text-align: left;
+  margin-top: 16px;
+}
+
+.copy-paste-input {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.copy-paste-input input {
+  flex: 1;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #9fb0c8;
+  font-family: monospace;
+}
+
+.copy-paste-input button {
+  padding: 0 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #e6eef8;
+  cursor: pointer;
+}
+
+.copy-paste-input button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
 @media (max-width: 1024px) {
   .dashboard-layout {
     flex-direction: column;
@@ -1221,4 +1384,3 @@
     align-items: flex-start;
   }
 }
-

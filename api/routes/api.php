@@ -62,7 +62,7 @@ Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
                 'data' => $request->user()
             ]);
         });
-        
+
         Route::get('/balance', function (Request $request) {
             return response()->json([
                 'success' => true,
@@ -82,10 +82,10 @@ Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
             ])
                 ->where('user_id', $request->user()->id)
                 ->orderBy('created_at', 'desc');
-            
+
             $perPage = $request->get('per_page', 15);
             $bids = $query->paginate($perPage);
-            
+
             return response()->json([
                 'success' => true,
                 'data' => $bids
@@ -97,14 +97,14 @@ Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
             $query = \App\Models\Transaction::with(['user:id,name,email'])
                 ->where('user_id', $request->user()->id)
                 ->orderBy('created_at', 'desc');
-            
+
             if ($request->has('type')) {
                 $query->where('type', $request->type);
             }
-            
+
             $perPage = $request->get('per_page', 15);
             $transactions = $query->paginate($perPage);
-            
+
             return response()->json([
                 'success' => true,
                 'data' => $transactions
@@ -116,7 +116,7 @@ Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
     Route::middleware('admin')->group(function () {
         // Settings public (apenas admin)
         Route::get('/settings/public', [\App\Http\Controllers\Api\SettingsController::class, 'getPublic']);
-        
+
         // Settings management
         Route::prefix('settings')->group(function () {
             Route::get('/', [\App\Http\Controllers\Api\SettingsController::class, 'index']);
@@ -183,12 +183,21 @@ Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
             Route::get('/cashback-by-user', [\App\Http\Controllers\Api\ReportController::class, 'cashbackByUser']);
         });
 
+        // Logs
+        Route::prefix('logs')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Api\LogController::class, 'index']);
+            Route::delete('/', [\App\Http\Controllers\Api\LogController::class, 'clear']);
+        });
+
         // Favorites
         Route::prefix('favorites')->group(function () {
             Route::get('/', [\App\Http\Controllers\Api\FavoriteController::class, 'index']);
             Route::post('/{productId}/toggle', [\App\Http\Controllers\Api\FavoriteController::class, 'toggle']);
             Route::get('/{productId}/check', [\App\Http\Controllers\Api\FavoriteController::class, 'check']);
         });
+
+        // Mercado Pago
+        Route::post('/mercadopago/validate', [\App\Http\Controllers\Api\PaymentController::class, 'validateMercadoPago']);
     });
 });
 

@@ -239,7 +239,8 @@
 }
 
 .btn-save,
-.btn-cancel {
+.btn-cancel,
+.btn-validate {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -276,6 +277,22 @@
 .btn-cancel:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.1);
   color: #e6eef8;
+}
+
+.btn-validate {
+  background: rgba(74, 159, 216, 0.1);
+  color: #4A9FD8;
+  border: 1px solid rgba(74, 159, 216, 0.3);
+}
+
+.btn-validate:hover:not(:disabled) {
+  background: rgba(74, 159, 216, 0.2);
+  transform: translateY(-2px);
+}
+
+.btn-validate:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .loading-container {
@@ -378,6 +395,24 @@
   width: 100%;
 }
 
+/* Payment Settings Styles */
+.settings-section {
+  margin-bottom: 2rem;
+}
+
+.settings-section h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #e6eef8;
+  margin-bottom: 0.5rem;
+}
+
+.section-description {
+  color: #8da4bf;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+
 @media (max-width: 768px) {
   .settings-content {
     padding: 1.5rem;
@@ -406,7 +441,8 @@
   }
 
   .btn-save,
-  .btn-cancel {
+  .btn-cancel,
+  .btn-validate {
     width: 100%;
     justify-content: center;
   }
@@ -422,3 +458,187 @@
   }
 }
 
+/* Logs Settings Styles */
+.logs-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.logs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logs-info h3 {
+  margin: 0;
+  color: #e6eef8;
+  font-size: 1.25rem;
+}
+
+.logs-info p {
+  margin: 0.25rem 0 0;
+  color: #8da4bf;
+  font-size: 0.875rem;
+}
+
+.logs-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-refresh, .btn-clear, .btn-page {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-refresh {
+  background: rgba(74, 159, 216, 0.1);
+  border: 1px solid rgba(74, 159, 216, 0.3);
+  color: #4A9FD8;
+}
+
+.btn-refresh:hover:not(:disabled) {
+  background: rgba(74, 159, 216, 0.2);
+}
+
+.btn-clear {
+  background: rgba(229, 95, 82, 0.1);
+  border: 1px solid rgba(229, 95, 82, 0.3);
+  color: #E55F52;
+}
+
+.btn-clear:hover:not(:disabled) {
+  background: rgba(229, 95, 82, 0.2);
+}
+
+.logs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.logs-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.logs-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.logs-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.log-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-left: 4px solid #8da4bf;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.log-item.log-error { border-left-color: #E55F52; background: rgba(229, 95, 82, 0.05); }
+.log-item.log-warning { border-left-color: #f39c12; background: rgba(243, 156, 18, 0.05); }
+.log-item.log-info { border-left-color: #4A9FD8; background: rgba(74, 159, 216, 0.05); }
+
+.log-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8125rem;
+}
+
+.log-timestamp {
+  color: #8da4bf;
+}
+
+.log-level-badge {
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.log-level-badge.error, .log-level-badge.critical, .log-level-badge.alert, .log-level-badge.emergency {
+  background: rgba(229, 95, 82, 0.2);
+  color: #E55F52;
+}
+
+.log-level-badge.warning {
+  background: rgba(243, 156, 18, 0.2);
+  color: #f39c12;
+}
+
+.log-level-badge.info {
+  background: rgba(74, 159, 216, 0.2);
+  color: #4A9FD8;
+}
+
+.log-env {
+  color: #5c6d82;
+}
+
+.log-content {
+  overflow-x: auto;
+}
+
+.log-message {
+  margin: 0;
+  color: #e6eef8;
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.logs-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.page-info {
+  color: #8da4bf;
+  font-size: 0.875rem;
+}
+
+.btn-page {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #8da4bf;
+}
+
+.btn-page:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: #e6eef8;
+}
+
+.btn-page:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.no-logs, .logs-loading {
+  padding: 3rem;
+  text-align: center;
+  color: #8da4bf;
+}

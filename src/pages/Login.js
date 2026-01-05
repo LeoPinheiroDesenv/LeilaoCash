@@ -23,10 +23,19 @@ const Login = () => {
       // Se veio de uma página específica, voltar para ela
       if (from) {
         navigate(from, { replace: true });
-      } else if (user.is_admin) {
-        navigate('/dashboard-admin', { replace: true });
       } else {
-        navigate('/dashboard-usuario', { replace: true });
+        // Verificar se é admin (pode ser 1, true ou "1")
+        const isAdmin = user.is_admin === 1 || user.is_admin === true || user.is_admin === '1';
+
+
+
+        if (isAdmin) {
+
+          navigate('/dashboard-admin', { replace: true });
+        } else {
+          navigate('/dashboard-usuario', { replace: true });
+        }
+
       }
     }
   }, [isAuthenticated, user, navigate, from]);
@@ -40,14 +49,7 @@ const Login = () => {
       const result = await login(email, password);
       
       if (result.success) {
-        // Se veio de uma página específica (ex: página do produto), voltar para ela
-        if (from) {
-          navigate(from, { replace: true });
-        } else if (result.user.is_admin) {
-          navigate('/dashboard-admin', { replace: true });
-        } else {
-          navigate('/dashboard-usuario', { replace: true });
-        }
+        // A navegação será tratada pelo useEffect acima quando o estado user for atualizado
       } else {
         setError(result.message || 'Credenciais inválidas');
       }
@@ -156,4 +158,3 @@ const Login = () => {
 };
 
 export default Login;
-

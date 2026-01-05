@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Countdown from '../components/Countdown';
 import UserLayout from '../components/UserLayout';
+import Modal from '../components/Modal';
 import './DashboardUsuario.css';
 
 const DashboardUsuario = () => {
+  const [isBuyCreditsModalOpen, setIsBuyCreditsModalOpen] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState(null); // 'credit_card' or 'pix'
+  const [creditAmount, setCreditAmount] = useState('');
+
   const activeAuctions = [
     {
       id: 1,
@@ -42,6 +47,23 @@ const DashboardUsuario = () => {
     }
   ];
 
+  const handleOpenBuyCredits = (e) => {
+    e.preventDefault();
+    setIsBuyCreditsModalOpen(true);
+    setPaymentMethod(null);
+    setCreditAmount('');
+  };
+
+  const handleCloseBuyCredits = () => {
+    setIsBuyCreditsModalOpen(false);
+    setPaymentMethod(null);
+    setCreditAmount('');
+  };
+
+  const handleSelectPaymentMethod = (method) => {
+    setPaymentMethod(method);
+  };
+
   return (
     <UserLayout>
             <div className="welcome-section">
@@ -49,13 +71,13 @@ const DashboardUsuario = () => {
                 <h1>Olá, João! 👋</h1>
                 <p>Bem-vindo ao seu painel de controle</p>
               </div>
-              <Link to="/pagamento/creditos" className="btn-buy-credits">
+              <a href="#" onClick={handleOpenBuyCredits} className="btn-buy-credits">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="12" y1="2" x2="12" y2="22"></line>
                   <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                 </svg>
                 <span>Comprar Créditos</span>
-              </Link>
+              </a>
             </div>
             <div className="stats-grid">
               <div className="stat-card cashback-card">
@@ -212,9 +234,123 @@ const DashboardUsuario = () => {
                 ))}
               </div>
             </div>
+
+            <Modal
+              isOpen={isBuyCreditsModalOpen}
+              onClose={handleCloseBuyCredits}
+              title="Comprar Créditos"
+            >
+              {!paymentMethod ? (
+                <div className="payment-method-selection">
+                  <p className="modal-description">Escolha como deseja pagar pelos seus créditos:</p>
+                  <div className="payment-options">
+                    <button 
+                      className="payment-option-btn"
+                      onClick={() => handleSelectPaymentMethod('credit_card')}
+                    >
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                        <line x1="1" y1="10" x2="23" y2="10"></line>
+                      </svg>
+                      <span>Cartão de Crédito</span>
+                    </button>
+                    <button 
+                      className="payment-option-btn"
+                      onClick={() => handleSelectPaymentMethod('pix')}
+                    >
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <path d="M12 8v8"></path>
+                        <path d="M8 12h8"></path>
+                      </svg>
+                      <span>Pix</span>
+                    </button>
+                  </div>
+                </div>
+              ) : paymentMethod === 'credit_card' ? (
+                <div className="credit-card-form">
+                  <button className="btn-back" onClick={() => setPaymentMethod(null)}>
+                    ← Voltar
+                  </button>
+                  <h3>Pagamento com Cartão de Crédito</h3>
+                  <form onSubmit={(e) => e.preventDefault()}>
+                    <div className="form-group">
+                      <label>Valor da Recarga (R$)</label>
+                      <input 
+                        type="number" 
+                        placeholder="0,00" 
+                        value={creditAmount}
+                        onChange={(e) => setCreditAmount(e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Número do Cartão</label>
+                      <input type="text" placeholder="0000 0000 0000 0000" />
+                    </div>
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label>Validade</label>
+                        <input type="text" placeholder="MM/AA" />
+                      </div>
+                      <div className="form-group">
+                        <label>CVV</label>
+                        <input type="text" placeholder="123" />
+                      </div>
+                    </div>
+                    <div className="form-group">
+                      <label>Nome no Cartão</label>
+                      <input type="text" placeholder="Nome como está no cartão" />
+                    </div>
+                    <button className="btn-submit-payment">Finalizar Pagamento</button>
+                  </form>
+                </div>
+              ) : (
+                <div className="pix-payment">
+                  <button className="btn-back" onClick={() => setPaymentMethod(null)}>
+                    ← Voltar
+                  </button>
+                  <h3>Pagamento via Pix</h3>
+                  {!creditAmount ? (
+                     <div className="form-group">
+                      <label>Valor da Recarga (R$)</label>
+                      <div className="input-with-button">
+                        <input 
+                          type="number" 
+                          placeholder="0,00" 
+                          value={creditAmount}
+                          onChange={(e) => setCreditAmount(e.target.value)}
+                        />
+                        <button 
+                          className="btn-generate-pix"
+                          onClick={() => {/* Lógica para gerar QR Code */}}
+                          disabled={!creditAmount}
+                        >
+                          Gerar Pix
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="pix-content">
+                      <p>Escaneie o QR Code abaixo para pagar:</p>
+                      <div className="qr-code-placeholder">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg" alt="QR Code Pix" />
+                      </div>
+                      <div className="pix-copy-paste">
+                        <label>Código Pix Copia e Cola</label>
+                        <div className="copy-paste-input">
+                          <input type="text" value="00020126580014br.gov.bcb.pix0136123e4567-e89b-12d3-a456-426614174000520400005303986540410.005802BR5913Fulano de Tal6008BRASILIA62070503***6304E2CA" readOnly />
+                          <button onClick={() => navigator.clipboard.writeText("00020126580014br.gov.bcb.pix0136123e4567-e89b-12d3-a456-426614174000520400005303986540410.005802BR5913Fulano de Tal6008BRASILIA62070503***6304E2CA")}>
+                            Copiar
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </Modal>
     </UserLayout>
   );
 };
 
 export default DashboardUsuario;
-

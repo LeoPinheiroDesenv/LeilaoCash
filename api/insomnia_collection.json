@@ -1,0 +1,298 @@
+{
+	"_type": "export",
+	"__export_format": 4,
+	"__export_date": "2026-01-05T01:57:00.000Z",
+	"__export_source": "insomnia.desktop.app:v2023.5.8",
+	"resources": [
+		{
+			"_id": "wrk_1",
+			"parentId": null,
+			"modified": 1704420000000,
+			"created": 1704420000000,
+			"name": "LeilaoCash API",
+			"description": "Coleção de requisições para a API do LeilaoCash",
+			"scope": "collection",
+			"_type": "workspace"
+		},
+		{
+			"_id": "env_1",
+			"parentId": "wrk_1",
+			"modified": 1704420000000,
+			"created": 1704420000000,
+			"name": "Base Environment",
+			"data": {
+				"base_url": "http://localhost:8000/api",
+				"token": "SEU_TOKEN_AQUI"
+			},
+			"dataPropertyOrder": {
+				"&": [
+					"base_url",
+					"token"
+				]
+			},
+			"color": null,
+			"isPrivate": false,
+			"metaSortKey": 1704420000000,
+			"_type": "environment"
+		},
+		{
+			"_id": "fld_auth",
+			"parentId": "wrk_1",
+			"name": "Authentication",
+			"description": "",
+			"environment": {},
+			"environmentPropertyOrder": null,
+			"metaSortKey": -100,
+			"_type": "request_group"
+		},
+		{
+			"_id": "req_login",
+			"parentId": "fld_auth",
+			"name": "Login",
+			"method": "POST",
+			"body": {
+				"mimeType": "application/json",
+				"text": "{\n\t\"email\": \"admin@example.com\",\n\t\"password\": \"password\"\n}"
+			},
+			"url": "{{ _.base_url }}/auth/login",
+			"headers": [
+				{ "name": "Content-Type", "value": "application/json" },
+				{ "name": "Accept", "value": "application/json" }
+			],
+			"_type": "request"
+		},
+		{
+			"_id": "req_register",
+			"parentId": "fld_auth",
+			"name": "Register",
+			"method": "POST",
+			"body": {
+				"mimeType": "application/json",
+				"text": "{\n\t\"name\": \"Novo Usuário\",\n\t\"email\": \"user@example.com\",\n\t\"password\": \"password\",\n\t\"password_confirmation\": \"password\"\n}"
+			},
+			"url": "{{ _.base_url }}/auth/register",
+			"headers": [
+				{ "name": "Content-Type", "value": "application/json" },
+				{ "name": "Accept", "value": "application/json" }
+			],
+			"_type": "request"
+		},
+		{
+			"_id": "req_me",
+			"parentId": "fld_auth",
+			"name": "Me",
+			"method": "GET",
+			"body": {},
+			"url": "{{ _.base_url }}/auth/me",
+			"headers": [
+				{ "name": "Accept", "value": "application/json" },
+				{ "name": "Authorization", "value": "Bearer {{ _.token }}" }
+			],
+			"_type": "request"
+		},
+		{
+			"_id": "req_logout",
+			"parentId": "fld_auth",
+			"name": "Logout",
+			"method": "POST",
+			"body": {},
+			"url": "{{ _.base_url }}/auth/logout",
+			"headers": [
+				{ "name": "Accept", "value": "application/json" },
+				{ "name": "Authorization", "value": "Bearer {{ _.token }}" }
+			],
+			"_type": "request"
+		},
+		{
+			"_id": "fld_public",
+			"parentId": "wrk_1",
+			"name": "Public",
+			"metaSortKey": -50,
+			"_type": "request_group"
+		},
+		{
+			"_id": "req_health",
+			"parentId": "fld_public",
+			"name": "Health Check",
+			"method": "GET",
+			"url": "{{ _.base_url }}/health",
+			"_type": "request"
+		},
+		{
+			"_id": "req_pub_cats",
+			"parentId": "fld_public",
+			"name": "Categories",
+			"method": "GET",
+			"url": "{{ _.base_url }}/categories",
+			"_type": "request"
+		},
+		{
+			"_id": "req_pub_prods",
+			"parentId": "fld_public",
+			"name": "Products",
+			"method": "GET",
+			"url": "{{ _.base_url }}/products/public",
+			"_type": "request"
+		},
+		{
+			"_id": "req_pub_auctions",
+			"parentId": "fld_public",
+			"name": "Auctions",
+			"method": "GET",
+			"url": "{{ _.base_url }}/auctions/public",
+			"_type": "request"
+		},
+		{
+			"_id": "fld_user",
+			"parentId": "wrk_1",
+			"name": "User",
+			"metaSortKey": 0,
+			"_type": "request_group"
+		},
+		{
+			"_id": "req_user_profile",
+			"parentId": "fld_user",
+			"name": "Profile Info",
+			"method": "GET",
+			"url": "{{ _.base_url }}/user",
+			"headers": [
+				{ "name": "Accept", "value": "application/json" },
+				{ "name": "Authorization", "value": "Bearer {{ _.token }}" }
+			],
+			"_type": "request"
+		},
+		{
+			"_id": "req_user_balance",
+			"parentId": "fld_user",
+			"name": "Balance",
+			"method": "GET",
+			"url": "{{ _.base_url }}/user/balance",
+			"headers": [
+				{ "name": "Accept", "value": "application/json" },
+				{ "name": "Authorization", "value": "Bearer {{ _.token }}" }
+			],
+			"_type": "request"
+		},
+		{
+			"_id": "req_user_bids",
+			"parentId": "fld_user",
+			"name": "My Bids",
+			"method": "GET",
+			"url": "{{ _.base_url }}/user/bids",
+			"headers": [
+				{ "name": "Accept", "value": "application/json" },
+				{ "name": "Authorization", "value": "Bearer {{ _.token }}" }
+			],
+			"_type": "request"
+		},
+		{
+			"_id": "req_user_tx",
+			"parentId": "fld_user",
+			"name": "My Transactions",
+			"method": "GET",
+			"url": "{{ _.base_url }}/user/transactions",
+			"headers": [
+				{ "name": "Accept", "value": "application/json" },
+				{ "name": "Authorization", "value": "Bearer {{ _.token }}" }
+			],
+			"_type": "request"
+		},
+		{
+			"_id": "fld_admin",
+			"parentId": "wrk_1",
+			"name": "Admin",
+			"metaSortKey": 50,
+			"_type": "request_group"
+		},
+		{
+			"_id": "fld_admin_settings",
+			"parentId": "fld_admin",
+			"name": "Settings",
+			"_type": "request_group"
+		},
+		{
+			"_id": "req_adm_settings_list",
+			"parentId": "fld_admin_settings",
+			"name": "List Settings",
+			"method": "GET",
+			"url": "{{ _.base_url }}/settings",
+			"headers": [
+				{ "name": "Accept", "value": "application/json" },
+				{ "name": "Authorization", "value": "Bearer {{ _.token }}" }
+			],
+			"_type": "request"
+		},
+		{
+			"_id": "fld_admin_users",
+			"parentId": "fld_admin",
+			"name": "Users Management",
+			"_type": "request_group"
+		},
+		{
+			"_id": "req_adm_users_list",
+			"parentId": "fld_admin_users",
+			"name": "List Users",
+			"method": "GET",
+			"url": "{{ _.base_url }}/users",
+			"headers": [
+				{ "name": "Accept", "value": "application/json" },
+				{ "name": "Authorization", "value": "Bearer {{ _.token }}" }
+			],
+			"_type": "request"
+		},
+		{
+			"_id": "fld_admin_products",
+			"parentId": "fld_admin",
+			"name": "Products Management",
+			"_type": "request_group"
+		},
+		{
+			"_id": "req_adm_products_list",
+			"parentId": "fld_admin_products",
+			"name": "List Products",
+			"method": "GET",
+			"url": "{{ _.base_url }}/products",
+			"headers": [
+				{ "name": "Accept", "value": "application/json" },
+				{ "name": "Authorization", "value": "Bearer {{ _.token }}" }
+			],
+			"_type": "request"
+		},
+		{
+			"_id": "fld_admin_auctions",
+			"parentId": "fld_admin",
+			"name": "Auctions Management",
+			"_type": "request_group"
+		},
+		{
+			"_id": "req_adm_auctions_list",
+			"parentId": "fld_admin_auctions",
+			"name": "List Auctions",
+			"method": "GET",
+			"url": "{{ _.base_url }}/auctions",
+			"headers": [
+				{ "name": "Accept", "value": "application/json" },
+				{ "name": "Authorization", "value": "Bearer {{ _.token }}" }
+			],
+			"_type": "request"
+		},
+		{
+			"_id": "fld_admin_reports",
+			"parentId": "fld_admin",
+			"name": "Reports",
+			"_type": "request_group"
+		},
+		{
+			"_id": "req_adm_reports_gen",
+			"parentId": "fld_admin_reports",
+			"name": "General Report",
+			"method": "GET",
+			"url": "{{ _.base_url }}/reports/general",
+			"headers": [
+				{ "name": "Accept", "value": "application/json" },
+				{ "name": "Authorization", "value": "Bearer {{ _.token }}" }
+			],
+			"_type": "request"
+		}
+	]
+}

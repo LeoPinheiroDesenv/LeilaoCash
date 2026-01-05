@@ -2,8 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import AdminLayout from '../components/AdminLayout';
 import ConfiguracoesLayout from './ConfiguracoesLayout';
 import ConfiguracoesTextos from './ConfiguracoesTextos';
+import ConfiguracoesLogs from './ConfiguracoesLogs';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import Modal from '../components/Modal';
 import './Configuracoes.css';
 
 const Configuracoes = () => {
@@ -13,19 +15,22 @@ const Configuracoes = () => {
     appearance: [],
     general: [],
     content: [],
-    social: []
+    social: [],
+    payment: []
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [validating, setValidating] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [activeTab, setActiveTab] = useState('layout');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState({ title: '', message: '', success: false });
 
   const loadSettings = useCallback(async () => {
     try {
       setLoading(true);
       setMessage({ type: '', text: '' });
       
-      // Verificar se há token antes de fazer a requisição
       const token = localStorage.getItem('access_token');
       if (!token) {
         setMessage({ type: 'error', text: 'Você precisa estar autenticado para acessar esta página. Faça login novamente.' });
@@ -33,113 +38,23 @@ const Configuracoes = () => {
         return;
       }
       
-      // Debug: verificar token e usuário (sempre logar em produção também para debug)
-      const user = localStorage.getItem('user');
-      console.log('[Configuracoes] Verificando autenticação:', {
-        hasToken: !!token,
-        tokenLength: token?.length,
-        hasUser: !!user,
-        userData: user ? JSON.parse(user) : null,
-        isAdmin: isAdmin,
-        isAuthenticated: isAuthenticated
-      });
-      
-      // Tentar revalidar token antes de fazer requisição crítica
-      // Isso garante que o token ainda é válido
-      let tokenIsValid = false;
-      try {
-        console.log('[Configuracoes] Validando token com /auth/me...');
-        const meResponse = await api.get('/auth/me');
-        if (meResponse.data.success) {
-          tokenIsValid = true;
-          console.log('[Configuracoes] ✅ Token válido, usuário autenticado:', meResponse.data.data);
-        }
-      } catch (meError) {
-        // Se /auth/me falhar, o token pode estar inválido
-        console.error('[Configuracoes] ❌ Falha ao validar token com /auth/me:', {
-          status: meError.response?.status,
-          statusText: meError.response?.statusText,
-          data: meError.response?.data,
-          message: meError.message,
-          config: {
-            url: meError.config?.url,
-            baseURL: meError.config?.baseURL,
-            headers: meError.config?.headers
-          }
-        });
-        
-        // Se o token está inválido, não fazer requisição de configurações
-        if (meError.response?.status === 401) {
-          setMessage({ type: 'error', text: 'Sessão expirada. Faça login novamente.' });
-          setLoading(false);
-          return;
-        }
-        // Continuar mesmo assim se for outro tipo de erro (rede, etc)
-      }
-      
-      // Só fazer requisição de configurações se o token foi validado ou se não houve erro crítico
-      console.log('[Configuracoes] Fazendo requisição para /settings...');
       const response = await api.get('/settings');
       
       if (response.data.success) {
-        setSettings(response.data.data);
-        console.log('[Configuracoes] Configurações carregadas com sucesso');
+        setSettings(prev => ({
+          ...prev,
+          ...response.data.data
+        }));
       }
     } catch (error) {
       console.error('[Configuracoes] Erro ao carregar configurações:', error);
-      console.error('[Configuracoes] Detalhes do erro:', {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
-        config: {
-          url: error.config?.url,
-          method: error.config?.method,
-          headers: error.config?.headers,
-          baseURL: error.config?.baseURL
-        }
-      });
       
-      // Tratar diferentes tipos de erro com mensagens amigáveis
       if (error.response?.status === 401) {
-        // Token inválido ou expirado - SEMPRE mostrar mensagem amigável
-        const backendMessage = error.response?.data?.message;
-        
-        // Nunca mostrar "Unauthenticated" diretamente
-        let friendlyMessage = 'Sessão expirada. Faça login novamente.';
-        
-        if (backendMessage && !backendMessage.toLowerCase().includes('unauthenticated')) {
-          friendlyMessage = backendMessage;
-        } else if (backendMessage && backendMessage.includes('Não autenticado')) {
-          friendlyMessage = 'Sessão expirada. Faça login novamente.';
-        }
-        
-        setMessage({ type: 'error', text: friendlyMessage });
-        
-        // Não fazer logout imediato aqui, deixar o interceptor ou ProtectedRoute tratar
+        setMessage({ type: 'error', text: 'Sessão expirada. Faça login novamente.' });
       } else if (error.response?.status === 403) {
-        // Acesso negado (não é admin)
         setMessage({ type: 'error', text: 'Acesso negado. Apenas administradores podem acessar esta página.' });
-      } else if (error.response?.status >= 500) {
-        // Erro do servidor
-        setMessage({ type: 'error', text: 'Erro no servidor. Tente novamente mais tarde.' });
-      } else if (!error.response) {
-        // Erro de rede
-        setMessage({ type: 'error', text: 'Erro de conexão. Verifique sua internet e tente novamente.' });
       } else {
-        // Outros erros - sempre usar mensagem amigável
-        const backendMessage = error.response?.data?.message;
-        
-        // Nunca mostrar "Unauthenticated" ou mensagens técnicas
-        let friendlyMessage = 'Erro ao carregar configurações. Tente novamente.';
-        
-        if (backendMessage && !backendMessage.toLowerCase().includes('unauthenticated')) {
-          friendlyMessage = backendMessage;
-        } else if (error.message && !error.message.toLowerCase().includes('unauthenticated')) {
-          friendlyMessage = error.message;
-        }
-        
-        setMessage({ type: 'error', text: friendlyMessage });
+        setMessage({ type: 'error', text: 'Erro ao carregar configurações. Tente novamente.' });
       }
     } finally {
       setLoading(false);
@@ -147,7 +62,6 @@ const Configuracoes = () => {
   }, [isAdmin, isAuthenticated]);
 
   useEffect(() => {
-    // Só carregar configurações se estiver autenticado e for admin
     if (isAuthenticated && isAdmin) {
       loadSettings();
     } else if (!isAuthenticated) {
@@ -162,12 +76,36 @@ const Configuracoes = () => {
   const handleInputChange = (key, value) => {
     setSettings(prevSettings => {
       const newSettings = { ...prevSettings };
+      let found = false;
+      
+      // Tentar encontrar e atualizar a configuração existente
       Object.keys(newSettings).forEach(group => {
-        const settingIndex = newSettings[group].findIndex(s => s.key === key);
-        if (settingIndex !== -1) {
-          newSettings[group][settingIndex].value = value;
+        if (Array.isArray(newSettings[group])) {
+          const settingIndex = newSettings[group].findIndex(s => s.key === key);
+          if (settingIndex !== -1) {
+            newSettings[group][settingIndex].value = value;
+            found = true;
+          }
         }
       });
+
+      // Se não encontrou (caso de configurações novas como as de pagamento que são mescladas na renderização),
+      // precisamos adicionar ao grupo correto (payment neste caso)
+      if (!found) {
+        // Verificar se é uma chave de pagamento
+        if (key.startsWith('mercadopago_')) {
+          // Se o grupo payment não existir, cria
+          if (!newSettings.payment) newSettings.payment = [];
+          
+          // Adiciona a nova configuração
+          newSettings.payment.push({
+            key: key,
+            value: value,
+            group: 'payment' // Assumindo que o backend usa 'payment' como grupo
+          });
+        }
+      }
+      
       return newSettings;
     });
   };
@@ -177,12 +115,14 @@ const Configuracoes = () => {
       setSaving(true);
       setMessage({ type: '', text: '' });
 
-      // Prepare settings object for batch update
       const settingsToUpdate = {};
+      
       Object.keys(settings).forEach(group => {
-        settings[group].forEach(setting => {
-          settingsToUpdate[setting.key] = setting.value;
-        });
+        if (Array.isArray(settings[group])) {
+          settings[group].forEach(setting => {
+            settingsToUpdate[setting.key] = setting.value;
+          });
+        }
       });
 
       const response = await api.post('/settings/batch', {
@@ -191,7 +131,6 @@ const Configuracoes = () => {
 
       if (response.data.success) {
         setMessage({ type: 'success', text: 'Configurações salvas com sucesso!' });
-        // Reload settings to ensure sync
         await loadSettings();
       }
     } catch (error) {
@@ -199,6 +138,44 @@ const Configuracoes = () => {
       setMessage({ type: 'error', text: 'Erro ao salvar configurações' });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleValidateMercadoPago = async () => {
+    setValidating(true);
+    
+    const paymentList = settings.payment || [];
+    const paymentSettings = paymentList.reduce((acc, setting) => {
+      acc[setting.key] = setting.value;
+      return acc;
+    }, {});
+
+    try {
+      const response = await api.post('/mercadopago/validate', paymentSettings);
+      
+      if (response.data.success) {
+        setModalContent({
+          title: 'Validação bem-sucedida',
+          message: 'As credenciais do Mercado Pago são válidas!',
+          success: true,
+        });
+      } else {
+        setModalContent({
+          title: 'Erro na Validação',
+          message: response.data.message || 'As credenciais do Mercado Pago são inválidas.',
+          success: false,
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao validar Mercado Pago:', error);
+      setModalContent({
+        title: 'Erro na Validação',
+        message: error.response?.data?.message || 'Ocorreu um erro ao tentar validar as credenciais.',
+        success: false,
+      });
+    } finally {
+      setValidating(false);
+      setIsModalOpen(true);
     }
   };
 
@@ -242,6 +219,7 @@ const Configuracoes = () => {
           }}
           className="file-input"
           id={`file-${setting.key}`}
+          name={setting.key}
         />
         <label htmlFor={`file-${setting.key}`} className="file-input-label">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -258,6 +236,8 @@ const Configuracoes = () => {
   const renderTextInput = (setting) => (
     <input
       type="text"
+      id={`input-${setting.key}`}
+      name={setting.key}
       value={setting.value || ''}
       onChange={(e) => handleInputChange(setting.key, e.target.value)}
       className="text-input"
@@ -273,7 +253,7 @@ const Configuracoes = () => {
         {appearanceSettings.map(setting => (
           <div key={setting.key} className="setting-item">
             <div className="setting-header">
-              <label className="setting-label">{setting.description || setting.key}</label>
+              <label className="setting-label" htmlFor={`input-${setting.key}`}>{setting.description || setting.key}</label>
               <span className="setting-key">{setting.key}</span>
             </div>
             {setting.type === 'image' ? renderImageInput(setting) : renderTextInput(setting)}
@@ -291,12 +271,89 @@ const Configuracoes = () => {
         {generalSettings.map(setting => (
           <div key={setting.key} className="setting-item">
             <div className="setting-header">
-              <label className="setting-label">{setting.description || setting.key}</label>
+              <label className="setting-label" htmlFor={`input-${setting.key}`}>{setting.description || setting.key}</label>
               <span className="setting-key">{setting.key}</span>
             </div>
             {renderTextInput(setting)}
           </div>
         ))}
+      </div>
+    );
+  };
+
+  const renderPaymentSettings = () => {
+    const paymentSettings = settings.payment || [];
+    
+    const defaultFields = [
+      { key: 'mercadopago_environment', description: 'Ambiente (Sandbox/Produção)', value: 'sandbox', type: 'select', options: ['sandbox', 'production'] },
+      { key: 'mercadopago_public_key', description: 'Chave Pública (Public Key)', value: '' },
+      { key: 'mercadopago_access_token', description: 'Token de Acesso (Access Token)', value: '' },
+      { key: 'mercadopago_client_id', description: 'Client ID (Opcional)', value: '' },
+      { key: 'mercadopago_client_secret', description: 'Client Secret (Opcional)', value: '' }
+    ];
+
+    // Mesclar configurações existentes com padrão
+    const displaySettings = defaultFields.map(field => {
+      const existing = paymentSettings.find(s => s.key === field.key);
+      // Se existir, usa o valor existente. Se não, usa o valor padrão (vazio ou 'sandbox')
+      // Importante: Se o valor no estado for undefined, o input fica "uncontrolled", o que pode causar problemas.
+      // Garantimos que value nunca seja undefined.
+      return existing ? { ...existing, ...field, value: existing.value } : field;
+    });
+
+    return (
+      <div className="settings-section">
+        <h3>Configurações do Mercado Pago</h3>
+        <p className="section-description">
+          Configure as credenciais de integração com o Mercado Pago para processar pagamentos via Pix e Cartão de Crédito.
+          <br />
+          <small>Para obter suas credenciais, acesse o <a href="https://www.mercadopago.com.br/developers/panel" target="_blank" rel="noopener noreferrer" style={{color: '#4A9FD8'}}>Painel de Desenvolvedores do Mercado Pago</a>.</small>
+        </p>
+        <div className="settings-grid">
+          {displaySettings.map(setting => (
+            <div key={setting.key} className="setting-item">
+              <div className="setting-header">
+                <label className="setting-label" htmlFor={`input-${setting.key}`}>{setting.description}</label>
+                <span className="setting-key">{setting.key}</span>
+              </div>
+              
+              {setting.type === 'select' ? (
+                <select
+                  id={`input-${setting.key}`}
+                  name={setting.key}
+                  value={setting.value || 'sandbox'}
+                  onChange={(e) => handleInputChange(setting.key, e.target.value)}
+                  className="text-input"
+                >
+                  {setting.options.map(option => (
+                    <option key={option} value={option}>
+                      {option === 'sandbox' ? 'Sandbox (Testes)' : 'Produção (Real)'}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  id={`input-${setting.key}`}
+                  name={setting.key}
+                  value={setting.value || ''}
+                  onChange={(e) => handleInputChange(setting.key, e.target.value)}
+                  className="text-input"
+                  placeholder={`Insira ${setting.description}`}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="settings-actions" style={{marginTop: '2rem'}}>
+          <button 
+            className="btn-validate" 
+            onClick={handleValidateMercadoPago}
+            disabled={validating}
+          >
+            {validating ? 'Validando...' : 'Validar Credenciais'}
+          </button>
+        </div>
       </div>
     );
   };
@@ -367,6 +424,26 @@ const Configuracoes = () => {
             </svg>
             Geral
           </button>
+          <button
+            className={`tab-button ${activeTab === 'payment' ? 'active' : ''}`}
+            onClick={() => setActiveTab('payment')}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+              <line x1="1" y1="10" x2="23" y2="10"></line>
+            </svg>
+            Pagamentos
+          </button>
+          <button
+            className={`tab-button ${activeTab === 'logs' ? 'active' : ''}`}
+            onClick={() => setActiveTab('logs')}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+              <polyline points="13 2 13 9 20 9"></polyline>
+            </svg>
+            Logs
+          </button>
         </div>
 
         <div className="settings-content">
@@ -387,6 +464,10 @@ const Configuracoes = () => {
           {activeTab === 'appearance' && renderAppearanceSettings()}
           
           {activeTab === 'general' && renderGeneralSettings()}
+
+          {activeTab === 'payment' && renderPaymentSettings()}
+
+          {activeTab === 'logs' && <ConfiguracoesLogs />}
         </div>
 
         <div className="settings-actions">
@@ -420,6 +501,14 @@ const Configuracoes = () => {
           </button>
         </div>
       </div>
+      
+      <Modal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)}
+        title={modalContent.title}
+      >
+        <p style={{color: modalContent.success ? 'green' : 'red'}}>{modalContent.message}</p>
+      </Modal>
     </AdminLayout>
   );
 };
