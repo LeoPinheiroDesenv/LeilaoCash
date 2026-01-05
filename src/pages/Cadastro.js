@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Cadastro.css';
+import api from '../services/api';
 
 const Cadastro = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
@@ -14,6 +16,8 @@ const Cadastro = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -22,10 +26,39 @@ const Cadastro = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle registration logic here
-    console.log('Cadastro:', formData);
+    setError('');
+    
+    if (formData.senha !== formData.confirmarSenha) {
+      setError('As senhas não coincidem');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await api.post('/auth/register', {
+        name: formData.nome,
+        email: formData.email,
+        password: formData.senha,
+        password_confirmation: formData.confirmarSenha,
+        phone: formData.telefone,
+        cpf: formData.cpf
+      });
+
+      if (response.data.success) {
+        // Armazenar token e redirecionar
+        localStorage.setItem('token', response.data.data.access_token);
+        localStorage.setItem('user', JSON.stringify(response.data.data.user));
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      console.error('Erro no cadastro:', err);
+      setError(err.response?.data?.message || 'Erro ao realizar cadastro. Tente novamente.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const benefits = [
@@ -53,6 +86,8 @@ const Cadastro = () => {
               </div>
             ))}
           </div>
+
+          {error && <div className="error-message" style={{color: 'red', marginBottom: '1rem', textAlign: 'center'}}>{error}</div>}
 
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-row">
@@ -213,12 +248,14 @@ const Cadastro = () => {
                 <span>Li e aceito os <Link to="/termos">Termos de Uso</Link> e <Link to="/privacidade">Política de Privacidade</Link></span>
               </label>
             </div>
-            <button type="submit" className="btn-submit" disabled={!acceptTerms}>
-              Criar Conta
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="5" y1="12" x2="19" y2="12"/>
-                <polyline points="12 5 19 12 12 19"/>
-              </svg>
+            <button type="submit" className="btn-submit" disabled={!acceptTerms || loading}>
+              {loading ? 'Criando conta...' : 'Criar Conta'}
+              {!loading && (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                  <polyline points="12 5 19 12 12 19"/>
+                </svg>
+              )}
             </button>
           </form>
           <p className="auth-footer">
@@ -231,4 +268,3 @@ const Cadastro = () => {
 };
 
 export default Cadastro;
-
