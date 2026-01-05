@@ -3,12 +3,16 @@ import { Link } from 'react-router-dom';
 import Countdown from '../components/Countdown';
 import UserLayout from '../components/UserLayout';
 import Modal from '../components/Modal';
+import api from '../services/api';
 import './DashboardUsuario.css';
 
 const DashboardUsuario = () => {
   const [isBuyCreditsModalOpen, setIsBuyCreditsModalOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(null); // 'credit_card' or 'pix'
   const [creditAmount, setCreditAmount] = useState('');
+  const [pixData, setPixData] = useState(null);
+  const [loadingPix, setLoadingPix] = useState(false);
+  const [pixError, setPixError] = useState('');
 
   const activeAuctions = [
     {
@@ -52,16 +56,49 @@ const DashboardUsuario = () => {
     setIsBuyCreditsModalOpen(true);
     setPaymentMethod(null);
     setCreditAmount('');
+    setPixData(null);
+    setPixError('');
   };
 
   const handleCloseBuyCredits = () => {
     setIsBuyCreditsModalOpen(false);
     setPaymentMethod(null);
     setCreditAmount('');
+    setPixData(null);
+    setPixError('');
   };
 
   const handleSelectPaymentMethod = (method) => {
     setPaymentMethod(method);
+    setPixData(null);
+    setPixError('');
+  };
+
+  const handleGeneratePix = async () => {
+    if (!creditAmount || creditAmount <= 0) {
+      setPixError('Informe um valor válido para recarga.');
+      return;
+    }
+
+    try {
+      setLoadingPix(true);
+      setPixError('');
+      
+      const response = await api.post('/payments/pix', {
+        amount: parseFloat(creditAmount)
+      });
+
+      if (response.data.success) {
+        setPixData(response.data.data);
+      } else {
+        setPixError(response.data.message || 'Erro ao gerar Pix.');
+      }
+    } catch (error) {
+      console.error('Erro ao gerar Pix:', error);
+      setPixError(error.response?.data?.message || 'Erro ao processar pagamento. Verifique as configurações do Mercado Pago.');
+    } finally {
+      setLoadingPix(false);
+    }
   };
 
   return (
@@ -310,7 +347,8 @@ const DashboardUsuario = () => {
                     ← Voltar
                   </button>
                   <h3>Pagamento via Pix</h3>
-                  {!creditAmount ? (
+                  {pixError && <div className="alert alert-error" style={{marginBottom: '1rem', padding: '0.8rem', fontSize: '0.9rem'}}>{pixError}</div>}
+                  {!pixData ? (
                      <div className="form-group">
                       <label>Valor da Recarga (R$)</label>
                       <div className="input-with-button">
@@ -322,28 +360,34 @@ const DashboardUsuario = () => {
                         />
                         <button 
                           className="btn-generate-pix"
-                          onClick={() => {/* Lógica para gerar QR Code */}}
-                          disabled={!creditAmount}
+                          onClick={handleGeneratePix}
+                          disabled={!creditAmount || loadingPix}
                         >
-                          Gerar Pix
+                          {loadingPix ? 'Gerando...' : 'Gerar Pix'}
                         </button>
                       </div>
                     </div>
                   ) : (
                     <div className="pix-content">
                       <p>Escaneie o QR Code abaixo para pagar:</p>
-                      <div className="qr-code-placeholder">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg" alt="QR Code Pix" />
+                      <div className="qr-code-placeholder" style={{ background: '#fff', padding: '10px', borderRadius: '8px' }}>
+                        <img src={`data:image/png;base64,${pixData.qr_code_base64}`} alt="QR Code Pix" style={{ width: '100%', height: 'auto' }} />
                       </div>
                       <div className="pix-copy-paste">
                         <label>Código Pix Copia e Cola</label>
                         <div className="copy-paste-input">
-                          <input type="text" value="00020126580014br.gov.bcb.pix0136123e4567-e89b-12d3-a456-426614174000520400005303986540410.005802BR5913Fulano de Tal6008BRASILIA62070503***6304E2CA" readOnly />
-                          <button onClick={() => navigator.clipboard.writeText("00020126580014br.gov.bcb.pix0136123e4567-e89b-12d3-a456-426614174000520400005303986540410.005802BR5913Fulano de Tal6008BRASILIA62070503***6304E2CA")}>
+                          <input type="text" value={pixData.qr_code} readOnly />
+                          <button onClick={() => {
+                            navigator.clipboard.writeText(pixData.qr_code);
+                            alert('Código copiado!');
+                          }}>
                             Copiar
                           </button>
                         </div>
                       </div>
+                      <p style={{ marginTop: '1rem', fontSize: '0.8rem', textAlign: 'center', color: '#666' }}>
+                        O pagamento será processado automaticamente após a confirmação.
+                      </p>
                     </div>
                   )}
                 </div>

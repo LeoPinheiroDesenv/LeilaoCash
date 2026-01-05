@@ -92,7 +92,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Calcular isAdmin de forma mais robusta
-  const isAdmin = user ? (user.is_admin === 1 || user.is_admin === true) : false;
+  const isAdmin = user ? (user.is_admin === 1 || user.is_admin === true || user.is_admin === '1') : false;
 
   const value = {
     user,
@@ -109,4 +109,3 @@ export const AuthProvider = ({ children }) => {
 };
 
 export default AuthContext;
-

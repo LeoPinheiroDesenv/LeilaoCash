@@ -198,6 +198,7 @@ Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
 
         // Mercado Pago
         Route::post('/mercadopago/validate', [\App\Http\Controllers\Api\PaymentController::class, 'validateMercadoPago']);
+        Route::post('/payments/pix', [\App\Http\Controllers\Api\PaymentController::class, 'createPixPayment']);
     });
 });
 

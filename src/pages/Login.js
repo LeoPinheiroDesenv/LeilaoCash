@@ -20,25 +20,16 @@ const Login = () => {
   // Redirecionar se já estiver autenticado
   useEffect(() => {
     if (isAuthenticated && user) {
-      // Se veio de uma página específica, voltar para ela
-      if (from) {
-        navigate(from, { replace: true });
+      // Verificar se é admin (pode ser 1, true ou "1")
+      const isAdmin = user.is_admin === 1 || user.is_admin === true || user.is_admin === '1';
+
+      if (isAdmin) {
+        navigate('/dashboard-admin', { replace: true });
       } else {
-        // Verificar se é admin (pode ser 1, true ou "1")
-        const isAdmin = user.is_admin === 1 || user.is_admin === true || user.is_admin === '1';
-
-
-
-        if (isAdmin) {
-
-          navigate('/dashboard-admin', { replace: true });
-        } else {
-          navigate('/dashboard-usuario', { replace: true });
-        }
-
+        navigate('/dashboard-usuario', { replace: true });
       }
     }
-  }, [isAuthenticated, user, navigate, from]);
+  }, [isAuthenticated, user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -48,10 +48,19 @@ const Cadastro = () => {
       });
 
       if (response.data.success) {
-        // Armazenar token e redirecionar
-        localStorage.setItem('token', response.data.data.access_token);
+        // Armazenar token e usuário
+        localStorage.setItem('access_token', response.data.data.access_token);
         localStorage.setItem('user', JSON.stringify(response.data.data.user));
-        navigate('/dashboard');
+        
+        // Redirecionar baseado no perfil (embora cadastro padrão costume ser usuário comum)
+        const user = response.data.data.user;
+        const isAdmin = user.is_admin === 1 || user.is_admin === true || user.is_admin === '1';
+        
+        if (isAdmin) {
+          navigate('/dashboard-admin');
+        } else {
+          navigate('/dashboard-usuario');
+        }
       }
     } catch (err) {
       console.error('Erro no cadastro:', err);
