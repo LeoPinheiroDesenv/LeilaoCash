@@ -55,40 +55,20 @@ export const ThemeProvider = ({ children }) => {
 
   const loadSettings = async () => {
     try {
-      // Verifica se o usuário está autenticado e é admin
-      const token = localStorage.getItem('access_token');
-      const userStr = localStorage.getItem('user');
-      
-      if (!token || !userStr) {
-        // Não autenticado - usa configurações padrão
-        console.log('[Theme] Usuário não autenticado, usando configurações padrão');
-        applyTheme(settings);
-        setLoading(false);
-        return;
-      }
-
-      const user = JSON.parse(userStr);
-      if (user.is_admin !== 1) {
-        // Não é admin - usa configurações padrão
-        console.log('[Theme] Usuário não é admin, usando configurações padrão');
-        applyTheme(settings);
-        setLoading(false);
-        return;
-      }
-
-      // É admin - tenta carregar da API
-      console.log('[Theme] Carregando configurações da API...');
+      console.log('[Theme] Carregando configurações públicas da API...');
       const response = await api.get('/settings/public');
       if (response.data.success) {
         console.log('[Theme] Configurações carregadas com sucesso');
-        setSettings(prevSettings => ({
-          ...prevSettings,
-          ...response.data.data
-        }));
-        applyTheme(response.data.data);
+        const newSettings = { ...settings, ...response.data.data };
+        setSettings(newSettings);
+        applyTheme(newSettings);
+      } else {
+        // Se a API retornar success: false, usa o padrão
+        console.warn('[Theme] API retornou success: false, usando configurações padrão.');
+        applyTheme(settings);
       }
     } catch (error) {
-      // Em caso de erro (401, 403, rede, etc), usa configurações padrão
+      // Em caso de erro (404, rede, etc), usa configurações padrão
       console.warn('[Theme] Erro ao carregar configurações, usando padrão:', error.message);
       applyTheme(settings);
     } finally {
@@ -209,4 +189,3 @@ export const ThemeProvider = ({ children }) => {
 };
 
 export default ThemeContext;
-

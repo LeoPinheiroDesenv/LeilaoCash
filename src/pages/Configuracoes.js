@@ -5,11 +5,13 @@ import ConfiguracoesTextos from './ConfiguracoesTextos';
 import ConfiguracoesLogs from './ConfiguracoesLogs';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import Modal from '../components/Modal';
 import './Configuracoes.css';
 
 const Configuracoes = () => {
   const { isAuthenticated, isAdmin } = useAuth();
+  const { refreshTheme } = useTheme();
   const [settings, setSettings] = useState({
     theme: [],
     appearance: [],
@@ -132,6 +134,8 @@ const Configuracoes = () => {
       if (response.data.success) {
         setMessage({ type: 'success', text: 'Configurações salvas com sucesso!' });
         await loadSettings();
+        // Atualiza o tema globalmente
+        await refreshTheme();
       }
     } catch (error) {
       console.error('Erro ao salvar configurações:', error);
@@ -194,6 +198,7 @@ const Configuracoes = () => {
       if (response.data.success) {
         setMessage({ type: 'success', text: 'Imagem enviada com sucesso!' });
         await loadSettings();
+        await refreshTheme();
       }
     } catch (error) {
       console.error('Erro ao enviar imagem:', error);

@@ -1,8 +1,8 @@
 .user-dashboard {
   min-height: 100vh;
-  background: #071026;
-  color: #e6eef8;
-  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
 }
 
 .dashboard-header {
@@ -36,7 +36,7 @@
 .logo-icon {
   width: 32px;
   height: 32px;
-  background: linear-gradient(135deg, #E55F52, #4A9FD8);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -49,8 +49,8 @@
 .logo-text {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  color: var(--color-text);
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .header-nav {
@@ -65,11 +65,11 @@
   font-weight: 400;
   font-size: 16px;
   transition: color 0.2s;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
 }
 
 .header-nav a:hover {
-  color: #e6eef8;
+  color: var(--color-text);
 }
 
 .header-actions {
@@ -86,7 +86,7 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  color: #e6eef8;
+  color: var(--color-text);
   font-weight: 600;
   font-size: 14px;
 }
@@ -104,7 +104,7 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  color: #e6eef8;
+  color: var(--color-text);
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
@@ -119,7 +119,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #E55F52, #4A9FD8);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -137,7 +137,7 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  color: #e6eef8;
+  color: var(--color-text);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -185,12 +185,12 @@
 
 .nav-item:hover {
   background: rgba(255, 255, 255, 0.05);
-  color: #e6eef8;
+  color: var(--color-text);
 }
 
 .nav-item.active {
   background: rgba(107, 91, 255, 0.1);
-  color: #4A9FD8;
+  color: var(--color-secondary);
 }
 
 .nav-item svg {
@@ -220,8 +220,8 @@
   margin: 0 0 8px 0;
   font-size: 32px;
   font-weight: 700;
-  color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  color: var(--color-text);
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .welcome-text p {
@@ -235,7 +235,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(90deg, #E55F52, #4A9FD8);
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
   color: #fff;
   border: none;
   border-radius: 12px;
@@ -243,7 +243,7 @@
   font-size: 16px;
   text-decoration: none;
   transition: transform 0.2s, box-shadow 0.2s;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
 }
 
 .btn-buy-credits:hover {
@@ -294,8 +294,8 @@
   margin: 0 0 8px 0;
   font-size: 32px;
   font-weight: 700;
-  color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  color: var(--color-text);
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .stat-description {
@@ -325,7 +325,7 @@
 .stat-icon {
   width: 48px;
   height: 48px;
-  color: #4A9FD8;
+  color: var(--color-secondary);
   opacity: 0.7;
 }
 
@@ -337,8 +337,8 @@
   margin: 0 0 24px 0;
   font-size: 24px;
   font-weight: 700;
-  color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  color: var(--color-text);
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .actions-grid {
@@ -357,7 +357,7 @@
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.05);
   text-decoration: none;
-  color: #e6eef8;
+  color: var(--color-text);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -370,7 +370,7 @@
 .action-card svg {
   width: 32px;
   height: 32px;
-  color: #4A9FD8;
+  color: var(--color-secondary);
 }
 
 .action-card span {
@@ -393,24 +393,24 @@
   margin: 0;
   font-size: 24px;
   font-weight: 700;
-  color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  color: var(--color-text);
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .btn-ver-todos {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #4A9FD8;
+  color: var(--color-secondary);
   text-decoration: none;
   font-weight: 500;
   font-size: 14px;
   transition: color 0.2s;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
 }
 
 .btn-ver-todos:hover {
-  color: #E55F52;
+  color: var(--color-primary);
 }
 
 .auctions-grid {
@@ -499,7 +499,7 @@
   font-weight: 700;
   font-size: 12px;
   font-variant-numeric: tabular-nums;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
   z-index: 2;
 }
 
@@ -511,8 +511,8 @@
   margin: 0 0 12px 0;
   font-size: 18px;
   font-weight: 600;
-  color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  color: var(--color-text);
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .price-row {
@@ -557,19 +557,19 @@
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 10px;
-  color: #e6eef8;
+  color: var(--color-text);
   font-weight: 500;
   text-align: center;
   text-decoration: none;
   transition: all 0.2s;
   font-size: 14px;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
 }
 
 .btn-ver-leilao:hover {
   background: rgba(255, 255, 255, 0.05);
   border-color: rgba(74, 159, 216, 0.5);
-  color: #4A9FD8;
+  color: var(--color-secondary);
 }
 
 .profile-section {
@@ -592,7 +592,7 @@
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #E55F52, #4A9FD8);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -608,7 +608,7 @@
   right: 0;
   width: 40px;
   height: 40px;
-  background: linear-gradient(90deg, #E55F52, #4A9FD8);
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
   border: none;
   border-radius: 50%;
   color: #fff;
@@ -631,8 +631,8 @@
   margin: 0 0 8px 0;
   font-size: 24px;
   font-weight: 700;
-  color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  color: var(--color-text);
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .profile-info p {
@@ -660,12 +660,12 @@
   margin: 0;
   font-size: 20px;
   font-weight: 700;
-  color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  color: var(--color-text);
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .section-header-form svg {
-  color: #4A9FD8;
+  color: var(--color-secondary);
 }
 
 .form-grid {
@@ -685,7 +685,7 @@
   font-size: 14px;
   font-weight: 500;
   color: #9fb0c8;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
 }
 
 .form-group input {
@@ -693,9 +693,9 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  color: #e6eef8;
+  color: var(--color-text);
   font-size: 14px;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
   transition: all 0.2s;
 }
 
@@ -733,7 +733,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(90deg, #E55F52, #4A9FD8);
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -741,7 +741,7 @@
   font-size: 14px;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
 }
 
 .btn-save:hover {
@@ -768,8 +768,8 @@
   margin: 0 0 8px 0;
   font-size: 32px;
   font-weight: 700;
-  color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  color: var(--color-text);
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .stat-label {
@@ -786,8 +786,8 @@
   margin: 0 0 24px 0;
   font-size: 24px;
   font-weight: 700;
-  color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  color: var(--color-text);
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .bids-list {
@@ -842,8 +842,8 @@
   margin: 0 0 4px 0;
   font-size: 18px;
   font-weight: 600;
-  color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  color: var(--color-text);
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .bid-date {
@@ -888,8 +888,8 @@
   margin: 0;
   font-size: 18px;
   font-weight: 700;
-  color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  color: var(--color-text);
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .bid-timer {
@@ -903,7 +903,7 @@
   font-weight: 700;
   font-size: 14px;
   font-variant-numeric: tabular-nums;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .btn-ver-leilao-bid {
@@ -916,18 +916,18 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-top: none;
-  color: #e6eef8;
+  color: var(--color-text);
   text-decoration: none;
   font-weight: 500;
   font-size: 14px;
   transition: all 0.2s;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
 }
 
 .btn-ver-leilao-bid:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(74, 159, 216, 0.5);
-  color: #4A9FD8;
+  color: var(--color-secondary);
 }
 
 .cashback-balance-section {
@@ -954,8 +954,8 @@
   margin: 0;
   font-size: 48px;
   font-weight: 700;
-  color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  color: var(--color-text);
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .balance-cards-secondary {
@@ -978,7 +978,7 @@
 .balance-card-secondary svg {
   width: 32px;
   height: 32px;
-  color: #4A9FD8;
+  color: var(--color-secondary);
   flex-shrink: 0;
 }
 
@@ -992,8 +992,8 @@
   margin: 0;
   font-size: 20px;
   font-weight: 700;
-  color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  color: var(--color-text);
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .withdraw-section {
@@ -1013,7 +1013,7 @@
   font-size: 14px;
   font-weight: 500;
   color: #9fb0c8;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
 }
 
 .input-with-prefix {
@@ -1038,10 +1038,10 @@
   padding: 12px 16px;
   background: transparent;
   border: none;
-  color: #e6eef8;
+  color: var(--color-text);
   font-size: 16px;
   font-weight: 600;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
 }
 
 .input-with-prefix input:focus {
@@ -1063,7 +1063,7 @@
   font-size: 16px;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
 }
 
 .btn-withdraw:hover {
@@ -1084,7 +1084,7 @@
 .info-card svg {
   width: 48px;
   height: 48px;
-  color: #4A9FD8;
+  color: var(--color-secondary);
   flex-shrink: 0;
 }
 
@@ -1092,8 +1092,8 @@
   margin: 0 0 8px 0;
   font-size: 18px;
   font-weight: 700;
-  color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  color: var(--color-text);
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .info-card p {
@@ -1136,7 +1136,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #4A9FD8;
+  color: var(--color-secondary);
   flex-shrink: 0;
 }
 
@@ -1148,7 +1148,7 @@
   margin: 0 0 4px 0;
   font-size: 14px;
   font-weight: 500;
-  color: #e6eef8;
+  color: var(--color-text);
 }
 
 .history-date {
@@ -1160,7 +1160,7 @@
 .history-amount {
   font-size: 16px;
   font-weight: 700;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .history-amount.credit {
@@ -1193,19 +1193,19 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  color: #e6eef8;
+  color: var(--color-text);
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .payment-option-btn:hover {
   background: rgba(255, 255, 255, 0.1);
-  border-color: #4A9FD8;
+  border-color: var(--color-secondary);
   transform: translateY(-2px);
 }
 
 .payment-option-btn svg {
-  color: #4A9FD8;
+  color: var(--color-secondary);
 }
 
 .payment-option-btn span {
@@ -1226,13 +1226,13 @@
 }
 
 .btn-back:hover {
-  color: #e6eef8;
+  color: var(--color-text);
 }
 
 .credit-card-form h3, .pix-payment h3 {
   margin: 0 0 24px 0;
-  color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  color: var(--color-text);
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .form-row {
@@ -1270,7 +1270,7 @@
 
 .btn-generate-pix {
   padding: 0 20px;
-  background: #4A9FD8;
+  background: var(--color-secondary);
   color: white;
   border: none;
   border-radius: 8px;
@@ -1326,7 +1326,7 @@
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  color: #e6eef8;
+  color: var(--color-text);
   cursor: pointer;
 }
 

@@ -19,10 +19,10 @@ const UserLayout = ({ children }) => {
   const logoSrc = getLogoUrl();
   
   const menuItems = [
-    { path: '/dashboard-usuario', label: 'Dashboard', icon: 'dashboard' },
-    { path: '/dashboard-usuario/minha-conta', label: 'Minha Conta', icon: 'account' },
-    { path: '/dashboard-usuario/meus-lances', label: 'Meus Lances', icon: 'bids' },
-    { path: '/dashboard-usuario/meu-cashback', label: 'Meu Cashback', icon: 'cashback' }
+    { path: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
+    { path: '/dashboard/minha-conta', label: 'Minha Conta', icon: 'account' },
+    { path: '/dashboard/meus-lances', label: 'Meus Lances', icon: 'bids' },
+    { path: '/dashboard/meu-cashback', label: 'Meu Cashback', icon: 'cashback' }
   ];
 
   const getIcon = (iconName) => {
@@ -117,4 +117,3 @@ const UserLayout = ({ children }) => {
 };
 
 export default UserLayout;
-

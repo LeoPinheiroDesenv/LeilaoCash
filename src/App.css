@@ -55,7 +55,7 @@
   gap: 12px;
   font-weight: 700;
   line-height: 32px;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .section-icon {
@@ -81,7 +81,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-primary, 'Inter', sans-serif);
 }
 
 .btn-see-all:hover {
@@ -182,7 +182,7 @@
   margin: 0 0 16px 0;
   color: #e6eef8;
   font-weight: 800;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .cta-section p {
@@ -343,12 +343,9 @@
 }
 
 body {
-  background: #071026;
+  background: var(--color-background);
   margin: 0;
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--font-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-

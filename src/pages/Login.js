@@ -15,21 +15,14 @@ const Login = () => {
   const location = useLocation();
 
   // Obter a rota de origem (se houver) para redirecionar após login
-  const from = location.state?.from || null;
+  const from = location.state?.from || '/dashboard';
 
   // Redirecionar se já estiver autenticado
   useEffect(() => {
     if (isAuthenticated && user) {
-      // Verificar se é admin (pode ser 1, true ou "1")
-      const isAdmin = user.is_admin === 1 || user.is_admin === true || user.is_admin === '1';
-
-      if (isAdmin) {
-        navigate('/dashboard-admin', { replace: true });
-      } else {
-        navigate('/dashboard-usuario', { replace: true });
-      }
+      navigate(from, { replace: true });
     }
-  }, [isAuthenticated, user, navigate]);
+  }, [isAuthenticated, user, navigate, from]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

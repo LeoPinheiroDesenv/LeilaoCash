@@ -140,7 +140,7 @@ class ProductController extends Controller
                 $image = $request->file('image');
                 $imageName = 'product_' . time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
                 $image->move(public_path('uploads/products'), $imageName);
-                $data['image_url'] = '/uploads/products/' . $imageName;
+                $data['image_url'] = 'https://api.vibeget.net/uploads/products/' . $imageName;
             }
 
             // Upload de imagens adicionais (até 5)
@@ -156,7 +156,7 @@ class ProductController extends Controller
                     if ($img && $img->isValid()) {
                         $imageName = 'product_' . time() . '_' . uniqid() . '_' . $index . '.' . $img->getClientOriginalExtension();
                         $img->move(public_path('uploads/products'), $imageName);
-                        $uploadedImages[] = '/uploads/products/' . $imageName;
+                        $uploadedImages[] = 'https://api.vibeget.net/uploads/products/' . $imageName;
                     }
                 }
             }
@@ -254,7 +254,7 @@ class ProductController extends Controller
                 $image = $request->file('image');
                 $imageName = 'product_' . time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
                 $image->move(public_path('uploads/products'), $imageName);
-                $data['image_url'] = '/uploads/products/' . $imageName;
+                $data['image_url'] = 'https://api.vibeget.net/uploads/products/' . $imageName;
             }
 
             // Upload de imagens adicionais (até 5)
@@ -270,7 +270,7 @@ class ProductController extends Controller
                     if ($img && $img->isValid()) {
                         $imageName = 'product_' . time() . '_' . uniqid() . '_' . $index . '.' . $img->getClientOriginalExtension();
                         $img->move(public_path('uploads/products'), $imageName);
-                        $uploadedImages[] = '/uploads/products/' . $imageName;
+                        $uploadedImages[] = 'https://api.vibeget.net/uploads/products/' . $imageName;
                     }
                 }
             }

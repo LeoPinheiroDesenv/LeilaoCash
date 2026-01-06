@@ -16,8 +16,7 @@ import Privacidade from './pages/Privacidade';
 import Regras from './pages/Regras';
 import RecuperarSenha from './pages/RecuperarSenha';
 import SubaDeNivel from './pages/SubaDeNivel';
-import DashboardAdmin from './pages/DashboardAdmin';
-import DashboardUsuario from './pages/DashboardUsuario';
+import Dashboard from './pages/Dashboard'; // Importa o novo componente
 import Configuracoes from './pages/Configuracoes';
 import Usuarios from './pages/Usuarios';
 import Categorias from './pages/Categorias';
@@ -34,8 +33,6 @@ import {
   DashboardUsuarioMeusLances,
   DashboardUsuarioMeuCashback
 } from './pages/DashboardUsuarioPages';
-// Produtos estáticos removidos - agora buscamos da API via HomePage component
-// HomePage está em src/components/HomePage.js
 
 function App() {
   return (
@@ -49,75 +46,72 @@ function App() {
             <Route path="/cadastro" element={<Cadastro />} />
             <Route path="/recuperar-senha" element={<RecuperarSenha />} />
             
-            {/* Rotas protegidas - Admin apenas */}
-            <Route path="/dashboard-admin" element={
-              <ProtectedRoute adminOnly={true}>
-                <DashboardAdmin />
+            {/* Rota Unificada do Dashboard */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
               </ProtectedRoute>
             } />
-            <Route path="/dashboard-admin/usuarios" element={
+
+            {/* Sub-rotas do Dashboard (Admin) */}
+            <Route path="/dashboard/usuarios" element={
               <ProtectedRoute adminOnly={true}>
                 <Usuarios />
               </ProtectedRoute>
             } />
-            <Route path="/dashboard-admin/categorias" element={
+            <Route path="/dashboard/categorias" element={
               <ProtectedRoute adminOnly={true}>
                 <Categorias />
               </ProtectedRoute>
             } />
-            <Route path="/dashboard-admin/produtos" element={
+            <Route path="/dashboard/produtos" element={
               <ProtectedRoute adminOnly={true}>
                 <Produtos />
               </ProtectedRoute>
             } />
-            <Route path="/dashboard-admin/leiloes" element={
+            <Route path="/dashboard/leiloes" element={
               <ProtectedRoute adminOnly={true}>
                 <Leiloes />
               </ProtectedRoute>
             } />
-            <Route path="/dashboard-admin/lances" element={
+            <Route path="/dashboard/lances" element={
               <ProtectedRoute adminOnly={true}>
                 <DashboardAdminLances />
               </ProtectedRoute>
             } />
-            <Route path="/dashboard-admin/cashback" element={
+            <Route path="/dashboard/cashback" element={
               <ProtectedRoute adminOnly={true}>
                 <DashboardAdminCashback />
               </ProtectedRoute>
             } />
-            <Route path="/dashboard-admin/transacoes" element={
+            <Route path="/dashboard/transacoes" element={
               <ProtectedRoute adminOnly={true}>
                 <DashboardAdminTransacoes />
               </ProtectedRoute>
             } />
-            <Route path="/dashboard-admin/relatorios" element={
+            <Route path="/dashboard/relatorios" element={
               <ProtectedRoute adminOnly={true}>
                 <DashboardAdminRelatorios />
               </ProtectedRoute>
             } />
-            <Route path="/dashboard-admin/configuracoes" element={
+            <Route path="/dashboard/configuracoes" element={
               <ProtectedRoute adminOnly={true}>
                 <Configuracoes />
               </ProtectedRoute>
             } />
             
-            {/* Rotas protegidas - Usuários */}
-            <Route path="/dashboard-usuario" element={
-              <ProtectedRoute>
-                <DashboardUsuario />
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard-usuario/minha-conta" element={
+            {/* Sub-rotas do Dashboard (Usuário) */}
+            <Route path="/dashboard/minha-conta" element={
               <ProtectedRoute>
                 <DashboardUsuarioMinhaConta />
               </ProtectedRoute>
             } />
-            <Route path="/dashboard-usuario/meus-lances" element={
+            <Route path="/dashboard/meus-lances" element={
               <ProtectedRoute>
                 <DashboardUsuarioMeusLances />
               </ProtectedRoute>
             } />
-            <Route path="/dashboard-usuario/meu-cashback" element={
+            <Route path="/dashboard/meu-cashback" element={
               <ProtectedRoute>
                 <DashboardUsuarioMeuCashback />
               </ProtectedRoute>
