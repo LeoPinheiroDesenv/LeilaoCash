@@ -166,7 +166,7 @@ const DashboardAdmin = () => {
         <div className="section-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
             <h3>Leilões Recentes</h3>
-            <Link to="/dashboard-admin/leiloes" style={{ color: '#4A9FD8', textDecoration: 'none', fontSize: '0.9rem' }}>
+            <Link to="/dashboard/leiloes" style={{ color: '#4A9FD8', textDecoration: 'none', fontSize: '0.9rem' }}>
               Ver todos →
             </Link>
           </div>

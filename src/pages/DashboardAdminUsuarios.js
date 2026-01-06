@@ -13,7 +13,7 @@ const DashboardAdminUsuarios = () => {
           </Link>
         </div>
         <nav className="sidebar-nav">
-          <Link to="/dashboard-admin" className="nav-item">
+          <Link to="/dashboard" className="nav-item">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect width="7" height="9" x="3" y="3" rx="1"></rect>
               <rect width="7" height="5" x="14" y="3" rx="1"></rect>
@@ -22,7 +22,7 @@ const DashboardAdminUsuarios = () => {
             </svg>
             <span>Dashboard</span>
           </Link>
-          <Link to="/dashboard-admin/usuarios" className="nav-item active">
+          <Link to="/dashboard/usuarios" className="nav-item active">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
               <circle cx="9" cy="7" r="4"></circle>
@@ -31,14 +31,14 @@ const DashboardAdminUsuarios = () => {
             </svg>
             <span>Usuários</span>
           </Link>
-          <Link to="/dashboard-admin/produtos" className="nav-item">
+          <Link to="/dashboard/produtos" className="nav-item">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect width="20" height="14" x="2" y="5" rx="2"></rect>
               <path d="M2 10h20"></path>
             </svg>
             <span>Produtos</span>
           </Link>
-          <Link to="/dashboard-admin/leiloes" className="nav-item">
+          <Link to="/dashboard/leiloes" className="nav-item">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
               <path d="M3 6h18"></path>
@@ -46,7 +46,7 @@ const DashboardAdminUsuarios = () => {
             </svg>
             <span>Leilões</span>
           </Link>
-          <Link to="/dashboard-admin/lances" className="nav-item">
+          <Link to="/dashboard/lances" className="nav-item">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="m14.5 12.5-8 8a2.119 2.119 0 1 1-3-3l8-8"></path>
               <path d="m16 16 6-6"></path>
@@ -56,21 +56,21 @@ const DashboardAdminUsuarios = () => {
             </svg>
             <span>Lances</span>
           </Link>
-          <Link to="/dashboard-admin/cashback" className="nav-item">
+          <Link to="/dashboard/cashback" className="nav-item">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path>
               <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path>
             </svg>
             <span>Cashback</span>
           </Link>
-          <Link to="/dashboard-admin/transacoes" className="nav-item">
+          <Link to="/dashboard/transacoes" className="nav-item">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="12" y1="2" x2="12" y2="22"></line>
               <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
             </svg>
             <span>Transações</span>
           </Link>
-          <Link to="/dashboard-admin/relatorios" className="nav-item">
+          <Link to="/dashboard/relatorios" className="nav-item">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 3v18h18"></path>
               <path d="m19 9-5 5-4-4-3 3"></path>

@@ -80,7 +80,6 @@ const Configuracoes = () => {
       const newSettings = { ...prevSettings };
       let found = false;
       
-      // Tentar encontrar e atualizar a configuração existente
       Object.keys(newSettings).forEach(group => {
         if (Array.isArray(newSettings[group])) {
           const settingIndex = newSettings[group].findIndex(s => s.key === key);
@@ -91,20 +90,16 @@ const Configuracoes = () => {
         }
       });
 
-      // Se não encontrou (caso de configurações novas como as de pagamento que são mescladas na renderização),
-      // precisamos adicionar ao grupo correto (payment neste caso)
       if (!found) {
-        // Verificar se é uma chave de pagamento
-        if (key.startsWith('mercadopago_')) {
-          // Se o grupo payment não existir, cria
-          if (!newSettings.payment) newSettings.payment = [];
-          
-          // Adiciona a nova configuração
-          newSettings.payment.push({
-            key: key,
-            value: value,
-            group: 'payment' // Assumindo que o backend usa 'payment' como grupo
-          });
+        const groupName = key.split('_')[0]; // e.g., 'mercadopago' -> 'payment'
+        const groupKey = groupName === 'mercadopago' ? 'payment' : groupName;
+
+        if (newSettings[groupKey]) {
+            if (!newSettings[groupKey].some(s => s.key === key)) {
+                 newSettings[groupKey].push({ key, value, group: groupKey });
+            }
+        } else {
+             newSettings[groupKey] = [{ key, value, group: groupKey }];
         }
       }
       
@@ -134,7 +129,6 @@ const Configuracoes = () => {
       if (response.data.success) {
         setMessage({ type: 'success', text: 'Configurações salvas com sucesso!' });
         await loadSettings();
-        // Atualiza o tema globalmente
         await refreshTheme();
       }
     } catch (error) {
@@ -297,12 +291,8 @@ const Configuracoes = () => {
       { key: 'mercadopago_client_secret', description: 'Client Secret (Opcional)', value: '' }
     ];
 
-    // Mesclar configurações existentes com padrão
     const displaySettings = defaultFields.map(field => {
       const existing = paymentSettings.find(s => s.key === field.key);
-      // Se existir, usa o valor existente. Se não, usa o valor padrão (vazio ou 'sandbox')
-      // Importante: Se o valor no estado for undefined, o input fica "uncontrolled", o que pode causar problemas.
-      // Garantimos que value nunca seja undefined.
       return existing ? { ...existing, ...field, value: existing.value } : field;
     });
 

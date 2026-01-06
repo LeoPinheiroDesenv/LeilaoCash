@@ -491,7 +491,7 @@ const ProductPage = () => {
                   </svg>
                 </button>
                 {isAuthenticated ? (
-                  <Link to="/dashboard-usuario" className="action-btn credits">
+                  <Link to="/dashboard" className="action-btn credits">
                     Comprar Créditos
                   </Link>
                 ) : (

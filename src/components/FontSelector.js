@@ -13,6 +13,8 @@ const GOOGLE_FONTS = [
   { name: 'Ubuntu', family: 'Ubuntu', category: 'Sans Serif' },
   { name: 'Nunito', family: 'Nunito', category: 'Sans Serif' },
   { name: 'Source Sans Pro', family: 'Source Sans Pro', category: 'Sans Serif' },
+  { name: 'Barlow', family: 'Barlow', category: 'Sans Serif' },
+  { name: 'Saira', family: 'Saira', category: 'Sans Serif' },
   { name: 'Playfair Display', family: 'Playfair Display', category: 'Serif' },
   { name: 'Merriweather', family: 'Merriweather', category: 'Serif' },
   { name: 'Lora', family: 'Lora', category: 'Serif' },
@@ -184,4 +186,3 @@ const FontSelector = ({ value, onChange, placeholder = 'Selecione uma fonte' }) 
 };
 
 export default FontSelector;
-

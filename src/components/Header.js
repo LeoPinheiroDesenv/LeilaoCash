@@ -17,7 +17,7 @@ export default function Header() {
 
   const getDashboardLink = () => {
     if (!user) return '/login';
-    return user.is_admin ? '/dashboard-admin' : '/dashboard-usuario';
+    return user.is_admin ? '/dashboard' : '/dashboard';
   };
 
   const logoSrc = getLogoUrl();

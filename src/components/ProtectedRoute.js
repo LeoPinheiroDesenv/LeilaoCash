@@ -86,7 +86,7 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
     
     if (!userIsAdmin) {
       console.warn('Usuário não é admin, redirecionando. isAdmin:', isAdmin, 'user.is_admin:', user?.is_admin, 'storedUser.is_admin:', storedUser?.is_admin);
-      return <Navigate to="/dashboard-usuario" replace />;
+      return <Navigate to="/dashboard" replace />;
     }
   }
 

@@ -57,9 +57,9 @@ const Cadastro = () => {
         const isAdmin = user.is_admin === 1 || user.is_admin === true || user.is_admin === '1';
         
         if (isAdmin) {
-          navigate('/dashboard-admin');
+          navigate('/dashboard');
         } else {
-          navigate('/dashboard-usuario');
+          navigate('/dashboard');
         }
       }
     } catch (err) {

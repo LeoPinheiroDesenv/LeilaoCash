@@ -103,7 +103,7 @@ api.interceptors.response.use(
       // Token inválido ou expirado em requisição real
       // Mas só fazer logout se não estiver em uma rota protegida que pode ter erro temporário
       const currentPath = window.location.pathname;
-      const isProtectedRoute = currentPath.includes('/dashboard-admin') || currentPath.includes('/dashboard-usuario');
+      const isProtectedRoute = currentPath.includes('/dashboard') || currentPath.includes('/dashboard');
       
       // Log detalhado para debug em produção
       const token = localStorage.getItem('access_token');

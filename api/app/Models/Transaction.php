@@ -17,7 +17,11 @@ class Transaction extends Model
         'status',
         'description',
         'bid_id',
-        'auction_id'
+        'auction_id',
+        'external_id',
+        'payment_method',
+        'qr_code',
+        'qr_code_base64'
     ];
 
     protected $casts = [

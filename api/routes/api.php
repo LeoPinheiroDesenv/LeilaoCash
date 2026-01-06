@@ -44,8 +44,6 @@ Route::get('/auctions/public/{id}', [\App\Http\Controllers\Api\AuctionController
 // Protected routes
 Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
     // Auth routes
-
-
     Route::prefix('auth')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
@@ -110,6 +108,12 @@ Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
                 'data' => $transactions
             ]);
         });
+    });
+
+    // Payment Routes (for all authenticated users)
+    Route::prefix('payments')->group(function () {
+        Route::post('/pix', [\App\Http\Controllers\Api\PaymentController::class, 'createPixPayment']);
+        Route::post('/credit-card', [\App\Http\Controllers\Api\PaymentController::class, 'createCreditCardPayment']);
     });
 
     // Admin only routes
@@ -196,9 +200,7 @@ Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
             Route::get('/{productId}/check', [\App\Http\Controllers\Api\FavoriteController::class, 'check']);
         });
 
-        // Mercado Pago
+        // Mercado Pago Validation (Admin only)
         Route::post('/mercadopago/validate', [\App\Http\Controllers\Api\PaymentController::class, 'validateMercadoPago']);
-        Route::post('/payments/pix', [\App\Http\Controllers\Api\PaymentController::class, 'createPixPayment']);
     });
 });
-

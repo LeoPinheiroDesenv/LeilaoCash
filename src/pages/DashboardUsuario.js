@@ -4,15 +4,29 @@ import Countdown from '../components/Countdown';
 import UserLayout from '../components/UserLayout';
 import Modal from '../components/Modal';
 import api from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 import './DashboardUsuario.css';
 
 const DashboardUsuario = () => {
+  const { user } = useAuth();
   const [isBuyCreditsModalOpen, setIsBuyCreditsModalOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(null); // 'credit_card' or 'pix'
   const [creditAmount, setCreditAmount] = useState('');
+  
+  // Pix states
   const [pixData, setPixData] = useState(null);
   const [loadingPix, setLoadingPix] = useState(false);
   const [pixError, setPixError] = useState('');
+
+  // Credit Card states
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardExpiration, setCardExpiration] = useState('');
+  const [cardCvv, setCardCvv] = useState('');
+  const [cardHolderName, setCardHolderName] = useState('');
+  const [cardCpf, setCardCpf] = useState('');
+  const [loadingCard, setLoadingCard] = useState(false);
+  const [cardError, setCardError] = useState('');
+  const [cardSuccess, setCardSuccess] = useState('');
 
   const activeAuctions = [
     {
@@ -54,24 +68,34 @@ const DashboardUsuario = () => {
   const handleOpenBuyCredits = (e) => {
     e.preventDefault();
     setIsBuyCreditsModalOpen(true);
-    setPaymentMethod(null);
-    setCreditAmount('');
-    setPixData(null);
-    setPixError('');
+    resetStates();
   };
 
   const handleCloseBuyCredits = () => {
     setIsBuyCreditsModalOpen(false);
+    resetStates();
+  };
+
+  const resetStates = () => {
     setPaymentMethod(null);
     setCreditAmount('');
     setPixData(null);
     setPixError('');
+    setCardNumber('');
+    setCardExpiration('');
+    setCardCvv('');
+    setCardHolderName('');
+    setCardCpf('');
+    setCardError('');
+    setCardSuccess('');
   };
 
   const handleSelectPaymentMethod = (method) => {
     setPaymentMethod(method);
     setPixData(null);
     setPixError('');
+    setCardError('');
+    setCardSuccess('');
   };
 
   const handleGeneratePix = async () => {
@@ -101,11 +125,75 @@ const DashboardUsuario = () => {
     }
   };
 
+  const getPaymentMethodId = (number) => {
+    // Lógica simples para detectar bandeira (apenas para exemplo, ideal usar biblioteca ou regex mais robusto)
+    const bin = number.substring(0, 6);
+    if (/^4/.test(bin)) return 'visa';
+    if (/^5[1-5]/.test(bin)) return 'master';
+    if (/^3[47]/.test(bin)) return 'amex';
+    if (/^6(?:011|5)/.test(bin)) return 'discover';
+    return 'master'; // Fallback
+  };
+
+  const handleCreditCardPayment = async (e) => {
+    e.preventDefault();
+    
+    if (!creditAmount || creditAmount <= 0) {
+      setCardError('Informe um valor válido para recarga.');
+      return;
+    }
+
+    if (!cardNumber || !cardExpiration || !cardCvv || !cardHolderName || !cardCpf) {
+      setCardError('Preencha todos os campos do cartão.');
+      return;
+    }
+
+    try {
+      setLoadingCard(true);
+      setCardError('');
+      setCardSuccess('');
+
+      const [month, year] = cardExpiration.split('/');
+      const fullYear = year.length === 2 ? `20${year}` : year;
+
+      const payload = {
+        amount: parseFloat(creditAmount),
+        card_number: cardNumber.replace(/\s/g, ''),
+        expiration_month: parseInt(month),
+        expiration_year: parseInt(fullYear),
+        security_code: cardCvv,
+        cardholderName: cardHolderName,
+        identificationNumber: cardCpf.replace(/\D/g, ''),
+        identificationType: 'CPF',
+        installments: 1,
+        payment_method_id: getPaymentMethodId(cardNumber),
+        email: user.email
+      };
+
+      const response = await api.post('/payments/credit-card', payload);
+
+      if (response.data.success) {
+        setCardSuccess('Pagamento realizado com sucesso! Seus créditos foram adicionados.');
+        setTimeout(() => {
+            handleCloseBuyCredits();
+            window.location.reload(); // Recarregar para atualizar saldo
+        }, 2000);
+      } else {
+        setCardError(response.data.message || 'Erro ao processar pagamento.');
+      }
+    } catch (error) {
+      console.error('Erro no pagamento com cartão:', error);
+      setCardError(error.response?.data?.message || 'Erro ao processar pagamento. Verifique os dados do cartão.');
+    } finally {
+      setLoadingCard(false);
+    }
+  };
+
   return (
     <UserLayout>
             <div className="welcome-section">
               <div className="welcome-text">
-                <h1>Olá, João! 👋</h1>
+                <h1>Olá, {user?.name?.split(' ')[0] || 'Usuário'}! 👋</h1>
                 <p>Bem-vindo ao seu painel de controle</p>
               </div>
               <a href="#" onClick={handleOpenBuyCredits} className="btn-buy-credits">
@@ -120,7 +208,7 @@ const DashboardUsuario = () => {
               <div className="stat-card cashback-card">
                 <div className="stat-content">
                   <p className="stat-label">Cashback Disponível</p>
-                  <p className="stat-value">R$ 1250.50</p>
+                  <p className="stat-value">R$ {user?.cashback_balance || '0.00'}</p>
                   <p className="stat-description">Disponível para saque</p>
                 </div>
                 <div className="stat-icon">
@@ -132,21 +220,15 @@ const DashboardUsuario = () => {
               </div>
               <div className="stat-card">
                 <div className="stat-content">
-                  <p className="stat-label">Total de Lances</p>
-                  <p className="stat-value">47</p>
-                  <p className="stat-description">Lances realizados</p>
-                  <div className="stat-trend">
-                    <span className="trend-up">↑ 12%</span>
-                    <span className="trend-label">vs ontem</span>
-                  </div>
+                  <p className="stat-label">Saldo de Créditos</p>
+                  <p className="stat-value">R$ {user?.balance || '0.00'}</p>
+                  <p className="stat-description">Disponível para lances</p>
                 </div>
                 <div className="stat-icon">
                   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="m14.5 12.5-8 8a2.119 2.119 0 1 1-3-3l8-8"></path>
-                    <path d="m16 16 6-6"></path>
-                    <path d="m8 8 6-6"></path>
-                    <path d="m9 7 8 8"></path>
-                    <path d="m21 11-8-8"></path>
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
                   </svg>
                 </div>
               </div>
@@ -189,7 +271,7 @@ const DashboardUsuario = () => {
                   </svg>
                   <span>Ver Leilões</span>
                 </Link>
-                <Link to="/dashboard-usuario/meus-lances" className="action-card">
+                <Link to="/dashboard/meus-lances" className="action-card">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="m14.5 12.5-8 8a2.119 2.119 0 1 1-3-3l8-8"></path>
                     <path d="m16 16 6-6"></path>
@@ -199,14 +281,14 @@ const DashboardUsuario = () => {
                   </svg>
                   <span>Meus Lances</span>
                 </Link>
-                <Link to="/dashboard-usuario/meu-cashback" className="action-card">
+                <Link to="/dashboard/meu-cashback" className="action-card">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path>
                     <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path>
                   </svg>
                   <span>Meu Cashback</span>
                 </Link>
-                <Link to="/dashboard-usuario/minha-conta" className="action-card">
+                <Link to="/dashboard/minha-conta" className="action-card">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
                     <circle cx="12" cy="7" r="4"></circle>
@@ -218,7 +300,7 @@ const DashboardUsuario = () => {
             <div className="active-auctions">
               <div className="section-header">
                 <h2>Seus Lances Ativos</h2>
-                <Link to="/dashboard-usuario/meus-lances" className="btn-ver-todos">
+                <Link to="/dashboard/meus-lances" className="btn-ver-todos">
                   Ver todos
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M5 12h14"></path>
@@ -310,7 +392,11 @@ const DashboardUsuario = () => {
                     ← Voltar
                   </button>
                   <h3>Pagamento com Cartão de Crédito</h3>
-                  <form onSubmit={(e) => e.preventDefault()}>
+                  
+                  {cardError && <div className="alert alert-error" style={{marginBottom: '1rem', padding: '0.8rem', fontSize: '0.9rem'}}>{cardError}</div>}
+                  {cardSuccess && <div className="alert alert-success" style={{marginBottom: '1rem', padding: '0.8rem', fontSize: '0.9rem'}}>{cardSuccess}</div>}
+                  
+                  <form onSubmit={handleCreditCardPayment}>
                     <div className="form-group">
                       <label>Valor da Recarga (R$)</label>
                       <input 
@@ -318,27 +404,64 @@ const DashboardUsuario = () => {
                         placeholder="0,00" 
                         value={creditAmount}
                         onChange={(e) => setCreditAmount(e.target.value)}
+                        required
                       />
                     </div>
                     <div className="form-group">
                       <label>Número do Cartão</label>
-                      <input type="text" placeholder="0000 0000 0000 0000" />
+                      <input 
+                        type="text" 
+                        placeholder="0000 0000 0000 0000" 
+                        value={cardNumber}
+                        onChange={(e) => setCardNumber(e.target.value)}
+                        required
+                      />
                     </div>
                     <div className="form-row">
                       <div className="form-group">
                         <label>Validade</label>
-                        <input type="text" placeholder="MM/AA" />
+                        <input 
+                          type="text" 
+                          placeholder="MM/AA" 
+                          value={cardExpiration}
+                          onChange={(e) => setCardExpiration(e.target.value)}
+                          required
+                        />
                       </div>
                       <div className="form-group">
                         <label>CVV</label>
-                        <input type="text" placeholder="123" />
+                        <input 
+                          type="text" 
+                          placeholder="123" 
+                          value={cardCvv}
+                          onChange={(e) => setCardCvv(e.target.value)}
+                          required
+                        />
                       </div>
                     </div>
                     <div className="form-group">
                       <label>Nome no Cartão</label>
-                      <input type="text" placeholder="Nome como está no cartão" />
+                      <input 
+                        type="text" 
+                        placeholder="Nome como está no cartão" 
+                        value={cardHolderName}
+                        onChange={(e) => setCardHolderName(e.target.value)}
+                        required
+                      />
                     </div>
-                    <button className="btn-submit-payment">Finalizar Pagamento</button>
+                    <div className="form-group">
+                      <label>CPF do Titular</label>
+                      <input 
+                        type="text" 
+                        placeholder="000.000.000-00" 
+                        value={cardCpf}
+                        onChange={(e) => setCardCpf(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <button className="btn-submit-payment" disabled={loadingCard}>
+                        {loadingCard ? 'Processando...' : 'Finalizar Pagamento'}
+                    </button>
                   </form>
                 </div>
               ) : (

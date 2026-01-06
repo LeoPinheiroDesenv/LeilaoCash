@@ -8,12 +8,11 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Setting;
 use App\Models\Transaction;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 
 class PaymentController extends Controller
 {
-    /**
-     * Cria um pagamento via Pix no Mercado Pago
-     */
+    // ... (createPixPayment method remains the same)
     public function createPixPayment(Request $request)
     {
         try {
@@ -42,26 +41,42 @@ class PaymentController extends Controller
             // Gerar um ID único para a requisição (Idempotency-Key)
             $idempotencyKey = uniqid('pay_', true);
 
+            // Preparar dados do pagador
+            $firstName = explode(' ', $user->name)[0];
+            $lastName = count(explode(' ', $user->name)) > 1 ? collect(explode(' ', $user->name))->last() : $firstName;
+
+            // Limpar CPF
+            $cpf = preg_replace('/[^0-9]/', '', $user->cpf);
+
+            // Montar payload
+            $payload = [
+                'transaction_amount' => (float) $amount,
+                'description' => 'Recarga de Créditos - LeilaoCash',
+                'payment_method_id' => 'pix',
+                'payer' => [
+                    'email' => $user->email,
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
+                ],
+            ];
+
+            // Adicionar identificação apenas se o CPF for válido (11 dígitos)
+            if ($cpf && strlen($cpf) === 11) {
+                $payload['payer']['identification'] = [
+                    'type' => 'CPF',
+                    'number' => $cpf,
+                ];
+            }
+
+            Log::info('[PaymentController] Payload Pix:', $payload);
+
             $response = $client->post('https://api.mercadopago.com/v1/payments', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $accessToken,
                     'X-Idempotency-Key' => $idempotencyKey,
                     'Content-Type' => 'application/json',
                 ],
-                'json' => [
-                    'transaction_amount' => (float) $amount,
-                    'description' => 'Recarga de Créditos - LeilaoCash',
-                    'payment_method_id' => 'pix',
-                    'payer' => [
-                        'email' => $user->email,
-                        'first_name' => explode(' ', $user->name)[0],
-                        'last_name' => count(explode(' ', $user->name)) > 1 ? collect(explode(' ', $user->name))->last() : '',
-                        'identification' => [
-                            'type' => 'CPF',
-                            'number' => preg_replace('/[^0-9]/', '', $user->cpf ?? '00000000000'),
-                        ],
-                    ],
-                ]
+                'json' => $payload
             ]);
 
             $data = json_decode($response->getBody()->getContents(), true);
@@ -98,8 +113,31 @@ class PaymentController extends Controller
                 'message' => 'Erro ao gerar o pagamento no Mercado Pago.'
             ], 400);
 
+        } catch (ClientException $e) {
+            $responseBody = $e->getResponse() ? $e->getResponse()->getBody()->getContents() : 'No response body';
+            $errorDetails = json_decode($responseBody, true) ?? $responseBody;
+
+            Log::error('[PaymentController] Erro ClientException ao criar pagamento Pix', [
+                'error' => $e->getMessage(),
+                'response' => $responseBody
+            ]);
+
+            if (isset($errorDetails['message']) && str_contains($errorDetails['message'], 'Collector user without key enabled for QR')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Erro de configuração no Mercado Pago: É necessário cadastrar uma chave Pix na conta do Mercado Pago para receber pagamentos.',
+                    'details' => $errorDetails
+                ], 400);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro na comunicação com o Mercado Pago.',
+                'details' => $errorDetails
+            ], 400);
+
         } catch (\Exception $e) {
-            Log::error('[PaymentController] Erro ao criar pagamento Pix', [
+            Log::error('[PaymentController] Erro genérico ao criar pagamento Pix', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -113,8 +151,190 @@ class PaymentController extends Controller
     }
 
     /**
-     * Valida as credenciais do Mercado Pago
+     * Cria um pagamento via Cartão de Crédito no Mercado Pago
      */
+    public function createCreditCardPayment(Request $request)
+    {
+        try {
+            $user = $request->user();
+
+            // Validação básica
+            $request->validate([
+                'amount' => 'required|numeric|min:1',
+                // Aceita token OU dados do cartão
+                'token' => 'nullable|string',
+                'card_number' => 'required_without:token|string',
+                'expiration_month' => 'required_without:token|integer',
+                'expiration_year' => 'required_without:token|integer',
+                'security_code' => 'required_without:token|string',
+                'cardholderName' => 'required_without:token|string',
+                'identificationNumber' => 'required_without:token|string',
+                // Outros campos
+                'installments' => 'required|integer|min:1',
+                'payment_method_id' => 'required|string',
+                'issuer_id' => 'nullable|integer',
+                'email' => 'required|email',
+            ]);
+
+            $amount = $request->input('amount');
+            $token = $request->input('token');
+
+            // Buscar configurações do Mercado Pago
+            $accessToken = Setting::getValue('mercadopago_access_token');
+            $publicKey = Setting::getValue('mercadopago_public_key');
+
+            if (!$accessToken) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'O sistema de pagamentos não está configurado corretamente.'
+                ], 500);
+            }
+
+            $client = new Client();
+
+            // Se não veio token, criar token no Mercado Pago
+            if (!$token) {
+                try {
+                    $tokenResponse = $client->post('https://api.mercadopago.com/v1/card_tokens?public_key=' . $publicKey, [
+                        'json' => [
+                            'card_number' => str_replace(' ', '', $request->input('card_number')),
+                            'expiration_month' => (int)$request->input('expiration_month'),
+                            'expiration_year' => (int)$request->input('expiration_year'),
+                            'security_code' => $request->input('security_code'),
+                            'cardholder' => [
+                                'name' => $request->input('cardholderName'),
+                                'identification' => [
+                                    'number' => $request->input('identificationNumber'),
+                                    'type' => 'CPF' // Assumindo CPF por padrão
+                                ]
+                            ]
+                        ]
+                    ]);
+
+                    $tokenData = json_decode($tokenResponse->getBody()->getContents(), true);
+                    $token = $tokenData['id'];
+                } catch (ClientException $e) {
+                    Log::error('[PaymentController] Erro ao criar token do cartão', [
+                        'error' => $e->getMessage(),
+                        'response' => $e->getResponse() ? $e->getResponse()->getBody()->getContents() : 'No response'
+                    ]);
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Dados do cartão inválidos. Verifique o número, validade e código de segurança.'
+                    ], 400);
+                }
+            }
+
+            $idempotencyKey = uniqid('pay_cc_', true);
+
+            $payload = [
+                'transaction_amount' => (float) $amount,
+                'token' => $token,
+                'description' => 'Recarga de Créditos - LeilaoCash',
+                'installments' => (int) $request->input('installments'),
+                'payment_method_id' => $request->input('payment_method_id'),
+                'payer' => [
+                    'email' => $request->input('email'),
+                    'identification' => [
+                        'type' => 'CPF',
+                        'number' => $request->input('identificationNumber')
+                    ]
+                ]
+            ];
+
+            if ($request->has('issuer_id')) {
+                $payload['issuer_id'] = (int) $request->input('issuer_id');
+            }
+
+            Log::info('[PaymentController] Payload Cartão:', $payload);
+
+            $response = $client->post('https://api.mercadopago.com/v1/payments', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $accessToken,
+                    'X-Idempotency-Key' => $idempotencyKey,
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => $payload
+            ]);
+
+            $data = json_decode($response->getBody()->getContents(), true);
+
+            if (isset($data['id']) && $data['status'] === 'approved') {
+                // Criar transação no banco de dados
+                $transaction = Transaction::create([
+                    'user_id' => $user->id,
+                    'external_id' => $data['id'],
+                    'type' => 'deposit',
+                    'payment_method' => 'credit_card',
+                    'amount' => $amount,
+                    'status' => 'completed', // Aprovado imediatamente
+                    'description' => 'Recarga de Créditos via Cartão',
+                ]);
+
+                // Atualizar saldo do usuário
+                $user->balance += $amount;
+                $user->save();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Pagamento aprovado com sucesso!',
+                    'data' => [
+                        'id' => $transaction->id,
+                        'status' => $transaction->status,
+                        'amount' => $transaction->amount,
+                    ]
+                ]);
+            } elseif (isset($data['id'])) {
+                 // Pagamento criado mas não aprovado (pendente, rejeitado, etc)
+                 $transaction = Transaction::create([
+                    'user_id' => $user->id,
+                    'external_id' => $data['id'],
+                    'type' => 'deposit',
+                    'payment_method' => 'credit_card',
+                    'amount' => $amount,
+                    'status' => $data['status'],
+                    'description' => 'Recarga de Créditos via Cartão (' . ($data['status_detail'] ?? 'pendente') . ')',
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Pagamento não aprovado: ' . ($data['status_detail'] ?? $data['status']),
+                    'data' => $data
+                ], 400);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao processar pagamento com cartão.'
+            ], 400);
+
+        } catch (ClientException $e) {
+            $responseBody = $e->getResponse() ? $e->getResponse()->getBody()->getContents() : 'No response body';
+            Log::error('[PaymentController] Erro ClientException ao criar pagamento Cartão', [
+                'error' => $e->getMessage(),
+                'response' => $responseBody
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro na comunicação com o Mercado Pago.',
+                'details' => json_decode($responseBody, true) ?? $responseBody
+            ], 400);
+        } catch (\Exception $e) {
+            Log::error('[PaymentController] Erro genérico ao criar pagamento Cartão', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao processar o pagamento. Tente novamente mais tarde.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // ... (validateMercadoPago method remains the same)
     public function validateMercadoPago(Request $request)
     {
         try {
