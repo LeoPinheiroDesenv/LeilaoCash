@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './Cadastro.css';
 import api from '../services/api';
+import { useTheme } from '../contexts/ThemeContext';
+import './Cadastro.css';
 
 const Cadastro = () => {
   const navigate = useNavigate();
+  const { getText } = useTheme();
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
@@ -48,19 +50,9 @@ const Cadastro = () => {
       });
 
       if (response.data.success) {
-        // Armazenar token e usuário
-        localStorage.setItem('access_token', response.data.data.access_token);
+        localStorage.setItem('token', response.data.data.access_token);
         localStorage.setItem('user', JSON.stringify(response.data.data.user));
-        
-        // Redirecionar baseado no perfil (embora cadastro padrão costume ser usuário comum)
-        const user = response.data.data.user;
-        const isAdmin = user.is_admin === 1 || user.is_admin === true || user.is_admin === '1';
-        
-        if (isAdmin) {
-          navigate('/dashboard');
-        } else {
-          navigate('/dashboard');
-        }
+        navigate('/dashboard');
       }
     } catch (err) {
       console.error('Erro no cadastro:', err);
@@ -71,10 +63,10 @@ const Cadastro = () => {
   };
 
   const benefits = [
-    { icon: '💰', text: 'Cashback em cada lance' },
-    { icon: '💸', text: 'Economize até 90%' },
-    { icon: '✅', text: 'Produtos garantidos' },
-    { icon: '🛡️', text: 'Suporte 24/7' }
+    { icon: '💰', text: getText('text_benefit_cashback', 'Cashback em cada lance') },
+    { icon: '💸', text: getText('text_benefit_economy', 'Economize até 90%') },
+    { icon: '✅', text: getText('text_benefit_guarantee', 'Produtos garantidos') },
+    { icon: '🛡️', text: getText('text_benefit_support', 'Suporte 24/7') }
   ];
 
   return (
@@ -84,8 +76,8 @@ const Cadastro = () => {
           <div className="auth-logo-icon">LC</div>
         </Link>
         <div className="auth-content">
-          <h1>Criar Conta</h1>
-          <p>Junte-se a milhares de usuários</p>
+          <h1>{getText('text_signup_title', 'Criar Conta')}</h1>
+          <p>{getText('text_signup_subtitle', 'Junte-se a milhares de usuários')}</p>
           
           <div className="benefits-grid">
             {benefits.map((benefit, index) => (
@@ -101,7 +93,7 @@ const Cadastro = () => {
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-row">
               <div className="form-group">
-                <label>Nome completo</label>
+                <label>{getText('text_fullname_label', 'Nome completo')}</label>
                 <div className="input-wrapper">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -110,7 +102,7 @@ const Cadastro = () => {
                   <input
                     type="text"
                     name="nome"
-                    placeholder="João Silva"
+                    placeholder={getText('text_fullname_placeholder', 'João Silva')}
                     value={formData.nome}
                     onChange={handleChange}
                     required
@@ -118,7 +110,7 @@ const Cadastro = () => {
                 </div>
               </div>
               <div className="form-group">
-                <label>Email</label>
+                <label>{getText('text_email_label', 'Email')}</label>
                 <div className="input-wrapper">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
@@ -127,7 +119,7 @@ const Cadastro = () => {
                   <input
                     type="email"
                     name="email"
-                    placeholder="seu@email.com"
+                    placeholder={getText('text_email_placeholder', 'seu@email.com')}
                     value={formData.email}
                     onChange={handleChange}
                     required
@@ -137,7 +129,7 @@ const Cadastro = () => {
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label>Telefone</label>
+                <label>{getText('text_phone_label', 'Telefone')}</label>
                 <div className="input-wrapper">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
@@ -153,7 +145,7 @@ const Cadastro = () => {
                 </div>
               </div>
               <div className="form-group">
-                <label>CPF</label>
+                <label>{getText('text_cpf_label', 'CPF')}</label>
                 <div className="input-wrapper">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
@@ -174,7 +166,7 @@ const Cadastro = () => {
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label>Senha</label>
+                <label>{getText('text_password_label', 'Senha')}</label>
                 <div className="input-wrapper">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
@@ -210,7 +202,7 @@ const Cadastro = () => {
                 </div>
               </div>
               <div className="form-group">
-                <label>Confirmar senha</label>
+                <label>{getText('text_confirm_password_label', 'Confirmar senha')}</label>
                 <div className="input-wrapper">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
@@ -254,11 +246,11 @@ const Cadastro = () => {
                   onChange={(e) => setAcceptTerms(e.target.checked)}
                   required
                 />
-                <span>Li e aceito os <Link to="/termos">Termos de Uso</Link> e <Link to="/privacidade">Política de Privacidade</Link></span>
+                <span>{getText('text_accept_terms_prefix', 'Li e aceito os')} <Link to="/termos">{getText('text_terms_of_use', 'Termos de Uso')}</Link> {getText('text_and', 'e')} <Link to="/privacidade">{getText('text_privacy_policy', 'Política de Privacidade')}</Link></span>
               </label>
             </div>
             <button type="submit" className="btn-submit" disabled={!acceptTerms || loading}>
-              {loading ? 'Criando conta...' : 'Criar Conta'}
+              {loading ? getText('text_creating_account', 'Criando conta...') : getText('text_create_account_button', 'Criar Conta')}
               {!loading && (
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <line x1="5" y1="12" x2="19" y2="12"/>
@@ -268,7 +260,7 @@ const Cadastro = () => {
             </button>
           </form>
           <p className="auth-footer">
-            Já tem uma conta? <Link to="/login">Fazer login</Link>
+            {getText('text_already_have_account', 'Já tem uma conta?')} <Link to="/login">{getText('text_login_button', 'Fazer login')}</Link>
           </p>
         </div>
       </div>

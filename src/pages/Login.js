@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import './Login.css';
 
 const Login = () => {
@@ -11,13 +12,12 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   
   const { login, isAuthenticated, user } = useAuth();
+  const { getText } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Obter a rota de origem (se houver) para redirecionar após login
   const from = location.state?.from || '/dashboard';
 
-  // Redirecionar se já estiver autenticado
   useEffect(() => {
     if (isAuthenticated && user) {
       navigate(from, { replace: true });
@@ -32,9 +32,7 @@ const Login = () => {
     try {
       const result = await login(email, password);
       
-      if (result.success) {
-        // A navegação será tratada pelo useEffect acima quando o estado user for atualizado
-      } else {
+      if (!result.success) {
         setError(result.message || 'Credenciais inválidas');
       }
     } catch (err) {
@@ -52,8 +50,8 @@ const Login = () => {
           <div className="auth-logo-icon">LC</div>
         </Link>
         <div className="auth-content">
-          <h1>Bem-vindo de volta</h1>
-          <p>Entre na sua conta para continuar</p>
+          <h1>{getText('text_login_title', 'Bem-vindo de volta')}</h1>
+          <p>{getText('text_login_subtitle', 'Entre na sua conta para continuar')}</p>
           
           {error && (
             <div className="alert alert-error">
@@ -68,7 +66,7 @@ const Login = () => {
 
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
-              <label>Email</label>
+              <label>{getText('text_email_label', 'Email')}</label>
               <div className="input-wrapper">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
@@ -76,7 +74,7 @@ const Login = () => {
                 </svg>
                 <input
                   type="email"
-                  placeholder="seu@email.com"
+                  placeholder={getText('text_email_placeholder', 'seu@email.com')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -85,8 +83,8 @@ const Login = () => {
             </div>
             <div className="form-group">
               <div className="label-row">
-                <label>Senha</label>
-                <Link to="/recuperar-senha" className="forgot-link">Esqueceu a senha?</Link>
+                <label>{getText('text_password_label', 'Senha')}</label>
+                <Link to="/recuperar-senha" className="forgot-link">{getText('text_forgot_password_link', 'Esqueceu a senha?')}</Link>
               </div>
               <div className="input-wrapper">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -122,7 +120,7 @@ const Login = () => {
               </div>
             </div>
             <button type="submit" className="btn-submit" disabled={loading}>
-              {loading ? 'Entrando...' : 'Entrar'}
+              {loading ? getText('text_logging_in', 'Entrando...') : getText('text_login_button', 'Entrar')}
               {!loading && (
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <line x1="5" y1="12" x2="19" y2="12"/>
@@ -133,7 +131,7 @@ const Login = () => {
             
           </form>
           <p className="auth-footer">
-            Não tem uma conta? <Link to="/cadastro">Cadastre-se grátis</Link>
+            {getText('text_no_account', 'Não tem uma conta?')} <Link to="/cadastro">{getText('text_signup_free', 'Cadastre-se grátis')}</Link>
           </p>
         </div>
       </div>

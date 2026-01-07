@@ -1,25 +1,12 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import './header.css';
-import logo from '../assets/images/logo-vibeget.png';
 
-export default function Header() {
-  const { isAuthenticated, user, logout } = useAuth();
-  const { getLogoUrl, settings } = useTheme();
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    await logout();
-    navigate('/');
-  };
-
-  const getDashboardLink = () => {
-    if (!user) return '/login';
-    return user.is_admin ? '/dashboard' : '/dashboard';
-  };
-
+const Header = () => {
+  const { isAuthenticated, user } = useAuth();
+  const { getLogoUrl, getText } = useTheme();
   const logoSrc = getLogoUrl();
 
   return (
@@ -27,30 +14,20 @@ export default function Header() {
       <div className="container">
         <div className="header-content">
           <Link to="/" className="logo">
-            <img src={logoSrc} alt={settings.site_name || "VibeGet"} className="logo-full" />
+            <img src={logoSrc} alt="Logo" className="logo-full" />
           </Link>
           <nav className="main-nav">
-            <Link to="/" className="nav-link">Início</Link>
-            <Link to="/?filter=featured" className="nav-link">Destaques</Link>
-            <Link to="/?filter=ending" className="nav-link">Encerrando</Link>
-            <Link to="/suba-de-nivel" className="nav-link">
-              Suba de Nível e Ganhe Mais!
-            </Link>
+            <Link to="/leiloes" className="nav-link">{getText('text_header_leiloes', 'Leilões')}</Link>
+            <Link to="/como-funciona" className="nav-link">{getText('text_header_como_funciona', 'Como Funciona')}</Link>
+            <Link to="/suba-de-nivel" className="nav-link">{getText('text_header_suba_de_nivel', 'Suba de Nível')}</Link>
           </nav>
           <div className="auth-buttons">
             {isAuthenticated ? (
-              <>
-                <Link to={getDashboardLink()} className="btn-login">
-                  Painel
-                </Link>
-                <button onClick={handleLogout} className="btn-register">
-                  Sair
-                </button>
-              </>
+              <Link to="/dashboard" className="btn-register">Meu Painel</Link>
             ) : (
               <>
-                <Link to="/login" className="btn-login">Entrar</Link>
-                <Link to="/cadastro" className="btn-register">Cadastrar</Link>
+                <Link to="/login" className="btn-login">{getText('text_header_login', 'Entrar')}</Link>
+                <Link to="/cadastro" className="btn-register">{getText('text_header_cadastro', 'Cadastre-se Grátis')}</Link>
               </>
             )}
           </div>
@@ -58,5 +35,6 @@ export default function Header() {
       </div>
     </header>
   );
-}
+};
 
+export default Header;

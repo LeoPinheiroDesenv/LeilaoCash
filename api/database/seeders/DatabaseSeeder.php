@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             ProductSeeder::class,
             AuctionSeeder::class,
+            TextSettingsSeeder::class, // Adicionado
         ]);
     }
 }
