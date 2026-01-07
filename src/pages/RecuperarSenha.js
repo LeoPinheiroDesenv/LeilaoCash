@@ -1,22 +1,34 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
+import api from '../services/api';
 import './RecuperarSenha.css';
 
 const RecuperarSenha = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { getText } = useTheme();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // Simular chamada de API
-    setTimeout(() => {
-      setMessage(`Um link para redefinição de senha foi enviado para ${email}.`);
+    setError('');
+    setMessage('');
+
+    try {
+      const response = await api.post('/auth/forgot-password', { email });
+      if (response.data.success) {
+        setMessage(response.data.message);
+      } else {
+        setError(response.data.message || 'Erro ao solicitar redefinição de senha.');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Ocorreu um erro. Tente novamente.');
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -32,6 +44,11 @@ const RecuperarSenha = () => {
           {message && (
             <div className="alert alert-success">
               {message}
+            </div>
+          )}
+          {error && (
+            <div className="alert alert-error">
+              {error}
             </div>
           )}
 

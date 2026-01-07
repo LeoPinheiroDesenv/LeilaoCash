@@ -15,8 +15,9 @@ import Termos from './pages/Termos';
 import Privacidade from './pages/Privacidade';
 import Regras from './pages/Regras';
 import RecuperarSenha from './pages/RecuperarSenha';
+import ResetPassword from './pages/ResetPassword'; // Importa o novo componente
 import SubaDeNivel from './pages/SubaDeNivel';
-import Dashboard from './pages/Dashboard'; // Importa o novo componente
+import Dashboard from './pages/Dashboard';
 import Configuracoes from './pages/Configuracoes';
 import Usuarios from './pages/Usuarios';
 import Categorias from './pages/Categorias';
@@ -45,6 +46,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/cadastro" element={<Cadastro />} />
             <Route path="/recuperar-senha" element={<RecuperarSenha />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             
             {/* Rota Unificada do Dashboard */}
             <Route path="/dashboard" element={

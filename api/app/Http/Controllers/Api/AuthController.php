@@ -9,9 +9,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use App\Mail\PasswordResetMail;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
+    // ... (register, login, me, logout, etc. methods remain the same)
+
     /**
      * Register a new user
      */
@@ -104,32 +111,7 @@ class AuthController extends Controller
                 ], 403);
             }
 
-            // Criar token com nome único e sem expiração (ou com expiração longa)
-            try {
-                $token = $user->createToken('auth_token', ['*'])->plainTextToken;
-            } catch (\Exception $tokenException) {
-                Log::error('[AuthController] Erro ao criar token no login', [
-                    'user_id' => $user->id,
-                    'user_email' => $user->email,
-                    'error' => $tokenException->getMessage(),
-                    'trace' => $tokenException->getTraceAsString()
-                ]);
-                
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Erro ao criar token de autenticação',
-                    'error' => $tokenException->getMessage()
-                ], 500);
-            }
-            
-            // Log para debug
-            Log::info('[AuthController] Token criado no login', [
-                'user_id' => $user->id,
-                'user_email' => $user->email,
-                'is_admin' => $user->is_admin,
-                'token_length' => strlen($token),
-                'token_prefix' => substr($token, 0, 20) . '...',
-            ]);
+            $token = $user->createToken('auth_token', ['*'])->plainTextToken;
 
             return response()->json([
                 'success' => true,
@@ -140,14 +122,14 @@ class AuthController extends Controller
                     'token_type' => 'Bearer',
                 ]
             ], 200);
-            
+
         } catch (\Exception $e) {
             Log::error('[AuthController] Erro no login', [
                 'email' => $request->email ?? 'N/A',
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erro ao realizar login',
@@ -161,78 +143,16 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     {
-        // Log detalhado do header Authorization
-        $authHeader = $request->header('Authorization');
-        $token = null;
-        
-        if ($authHeader && str_starts_with($authHeader, 'Bearer ')) {
-            $token = substr($authHeader, 7);
-        }
-        
-        Log::info('[AuthController] me chamado', [
-            'has_auth_header' => !!$authHeader,
-            'auth_header_prefix' => $authHeader ? substr($authHeader, 0, 30) . '...' : null,
-            'has_token' => !!$token,
-            'token_length' => $token ? strlen($token) : 0,
-            'token_prefix' => $token ? substr($token, 0, 20) . '...' : null,
-            'url' => $request->fullUrl(),
-        ]);
-        
-        // Tentar validar token manualmente antes de usar $request->user()
-        if ($token) {
-            try {
-                $accessToken = \Laravel\Sanctum\PersonalAccessToken::findToken($token);
-                
-                Log::info('[AuthController] Token encontrado na base', [
-                    'token_exists' => !!$accessToken,
-                    'token_id' => $accessToken?->id,
-                    'token_name' => $accessToken?->name,
-                    'token_expires_at' => $accessToken?->expires_at?->toDateTimeString(),
-                    'token_last_used_at' => $accessToken?->last_used_at?->toDateTimeString(),
-                ]);
-                
-                if ($accessToken) {
-                    $tokenUser = $accessToken->tokenable;
-                    Log::info('[AuthController] Usuário do token', [
-                        'user_id' => $tokenUser?->id,
-                        'user_email' => $tokenUser?->email,
-                        'user_is_admin' => $tokenUser?->is_admin,
-                    ]);
-                } else {
-                    Log::warning('[AuthController] Token não encontrado na base de dados', [
-                        'token_prefix' => substr($token, 0, 20) . '...',
-                    ]);
-                }
-            } catch (\Exception $e) {
-                Log::error('[AuthController] Erro ao validar token manualmente', [
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
-                ]);
-            }
-        }
-        
         $user = $request->user();
-        
-        Log::info('[AuthController] Usuário autenticado via $request->user()', [
-            'has_user' => !!$user,
-            'user_id' => $user?->id,
-            'user_email' => $user?->email,
-            'is_admin' => $user?->is_admin,
-            'is_admin_type' => $user ? gettype($user->is_admin) : null,
-        ]);
-        
+
         if (!$user) {
-            Log::warning('[AuthController] me: usuário não autenticado', [
-                'has_token' => !!$token,
-                'token_length' => $token ? strlen($token) : 0,
-            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Não autenticado. Token inválido ou ausente.',
                 'error' => 'Unauthenticated'
             ], 401);
         }
-        
+
         return response()->json([
             'success' => true,
             'data' => $user
@@ -354,5 +274,82 @@ class AuthController extends Controller
             ], 500);
         }
     }
-}
 
+    /**
+     * Handle forgot password request
+     */
+    public function forgotPassword(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            // Retorna sucesso para não revelar se um e-mail existe ou não
+            return response()->json(['success' => true, 'message' => 'Se o e-mail estiver em nosso sistema, um link de redefinição será enviado.']);
+        }
+
+        // Gerar token
+        $token = Str::random(60);
+
+        // Salvar token no banco
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $request->email],
+            ['token' => Hash::make($token), 'created_at' => now()]
+        );
+
+        // URL para o frontend
+        $resetUrl = config('app.frontend_url', 'http://localhost:3000') . "/reset-password?token={$token}&email=" . urlencode($request->email);
+
+        try {
+            Mail::to($user->email)->send(new PasswordResetMail($resetUrl));
+        } catch (\Exception $e) {
+            Log::error('Falha ao enviar e-mail de redefinição de senha: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Não foi possível enviar o e-mail de redefinição. Tente novamente mais tarde.'], 500);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Se o e-mail estiver em nosso sistema, um link de redefinição será enviado.']);
+    }
+
+    /**
+     * Handle reset password request
+     */
+    public function resetPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|confirmed|min:8',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => 'Dados inválidos.', 'errors' => $validator->errors()], 422);
+        }
+
+        $resetRecord = DB::table('password_reset_tokens')->where('email', $request->email)->first();
+
+        if (!$resetRecord || !Hash::check($request->token, $resetRecord->token)) {
+            return response()->json(['success' => false, 'message' => 'Token inválido ou expirado.'], 400);
+        }
+
+        // Verificar se o token não expirou (ex: 60 minutos)
+        if (Carbon::parse($resetRecord->created_at)->addMinutes(60)->isPast()) {
+            DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+            return response()->json(['success' => false, 'message' => 'Token expirado.'], 400);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Usuário não encontrado.'], 404);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        // Deletar o token após o uso
+        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+        return response()->json(['success' => true, 'message' => 'Senha redefinida com sucesso.']);
+    }
+}
