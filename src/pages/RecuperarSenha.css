@@ -31,7 +31,7 @@
   font-weight: 700;
   color: #fff;
   font-size: 1.5rem;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .auth-content {
@@ -49,7 +49,7 @@
   color: #e6eef8;
   margin: 0 0 0.5rem 0;
   text-align: center;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .auth-content > p {
@@ -157,4 +157,3 @@
     padding: 2rem 1.5rem;
   }
 }
-

@@ -63,7 +63,7 @@
   font-weight: 800;
   margin: 0 0 24px 0;
   color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
   line-height: 1.2;
 }
 
@@ -80,7 +80,7 @@
   background-clip: text;
   color: transparent;
   font-weight: 800;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 /* Content Section */
@@ -99,7 +99,7 @@
   font-weight: 700;
   margin: 0 0 24px 0;
   color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .intro-text {
@@ -179,7 +179,7 @@
   font-weight: 700;
   margin: 0 0 8px 0;
   color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .nivel-range {
@@ -225,7 +225,7 @@
   font-weight: 700;
   margin: 0 0 48px 0;
   color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
   text-align: center;
 }
 
@@ -267,7 +267,7 @@
   font-weight: 700;
   margin: 0 0 12px 0;
   color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .acao-card p {
@@ -285,7 +285,7 @@
   border-radius: 20px;
   font-size: 14px;
   font-weight: 700;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 /* CTA Final Section */
@@ -302,7 +302,7 @@
   font-weight: 700;
   margin: 0 0 16px 0;
   color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
 .cta-final-section > p {
@@ -330,7 +330,7 @@
   align-items: center;
   gap: 10px;
   transition: all 0.3s ease;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-primary, 'Inter', sans-serif);
   white-space: nowrap;
 }
 
@@ -416,4 +416,3 @@
     justify-content: center;
   }
 }
-

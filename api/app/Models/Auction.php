@@ -20,8 +20,10 @@ class Auction extends Model
         'current_bid',
         'bid_increment',
         'min_bids',
+        'bids_count',
         'cashback_percentage',
         'winner_id',
+        'product_id', // Adicionado product_id que estava faltando no fillable
     ];
 
     protected function casts(): array
@@ -33,6 +35,7 @@ class Auction extends Model
             'current_bid' => 'decimal:2',
             'bid_increment' => 'decimal:2',
             'cashback_percentage' => 'decimal:2',
+            'bids_count' => 'integer',
         ];
     }
 
@@ -45,11 +48,26 @@ class Auction extends Model
     }
 
     /**
+     * Relacionamento com o produto principal (se houver)
+     */
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    /**
      * Relacionamento com vencedor
      */
     public function winner()
     {
         return $this->belongsTo(User::class, 'winner_id');
     }
-}
 
+    /**
+     * Relacionamento com lances
+     */
+    public function bids()
+    {
+        return $this->hasMany(Bid::class);
+    }
+}
