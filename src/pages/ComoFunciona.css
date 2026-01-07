@@ -1,8 +1,8 @@
 .page-content {
   min-height: calc(100vh - 200px);
   padding: 4rem 0;
-  background: #071026;
-  color: #e6eef8;
+  background: var(--color-background);
+  color: var(--color-text);
 }
 
 .page-content .container {

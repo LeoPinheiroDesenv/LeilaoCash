@@ -1,6 +1,6 @@
 .auth-page {
   min-height: 100vh;
-  background: #071026;
+  background: var(--color-background);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -23,7 +23,7 @@
 .auth-logo-icon {
   width: 64px;
   height: 64px;
-  background: linear-gradient(135deg, #E55F52, #4A9FD8);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
   border-radius: 16px;
   display: flex;
   align-items: center;
@@ -46,7 +46,7 @@
 .auth-content h1 {
   font-size: 2rem;
   font-weight: 700;
-  color: #e6eef8;
+  color: var(--color-text);
   margin: 0 0 0.5rem 0;
   text-align: center;
   font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
@@ -72,7 +72,7 @@
 }
 
 .form-group label {
-  color: #e6eef8;
+  color: var(--color-text);
   font-weight: 500;
   font-size: 0.9rem;
 }
@@ -84,14 +84,14 @@
 }
 
 .forgot-link {
-  color: #4A9FD8;
+  color: var(--color-secondary);
   text-decoration: none;
   font-size: 0.875rem;
   transition: color 0.2s;
 }
 
 .forgot-link:hover {
-  color: #E55F52;
+  color: var(--color-primary);
 }
 
 .input-wrapper {
@@ -113,7 +113,7 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  color: #e6eef8;
+  color: var(--color-text);
   font-size: 1rem;
   transition: all 0.2s;
 }
@@ -148,7 +148,7 @@
 .btn-submit {
   width: 100%;
   padding: 14px 24px;
-  background: linear-gradient(90deg, #E55F52, #4A9FD8);
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
   color: #fff;
   border: none;
   border-radius: 12px;
@@ -179,7 +179,7 @@
 
 .demo-info p {
   margin: 0.25rem 0;
-  color: #4A9FD8;
+  color: var(--color-secondary);
   font-size: 0.875rem;
 }
 
@@ -191,14 +191,14 @@
 }
 
 .auth-footer a {
-  color: #4A9FD8;
+  color: var(--color-secondary);
   text-decoration: none;
   font-weight: 600;
   transition: color 0.2s;
 }
 
 .auth-footer a:hover {
-  color: #E55F52;
+  color: var(--color-primary);
 }
 
 /* Alert Messages */

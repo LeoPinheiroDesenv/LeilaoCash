@@ -49,12 +49,12 @@
     transition: color 0.2s;
     position: relative;
     padding-bottom: 4px;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-primary, 'Inter', sans-serif);
     white-space: nowrap;
 }
 
 .nav-link:hover {
-    color: #e6eef8;
+    color: var(--color-text);
 }
 
 .nav-link::after {
@@ -64,7 +64,7 @@
     left: 0;
     height: 2px;
     width: 0;
-    background: linear-gradient(90deg, #E55F52, #4A9FD8);
+    background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
     transition: width 0.3s;
 }
 
@@ -87,7 +87,7 @@
     transition: all 0.2s;
     cursor: pointer;
     display: inline-block;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-primary, 'Inter', sans-serif);
 }
 
 .btn-login {
@@ -98,12 +98,12 @@
 
 .btn-login:hover {
     background: rgba(255, 255, 255, 0.05);
-    color: #e6eef8;
+    color: var(--color-text);
     border-color: rgba(74, 159, 216, 0.5);
 }
 
 .btn-register {
-    background: linear-gradient(90deg, #E55F52, #4A9FD8);
+    background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
     color: #fff;
     border: none;
 }
