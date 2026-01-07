@@ -1,63 +1,62 @@
-.chips-row{
+.chips-row {
   display: flex;
   gap: 12px;
-  flex-wrap: nowrap;
-  margin: 32px auto 0;
-  overflow-x: auto;
-  padding-bottom: 8px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.1) transparent;
-  max-width: 1200px;
-  padding-left: 20px;
-  padding-right: 20px;
+  padding: 24px 0;
+  flex-wrap: wrap; /* Permite quebra de linha */
+  justify-content: center; /* Centraliza os itens */
 }
-.chips-row::-webkit-scrollbar{
-  height: 4px;
-}
-.chips-row::-webkit-scrollbar-track{
-  background: transparent;
-}
-.chips-row::-webkit-scrollbar-thumb{
-  background: rgba(255,255,255,0.1);
-  border-radius: 2px;
-}
-.chip{
-  background: rgba(255,255,255,0.04);
-  color: inherit;
-  border: 1px solid rgba(255,255,255,0.08);
-  padding: 10px 16px;
-  border-radius: 999px;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
+
+.chip {
   display: flex;
   align-items: center;
   gap: 8px;
-  transition: all 0.2s;
-  font-size: 14px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  color: #e6eef8;
   text-decoration: none;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
+  cursor: pointer;
 }
-.chip:hover{
-  background: linear-gradient(90deg, #E55F52, #4A9FD8);
-  color: #071026;
-  border-color: transparent;
+
+.chip:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(74, 159, 216, 0.5);
   transform: translateY(-2px);
 }
-.chip-emoji{
+
+.chip.active {
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(74, 159, 216, 0.3);
+}
+
+.chip-emoji {
   font-size: 16px;
-  line-height: 1;
 }
-.chip-name{
-  font-weight: 500;
-}
-.chip-count{
-  background: rgba(255,255,255,0.1);
+
+.chip-count {
+  background: rgba(255, 255, 255, 0.1);
   padding: 2px 8px;
-  border-radius: 12px;
+  border-radius: 999px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
-.chip:hover .chip-count{
-  background: rgba(7,16,38,0.3);
+
+@media (max-width: 768px) {
+  .chips-row {
+    padding: 16px 0;
+    gap: 8px;
+  }
+
+  .chip {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
 }

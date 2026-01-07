@@ -116,6 +116,9 @@ Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
         Route::post('/credit-card', [\App\Http\Controllers\Api\PaymentController::class, 'createCreditCardPayment']);
     });
 
+    // Bidding Routes (for all authenticated users)
+    Route::post('/auctions/{id}/bids', [\App\Http\Controllers\Api\BidController::class, 'store']);
+
     // Admin only routes
     Route::middleware('admin')->group(function () {
         // Settings public (apenas admin)

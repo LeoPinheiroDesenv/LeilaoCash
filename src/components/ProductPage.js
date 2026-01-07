@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import Countdown from './Countdown';
 import api from '../services/api';
 import './productPage.css';
@@ -8,7 +9,8 @@ import './productPage.css';
 const ProductPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const { settings } = useTheme();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,36 +18,85 @@ const ProductPage = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isCheckingFavorite, setIsCheckingFavorite] = useState(false);
+  const [bidding, setBidding] = useState(false);
+  const [bidMessage, setBidMessage] = useState({ type: '', text: '' });
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  
+  // Ref para armazenar o valor anterior do lance para comparação
+  const prevBidRef = useRef(0);
+
+  const parsePrice = (priceString) => {
+    if (!priceString) return 0;
+    if (typeof priceString === 'number') return priceString;
+    
+    // Se for string, tentar limpar
+    const cleanString = priceString.toString().replace('R$', '').trim();
+    
+    // Se tiver vírgula como separador decimal (formato PT-BR: 1.234,56)
+    if (cleanString.includes(',') && cleanString.indexOf('.') < cleanString.indexOf(',')) {
+        return parseFloat(cleanString.replace(/\./g, '').replace(',', '.'));
+    }
+    
+    // Se tiver apenas ponto (formato US: 1234.56) ou sem separador
+    return parseFloat(cleanString.replace(/,/g, ''));
+  };
+
+  const loadProduct = async (isPolling = false) => {
+    try {
+      if (!isPolling) setError(null);
+      
+      const response = await api.get(`/products/public/${id}`);
+      if (response.data.success) {
+        const newProductData = response.data.data;
+        const newAuction = newProductData.auction || {};
+        
+        // Verificar se houve novo lance
+        const newCurrentBid = parsePrice(newAuction.current_bid || newAuction.starting_bid || newProductData.price);
+        
+        if (isPolling && prevBidRef.current > 0 && newCurrentBid > prevBidRef.current) {
+            setToastMessage(`Novo lance! Valor atual: ${formatPrice(newCurrentBid)}`);
+            setShowToast(true);
+            setTimeout(() => setShowToast(false), 3000);
+        }
+        
+        prevBidRef.current = newCurrentBid;
+        setProduct(newProductData);
+        
+        // Atualizar valor sugerido do lance se o campo estiver vazio ou menor que o mínimo
+        const minBid = newCurrentBid + 0.5;
+        if (!bidAmount || parseFloat(bidAmount) < minBid) {
+            setBidAmount(minBid.toFixed(2));
+        }
+      } else {
+        if (!isPolling) setError('Produto não encontrado');
+      }
+    } catch (err) {
+      console.error('Erro ao carregar produto:', err);
+      if (!isPolling) setError('Erro ao carregar produto');
+    } finally {
+      if (!isPolling) setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadProduct = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        // Usar rota pública para visualização (não requer autenticação)
-        const response = await api.get(`/products/public/${id}`);
-        if (response.data.success) {
-          setProduct(response.data.data);
-        } else {
-          setError('Produto não encontrado');
-        }
-      } catch (err) {
-        console.error('Erro ao carregar produto:', err);
-        setError('Erro ao carregar produto');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (id) {
+      setLoading(true);
       loadProduct();
+      
+      // Polling a cada 5 segundos para atualizações em tempo real
+      const interval = setInterval(() => {
+          loadProduct(true);
+      }, 5000);
+      
+      return () => clearInterval(interval);
     }
   }, [id]);
 
   // Resetar índice da imagem quando o produto mudar
   useEffect(() => {
     setCurrentImageIndex(0);
-  }, [product]);
+  }, [product?.id]);
 
   // Verificar se produto está favoritado
   useEffect(() => {
@@ -70,44 +121,17 @@ const ProductPage = () => {
     };
 
     checkFavorite();
-  }, [product, isAuthenticated]);
-
-  const parsePrice = (priceString) => {
-    if (!priceString) return 0;
-    return parseFloat(priceString.replace('R$', '').replace(/\./g, '').replace(',', '.').trim());
-  };
-
-  if (loading) {
-    return (
-      <main>
-        <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
-          <p style={{ color: '#8da4bf', fontSize: '1.1rem' }}>Carregando produto...</p>
-        </div>
-      </main>
-    );
-  }
-
-  if (error || !product) {
-    return (
-      <main>
-        <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
-          <h2 style={{ color: '#E55F52', marginBottom: '1rem' }}>Produto não encontrado</h2>
-          <p style={{ color: '#8da4bf', marginBottom: '2rem' }}>{error || 'O produto que você está procurando não existe.'}</p>
-          <Link to="/" style={{ color: '#4A9FD8', textDecoration: 'none' }}>Voltar para a página inicial</Link>
-        </div>
-      </main>
-    );
-  }
+  }, [product?.id, isAuthenticated]);
 
   // Obter dados do produto e leilão
-  const auction = product.auction || {};
-  const productImage = product.image_url 
+  const auction = product?.auction || {};
+  const productImage = product?.image_url 
     ? (product.image_url.startsWith('http') 
         ? product.image_url 
         : `${process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:8000'}${product.image_url}`)
     : 'https://via.placeholder.com/400x300?text=Sem+Imagem';
   
-  const additionalImages = product.images && Array.isArray(product.images) 
+  const additionalImages = product?.images && Array.isArray(product.images) 
     ? product.images.map(img => 
         img.startsWith('http') 
           ? img 
@@ -134,11 +158,23 @@ const ProductPage = () => {
     setCurrentImageIndex(index);
   };
 
-  const currentBid = parsePrice(auction.current_bid || auction.starting_bid || product.price);
+  const currentBid = parsePrice(auction.current_bid || auction.starting_bid || product?.price);
   const minBid = currentBid + 0.5;
-  const currentLeader = auction.winner_id ? 'Usuário #' + auction.winner_id : 'Nenhum';
+  
+  // Formatar nome do vencedor (ex: João S.)
+  const formatWinnerName = (name) => {
+      if (!name) return 'Nenhum';
+      const parts = name.split(' ');
+      if (parts.length > 1) {
+          return `${parts[0]} ${parts[1].charAt(0)}.`;
+      }
+      return parts[0];
+  };
+
+  const currentLeader = auction.winner ? formatWinnerName(auction.winner.name) : 'Nenhum';
   
   const formatPrice = (price) => {
+    if (price === undefined || price === null) return 'R$ 0,00';
     return `R$ ${parseFloat(price).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
@@ -157,8 +193,9 @@ const ProductPage = () => {
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   };
 
-  const handleBid = (e) => {
+  const handleBid = async (e) => {
     e.preventDefault();
+    setBidMessage({ type: '', text: '' });
     
     // Verificar se o usuário está autenticado
     if (!isAuthenticated) {
@@ -166,11 +203,34 @@ const ProductPage = () => {
       navigate('/login', { state: { from: `/produto/${id}` } });
       return;
     }
+
+    if (!auction || !auction.id) {
+        setBidMessage({ type: 'error', text: 'Este produto não está em leilão.' });
+        return;
+    }
     
-    // TODO: Implementar lógica de lance
-    console.log('Lance:', bidAmount);
-    // Aqui você implementaria a chamada à API para dar o lance
-    // Exemplo: await api.post(`/auctions/${auction.id}/bids`, { amount: bidAmount });
+    try {
+        setBidding(true);
+        const response = await api.post(`/auctions/${auction.id}/bids`, { 
+            amount: parseFloat(bidAmount) 
+        });
+
+        if (response.data.success) {
+            setBidMessage({ type: 'success', text: 'Lance realizado com sucesso!' });
+            // Recarregar dados do produto para atualizar o lance atual e vencedor
+            await loadProduct();
+        } else {
+            setBidMessage({ type: 'error', text: response.data.message || 'Erro ao realizar lance.' });
+        }
+    } catch (error) {
+        console.error('Erro no lance:', error);
+        setBidMessage({ 
+            type: 'error', 
+            text: error.response?.data?.message || 'Erro ao processar lance. Verifique seu saldo.' 
+        });
+    } finally {
+        setBidding(false);
+    }
   };
 
   const handleFavorite = async () => {
@@ -223,8 +283,35 @@ const ProductPage = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <main>
+        <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
+          <p style={{ color: '#8da4bf', fontSize: '1.1rem' }}>Carregando produto...</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <main>
+        <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
+          <h2 style={{ color: '#E55F52', marginBottom: '1rem' }}>Produto não encontrado</h2>
+          <p style={{ color: '#8da4bf', marginBottom: '2rem' }}>{error || 'O produto que você está procurando não existe.'}</p>
+          <Link to="/" style={{ color: '#4A9FD8', textDecoration: 'none' }}>Voltar para a página inicial</Link>
+        </div>
+      </main>
+    );
+  }
+
   return (
       <main>
+        {showToast && (
+            <div className="toast-notification">
+                {toastMessage}
+            </div>
+        )}
         <section className="product-detail">
           <div className="container">
           <div className="breadcrumb">
@@ -435,7 +522,7 @@ const ProductPage = () => {
                     <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
                     <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                   </svg>
-                  {auction.min_bids || 0} lances mínimos
+                  {auction.bids_count || 0} lances
                 </div>
               </div>
 
@@ -451,10 +538,23 @@ const ProductPage = () => {
                     min={minBid}
                     step="0.50"
                     required
+                    disabled={bidding || auction.status !== 'active'}
                   />
-                  <button type="submit" className="btn-bid">Dar Lance</button>
+                  <button 
+                    type="submit" 
+                    className="btn-bid"
+                    disabled={bidding || auction.status !== 'active'}
+                  >
+                    {bidding ? 'Enviando...' : 'Dar Lance'}
+                  </button>
                 </div>
                 <p className="bid-info">Lance mínimo: R$ {minBid.toFixed(2).replace('.', ',')} | Incremento: R$ 0,50</p>
+                
+                {bidMessage.text && (
+                    <div className={`alert alert-${bidMessage.type}`} style={{ marginTop: '1rem', padding: '0.8rem', fontSize: '0.9rem' }}>
+                        {bidMessage.text}
+                    </div>
+                )}
               </form>
 
               <div className="action-buttons">
@@ -547,12 +647,14 @@ const ProductPage = () => {
             </div>
           </div>
 
-          <div className="bid-history-section">
-            <h3>Histórico de Lances</h3>
-            <div className="bid-history-list">
-              <p className="no-bids">Histórico de lances será implementado em breve.</p>
+          {settings?.show_bid_history === 'true' && (
+            <div className="bid-history-section">
+                <h3>Histórico de Lances</h3>
+                <div className="bid-history-list">
+                <p className="no-bids">Histórico de lances será implementado em breve.</p>
+                </div>
             </div>
-          </div>
+          )}
           </div>
         </section>
       </main>

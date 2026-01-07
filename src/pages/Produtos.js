@@ -28,10 +28,8 @@ const Produtos = () => {
     description: '',
     category_id: '',
     price: '',
-    image_url: '',
     image: null,
     additional_images: [],
-    images: [],
     brand: '',
     model: '',
     specifications: {},
@@ -93,10 +91,8 @@ const Produtos = () => {
         description: product.description || '',
         category_id: product.category_id || '',
         price: product.price || '',
-        image_url: product.image_url || '',
         image: null,
         additional_images: [],
-        images: product.images || [],
         brand: product.brand || '',
         model: product.model || '',
         specifications: product.specifications || {},
@@ -109,10 +105,8 @@ const Produtos = () => {
         description: '',
         category_id: '',
         price: '',
-        image_url: '',
         image: null,
         additional_images: [],
-        images: [],
         brand: '',
         model: '',
         specifications: {},
@@ -135,7 +129,7 @@ const Produtos = () => {
         // Permitir múltiplos arquivos (até 5)
         const fileArray = Array.from(files);
         const maxImages = 5;
-        const currentCount = formData.additional_images.length + formData.images.length;
+        const currentCount = formData.additional_images.length;
         const availableSlots = maxImages - currentCount;
         
         if (availableSlots <= 0) {
@@ -146,7 +140,7 @@ const Produtos = () => {
         const filesToAdd = fileArray.slice(0, availableSlots);
         setFormData(prev => ({
           ...prev,
-          additional_images: [...prev.additional_images, ...filesToAdd].slice(0, maxImages - prev.images.length)
+          additional_images: [...prev.additional_images, ...filesToAdd]
         }));
         
         if (fileArray.length > availableSlots) {
@@ -173,33 +167,6 @@ const Produtos = () => {
     }));
   };
 
-  const handleAddImageUrl = () => {
-    const maxImages = 5;
-    const currentCount = formData.additional_images.length + formData.images.length;
-    if (currentCount < maxImages) {
-      setFormData(prev => ({
-        ...prev,
-        images: [...prev.images, '']
-      }));
-    } else {
-      setMessage({ type: 'error', text: 'Limite de 5 imagens adicionais atingido' });
-    }
-  };
-
-  const handleImageUrlChange = (index, value) => {
-    setFormData(prev => ({
-      ...prev,
-      images: prev.images.map((img, i) => i === index ? value : img)
-    }));
-  };
-
-  const handleRemoveImageUrl = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index)
-    }));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -219,8 +186,6 @@ const Produtos = () => {
       // Imagem principal
       if (formData.image) {
         formDataToSend.append('image', formData.image);
-      } else if (formData.image_url && !editingProduct) {
-        formDataToSend.append('image_url', formData.image_url);
       }
       
       // Imagens adicionais (upload de arquivos)
@@ -229,13 +194,6 @@ const Produtos = () => {
           if (img instanceof File) {
             formDataToSend.append(`additional_images[${index}]`, img);
           }
-        });
-      }
-      
-      // Imagens via URL (se houver)
-      if (formData.images && formData.images.length > 0) {
-        formData.images.filter(img => img.trim() !== '' && typeof img === 'string').forEach((img, index) => {
-          formDataToSend.append(`images[${index}]`, img);
         });
       }
 
@@ -550,21 +508,11 @@ const Produtos = () => {
                       <img src={URL.createObjectURL(formData.image)} alt="Preview" />
                     </div>
                   )}
-                  {!formData.image && formData.image_url && (
+                  {!formData.image && editingProduct && editingProduct.image_url && (
                     <div className="image-preview">
-                      <img src={formData.image_url.startsWith('http') ? formData.image_url : `${process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:8000'}${formData.image_url}`} alt="Preview" />
+                      <img src={editingProduct.image_url.startsWith('http') ? editingProduct.image_url : `${process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:8000'}${editingProduct.image_url}`} alt="Preview" />
                     </div>
                   )}
-                  <p className="form-help">Ou informe uma URL:</p>
-                  <input
-                    type="url"
-                    name="image_url"
-                    value={formData.image_url}
-                    onChange={handleInputChange}
-                    className="form-input"
-                    placeholder="https://exemplo.com/imagem.jpg"
-                    disabled={!!formData.image}
-                  />
                 </div>
 
                 <div className="form-group">
@@ -576,11 +524,11 @@ const Produtos = () => {
                     onChange={handleInputChange}
                     multiple
                     className="form-input"
-                    disabled={(formData.additional_images.length + formData.images.length) >= 5}
+                    disabled={formData.additional_images.length >= 5}
                   />
                   <p className="form-help">
                     Selecione até 5 imagens (máximo 5MB cada).
-                    {((formData.additional_images.length + formData.images.length) >= 5) && (
+                    {formData.additional_images.length >= 5 && (
                       <span style={{ color: '#ffc107', fontWeight: '600', marginLeft: '0.5rem' }}> Limite atingido!</span>
                     )}
                   </p>
@@ -610,45 +558,9 @@ const Produtos = () => {
                     </div>
                   )}
 
-                  {formData.additional_images.length + formData.images.length < 5 && (
-                    <div className="form-group" style={{ marginTop: '1rem' }}>
-                      <div className="images-header">
-                        <label>Ou adicione URLs de imagens</label>
-                        <button type="button" className="btn-add-image" onClick={handleAddImageUrl}>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                          </svg>
-                          Adicionar URL
-                        </button>
-                      </div>
-                      {formData.images.map((img, index) => (
-                        <div key={index} className="image-input-row">
-                          <input
-                            type="url"
-                            value={img}
-                            onChange={(e) => handleImageUrlChange(index, e.target.value)}
-                            className="form-input"
-                            placeholder="https://exemplo.com/imagem.jpg"
-                          />
-                          <button
-                            type="button"
-                            className="btn-remove-image"
-                            onClick={() => handleRemoveImageUrl(index)}
-                          >
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <line x1="18" y1="6" x2="6" y2="18"></line>
-                              <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {(formData.additional_images.length + formData.images.length) > 0 && (
+                  {formData.additional_images.length > 0 && (
                     <div className="images-count">
-                      {formData.additional_images.length + formData.images.length} de 5 imagens adicionais
+                      {formData.additional_images.length} de 5 imagens adicionais
                     </div>
                   )}
                 </div>
@@ -697,4 +609,3 @@ const Produtos = () => {
 };
 
 export default Produtos;
-

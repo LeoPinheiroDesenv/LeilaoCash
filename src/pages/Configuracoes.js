@@ -91,8 +91,8 @@ const Configuracoes = () => {
       });
 
       if (!found) {
-        const groupName = key.split('_')[0]; // e.g., 'mercadopago' -> 'payment'
-        const groupKey = groupName === 'mercadopago' ? 'payment' : groupName;
+        const groupName = key.startsWith('mercadopago_') ? 'payment' : 'general';
+        const groupKey = groupName;
 
         if (newSettings[groupKey]) {
             if (!newSettings[groupKey].some(s => s.key === key)) {
@@ -265,15 +265,43 @@ const Configuracoes = () => {
   const renderGeneralSettings = () => {
     const generalSettings = settings.general || [];
     
+    // Adicionar configuração de visibilidade de lances se não existir
+    const showBidHistorySetting = generalSettings.find(s => s.key === 'show_bid_history') || {
+        key: 'show_bid_history',
+        value: 'true',
+        description: 'Exibir histórico de lances na página do produto',
+        group: 'general'
+    };
+
+    // Mesclar com as configurações existentes para exibição
+    const displaySettings = [...generalSettings];
+    if (!generalSettings.some(s => s.key === 'show_bid_history')) {
+        displaySettings.push(showBidHistorySetting);
+    }
+    
     return (
       <div className="settings-grid">
-        {generalSettings.map(setting => (
+        {displaySettings.map(setting => (
           <div key={setting.key} className="setting-item">
             <div className="setting-header">
               <label className="setting-label" htmlFor={`input-${setting.key}`}>{setting.description || setting.key}</label>
               <span className="setting-key">{setting.key}</span>
             </div>
-            {renderTextInput(setting)}
+            
+            {setting.key === 'show_bid_history' ? (
+                <select
+                    id={`input-${setting.key}`}
+                    name={setting.key}
+                    value={setting.value || 'true'}
+                    onChange={(e) => handleInputChange(setting.key, e.target.value)}
+                    className="text-input"
+                >
+                    <option value="true">Sim</option>
+                    <option value="false">Não</option>
+                </select>
+            ) : (
+                renderTextInput(setting)
+            )}
           </div>
         ))}
       </div>

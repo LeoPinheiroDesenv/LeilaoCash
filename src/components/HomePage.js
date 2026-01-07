@@ -8,6 +8,8 @@ import api from '../services/api';
 const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [auctions, setAuctions] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [error, setError] = useState(null);
 
   const calculateTimeRemaining = (endDate) => {
@@ -24,13 +26,29 @@ const HomePage = () => {
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   };
 
-  const loadAuctionsMemo = useCallback(async () => {
+  const loadCategories = async () => {
+    try {
+      const response = await api.get('/categories?is_active=true');
+      if (response.data.success) {
+        setCategories(response.data.data);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar categorias:', error);
+    }
+  };
+
+  const loadAuctionsMemo = useCallback(async (categoryId = null) => {
     try {
       setLoading(true);
       setError(null);
       
+      let url = '/auctions/public?status=active&per_page=20';
+      if (categoryId) {
+        url += `&category_id=${categoryId}`;
+      }
+
       // Buscar leilões ativos e agendados
-      const response = await api.get('/auctions/public?status=active&per_page=20', {
+      const response = await api.get(url, {
         headers: {
           'Accept': 'application/json'
         }
@@ -50,7 +68,7 @@ const HomePage = () => {
             discount: Math.round(((parseFloat(product.price) - parseFloat(auction.current_bid || auction.starting_bid)) / parseFloat(product.price)) * 100),
             isHot: auction.status === 'active',
             timer: auction.end_date ? calculateTimeRemaining(auction.end_date) : '00:00:00',
-            bids: '0', // TODO: Implementar contagem de lances
+            bids: auction.bids_count || '0',
             url: `/produto/${product.id}`,
             image: product.image_url 
               ? (product.image_url.startsWith('http') 
@@ -58,7 +76,7 @@ const HomePage = () => {
                   : `${process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:8000'}${product.image_url}`)
               : 'https://via.placeholder.com/400x300?text=Sem+Imagem',
             description: product.description || '',
-            visits: '0', // TODO: Implementar contagem de visitas
+            visits: product.visits || '0',
             type: product.categoryModel?.name || product.category || 'Geral',
             location: 'Online',
             vibeDate: auction.start_date ? new Date(auction.start_date).toLocaleDateString('pt-BR') : '',
@@ -94,13 +112,22 @@ const HomePage = () => {
   }, []);
 
   useEffect(() => {
-    loadAuctionsMemo();
-  }, [loadAuctionsMemo]);
+    loadCategories();
+    loadAuctionsMemo(selectedCategory);
+  }, [loadAuctionsMemo, selectedCategory]);
 
-  if (loading) {
+  const handleSelectCategory = (categoryId) => {
+    setSelectedCategory(categoryId);
+  };
+
+  if (loading && !categories.length) {
     return (
       <>
-        <Hero />
+        <Hero 
+            categories={categories} 
+            selectedCategory={selectedCategory} 
+            onSelectCategory={handleSelectCategory} 
+        />
         <main>
           <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
             <div className="spinner" style={{ width: '48px', height: '48px', margin: '0 auto', border: '4px solid rgba(255, 255, 255, 0.1)', borderTopColor: '#4A9FD8', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
@@ -115,11 +142,15 @@ const HomePage = () => {
   if (error) {
     return (
       <>
-        <Hero />
+        <Hero 
+            categories={categories} 
+            selectedCategory={selectedCategory} 
+            onSelectCategory={handleSelectCategory} 
+        />
         <main>
           <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
             <p style={{ color: '#E55F52', marginBottom: '1rem' }}>{error}</p>
-            <button onClick={loadAuctionsMemo} style={{ padding: '0.75rem 1.5rem', background: '#4A9FD8', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
+            <button onClick={() => loadAuctionsMemo(selectedCategory)} style={{ padding: '0.75rem 1.5rem', background: '#4A9FD8', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
               Tentar Novamente
             </button>
           </div>
@@ -131,7 +162,11 @@ const HomePage = () => {
 
   return (
     <>
-      <Hero />
+      <Hero 
+        categories={categories} 
+        selectedCategory={selectedCategory} 
+        onSelectCategory={handleSelectCategory} 
+      />
       <main>
         {auctions.produtosDestaque.length > 0 && (
           <ProductSection 
@@ -182,4 +217,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-

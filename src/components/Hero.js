@@ -2,7 +2,7 @@ import React from 'react';
 import './hero.css';
 import CategoryChips from './CategoryChips';
 
-export default function Hero(){
+const Hero = ({ categories, selectedCategory, onSelectCategory }) => {
   return (
     <section className="hero">
       <div className="hero-inner">
@@ -24,8 +24,14 @@ export default function Hero(){
           <div><strong>1.8K+</strong> Leilões</div>
         </div>
 
-        <CategoryChips />
+        <CategoryChips 
+          categories={categories} 
+          selectedCategory={selectedCategory} 
+          onSelectCategory={onSelectCategory} 
+        />
       </div>
     </section>
-  )
-}
+  );
+};
+
+export default Hero;

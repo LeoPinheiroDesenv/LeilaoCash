@@ -1,28 +1,30 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import './categoryChips.css';
 
-const categories = [
-  { name: 'Smartphones', count: 45, emoji: '📱', slug: 'smartphones' },
-  { name: 'Notebooks', count: 23, emoji: '💻', slug: 'notebooks' },
-  { name: 'Games & Consoles', count: 34, emoji: '🎮', slug: 'games' },
-  { name: 'Wearables', count: 18, emoji: '⌚', slug: 'wearables' },
-  { name: 'Tablets', count: 12, emoji: '📟', slug: 'tablets' },
-  { name: 'Áudio', count: 27, emoji: '🎧', slug: 'audio' },
-  { name: 'Drones', count: 8, emoji: '🚁', slug: 'drones' },
-  { name: 'Câmeras', count: 15, emoji: '📷', slug: 'cameras' }
-];
-
-export default function CategoryChips(){
+const CategoryChips = ({ categories = [], onSelectCategory, selectedCategory }) => {
   return (
     <div className="chips-row">
+      <button 
+        onClick={() => onSelectCategory(null)} 
+        className={`chip ${!selectedCategory ? 'active' : ''}`}
+      >
+        <span className="chip-emoji">✨</span>
+        <span className="chip-name">Todos</span>
+      </button>
       {categories.map(cat => (
-        <Link key={cat.name} to={`/?category=${cat.slug}`} className="chip">
-          <span className="chip-emoji">{cat.emoji}</span>
+        <button 
+          key={cat.id} 
+          onClick={() => onSelectCategory(cat.id)} 
+          className={`chip ${selectedCategory === cat.id ? 'active' : ''}`}
+        >
+          {cat.icon_emoji && <span className="chip-emoji">{cat.icon_emoji}</span>}
           <span className="chip-name">{cat.name}</span>
-          <span className="chip-count">{cat.count}</span>
-        </Link>
+          {/* Opcional: Contagem de produtos */}
+          {/* <span className="chip-count">{cat.products_count}</span> */}
+        </button>
       ))}
     </div>
-  )
-}
+  );
+};
+
+export default CategoryChips;

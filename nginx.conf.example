@@ -1,0 +1,41 @@
+server {
+    # Ouve na porta 80 para HTTP
+    listen 80;
+
+    # (Opcional mas recomendado) Redireciona todo o tráfego HTTP para HTTPS
+    server_name vibeget.net www.vibeget.net;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    # Ouve na porta 443 para HTTPS
+    listen 443 ssl;
+    server_name vibeget.net www.vibeget.net;
+
+    # --- CAMINHOS PARA SEUS CERTIFICADOS SSL ---
+    # Substitua pelos caminhos corretos no seu servidor
+    ssl_certificate /etc/letsencrypt/live/vibeget.net/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/vibeget.net/privkey.pem;
+
+    # --- CAMINHO PARA OS ARQUIVOS DA APLICAÇÃO ---
+    # Substitua pelo caminho onde os arquivos do 'build' do seu React estão
+    root /var/www/vibeget.net/html;
+
+    # Arquivo principal a ser servido
+    index index.html;
+
+    location / {
+        # Esta é a correção principal.
+        # Tenta encontrar um arquivo com o nome exato da URL ($uri).
+        # Se não encontrar, tenta como um diretório ($uri/).
+        # Se ambos falharem, ele serve o /index.html.
+        # Isso permite que o React Router controle a navegação.
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Configurações de cache para arquivos estáticos para melhorar a performance
+    location ~* \\.(?:jpg|jpeg|gif|png|ico|css|js|svg)$ {
+        expires 365d;
+        add_header Cache-Control "public";
+    }
+}
