@@ -117,21 +117,6 @@ class BidController extends Controller
             }
 
             // Verificar saldo do usuário
-            // O custo do lance pode ser o valor total do lance ou um valor fixo (custo do bid)
-            // Neste modelo, assumindo que o usuário paga o valor do lance (modelo tradicional)
-            // Se for leilão de centavos, a lógica seria diferente (deduzir 1 crédito e aumentar o valor em X centavos)
-
-            // Vamos assumir modelo tradicional onde o saldo deve cobrir o lance
-            // Mas em leilões online, geralmente se usa "créditos" para dar lances.
-            // Se for modelo de créditos: deduz 1 crédito (ou valor do lance) do saldo.
-
-            // Vou implementar a lógica onde o valor do lance é debitado do saldo.
-            // Se o usuário for superado, o valor deveria ser devolvido?
-            // Em leilões tradicionais, sim. Em leilões de centavos, não (paga-se pelo direito de dar o lance).
-
-            // Dado o contexto "LeilaoCash" e "Comprar Créditos", parece ser um modelo híbrido ou de centavos.
-            // Mas o formulário pede "Valor do Lance". Então parece ser leilão tradicional.
-
             if ($user->balance < $amount) {
                 return response()->json([
                     'success' => false,
@@ -165,7 +150,7 @@ class BidController extends Controller
             // Registrar transação de débito
             Transaction::create([
                 'user_id' => $user->id,
-                'type' => 'bid',
+                'type' => 'bid_purchase', // Corrigido de 'bid' para 'bid_purchase'
                 'amount' => $amount,
                 'status' => 'completed',
                 'description' => 'Lance no leilão #' . $auction->id,
@@ -192,11 +177,6 @@ class BidController extends Controller
             $auction->current_bid = $amount;
             $auction->winner_id = $user->id;
             $auction->bids_count = ($auction->bids_count ?? 0) + 1;
-
-            // Prorrogação automática (opcional - ex: se faltar menos de 30s, adiciona 30s)
-            // if ($auction->end_date && now()->diffInSeconds($auction->end_date) < 30) {
-            //     $auction->end_date = $auction->end_date->addSeconds(30);
-            // }
 
             $auction->save();
 

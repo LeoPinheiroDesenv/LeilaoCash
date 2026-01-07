@@ -1,16 +1,14 @@
 import React from 'react';
+import DynamicPage from './DynamicPage';
 import './Termos.css';
 
 const Termos = () => {
   return (
-    <main className="page-content">
-      <div className="container">
-        <h1>Termos de Uso</h1>
-        <p>Página em desenvolvimento...</p>
-      </div>
-    </main>
+    <DynamicPage 
+      contentKey="page_termos" 
+      defaultTitle="Termos de Uso" 
+    />
   );
 };
 
 export default Termos;
-

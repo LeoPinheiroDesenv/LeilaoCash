@@ -1,16 +1,14 @@
 import React from 'react';
+import DynamicPage from './DynamicPage';
 import './Privacidade.css';
 
 const Privacidade = () => {
   return (
-    <main className="page-content">
-      <div className="container">
-        <h1>Política de Privacidade</h1>
-        <p>Página em desenvolvimento...</p>
-      </div>
-    </main>
+    <DynamicPage 
+      contentKey="page_privacidade" 
+      defaultTitle="Política de Privacidade" 
+    />
   );
 };
 
 export default Privacidade;
-

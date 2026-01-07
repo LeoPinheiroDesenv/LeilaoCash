@@ -1,16 +1,14 @@
 import React from 'react';
+import DynamicPage from './DynamicPage';
 import './Regras.css';
 
 const Regras = () => {
   return (
-    <main className="page-content">
-      <div className="container">
-        <h1>Regras dos Leilões</h1>
-        <p>Página em desenvolvimento...</p>
-      </div>
-    </main>
+    <DynamicPage 
+      contentKey="page_regras" 
+      defaultTitle="Regras dos Leilões" 
+    />
   );
 };
 
 export default Regras;
-

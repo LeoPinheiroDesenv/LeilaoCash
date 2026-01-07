@@ -1,16 +1,14 @@
 import React from 'react';
+import DynamicPage from './DynamicPage';
 import './FAQ.css';
 
 const FAQ = () => {
   return (
-    <main className="page-content">
-      <div className="container">
-        <h1>Perguntas Frequentes</h1>
-        <p>Página em desenvolvimento...</p>
-      </div>
-    </main>
+    <DynamicPage 
+      contentKey="page_faq" 
+      defaultTitle="Perguntas Frequentes" 
+    />
   );
 };
 
 export default FAQ;
-

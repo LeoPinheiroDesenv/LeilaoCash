@@ -6,9 +6,8 @@ import './DynamicPage.css';
  * Componente reutilizável para páginas com conteúdo dinâmico
  * @param {string} contentKey - Chave da configuração (ex: 'page_como_funciona')
  * @param {string} defaultTitle - Título padrão caso não haja conteúdo
- * @param {string} defaultContent - Conteúdo padrão caso não haja conteúdo
  */
-const DynamicPage = ({ contentKey, defaultTitle = 'Página', defaultContent = '' }) => {
+const DynamicPage = ({ contentKey, defaultTitle = 'Página' }) => {
   const { settings, loading } = useTheme();
 
   if (loading) {
@@ -24,7 +23,8 @@ const DynamicPage = ({ contentKey, defaultTitle = 'Página', defaultContent = ''
     );
   }
 
-  const content = settings[contentKey] || `<h1>${defaultTitle}</h1><p>${defaultContent}</p>`;
+  // Usar o conteúdo da API se existir, caso contrário, exibir uma mensagem padrão.
+  const content = settings[contentKey] || `<h1>${defaultTitle}</h1><p>Nenhum conteúdo disponível para esta página no momento.</p>`;
 
   return (
     <main className="page-content">
@@ -39,4 +39,3 @@ const DynamicPage = ({ contentKey, defaultTitle = 'Página', defaultContent = ''
 };
 
 export default DynamicPage;
-
