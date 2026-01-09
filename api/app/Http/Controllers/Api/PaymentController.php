@@ -12,7 +12,7 @@ use GuzzleHttp\Exception\ClientException;
 
 class PaymentController extends Controller
 {
-    // ... (createPixPayment method remains the same)
+    // ... (createPixPayment and createCreditCardPayment methods remain the same)
     public function createPixPayment(Request $request)
     {
         try {
@@ -150,9 +150,6 @@ class PaymentController extends Controller
         }
     }
 
-    /**
-     * Cria um pagamento via Cartão de Crédito no Mercado Pago
-     */
     public function createCreditCardPayment(Request $request)
     {
         try {
@@ -334,7 +331,74 @@ class PaymentController extends Controller
         }
     }
 
-    // ... (validateMercadoPago method remains the same)
+    /**
+     * Get the status of a payment transaction
+     */
+    public function getPaymentStatus(Request $request, $id)
+    {
+        try {
+            $transaction = Transaction::where('id', $id)
+                ->where('user_id', $request->user()->id)
+                ->first();
+
+            if (!$transaction) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Transação não encontrada.'
+                ], 404);
+            }
+
+            // Opcional: Se a transação ainda estiver pendente, verificar no Mercado Pago
+            if ($transaction->status === 'pending' && $transaction->external_id) {
+                $accessToken = Setting::getValue('mercadopago_access_token');
+                if ($accessToken) {
+                    $client = new Client();
+                    $response = $client->get("https://api.mercadopago.com/v1/payments/{$transaction->external_id}", [
+                        'headers' => [
+                            'Authorization' => 'Bearer ' . $accessToken,
+                        ]
+                    ]);
+                    $data = json_decode($response->getBody()->getContents(), true);
+
+                    if (isset($data['status']) && $data['status'] !== $transaction->status) {
+                        $transaction->status = $data['status'];
+
+                        // Se o pagamento foi aprovado, creditar o saldo do usuário
+                        if ($data['status'] === 'approved' || $data['status'] === 'completed') {
+                            $transaction->status = 'completed';
+                            $user = $request->user();
+                            if (!$user->transactions()->where('id', $transaction->id)->where('status', 'completed')->exists()) {
+                                $user->balance += $transaction->amount;
+                                $user->save();
+                            }
+                        }
+                        $transaction->save();
+                    }
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'id' => $transaction->id,
+                    'status' => $transaction->status,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error("[PaymentController] Erro ao verificar status do pagamento #{$id}", [
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao verificar status do pagamento.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Valida as credenciais do Mercado Pago
+     */
     public function validateMercadoPago(Request $request)
     {
         try {

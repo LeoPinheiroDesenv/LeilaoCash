@@ -54,17 +54,21 @@ const Leiloes = () => {
       const response = await api.get(`/auctions?${params.toString()}`);
       
       if (response.data.success) {
-        setAuctions(response.data.data.data);
+        console.log('Leilões carregados:', response.data.data);
+        setAuctions(response.data.data.data || []);
         setPagination({
           current_page: response.data.data.current_page,
           last_page: response.data.data.last_page,
           per_page: response.data.data.per_page,
           total: response.data.data.total
         });
+      } else {
+        console.error('Erro na resposta da API:', response.data);
+        setMessage({ type: 'error', text: 'Erro ao carregar leilões: ' + (response.data.message || 'Erro desconhecido') });
       }
     } catch (error) {
       console.error('Erro ao carregar leilões:', error);
-      setMessage({ type: 'error', text: 'Erro ao carregar leilões' });
+      setMessage({ type: 'error', text: 'Erro ao carregar leilões. Verifique o console.' });
     } finally {
       setLoading(false);
     }
@@ -338,15 +342,15 @@ const Leiloes = () => {
                     <div className="auction-details">
                       <div className="detail-item">
                         <span className="detail-label">Lance Inicial:</span>
-                        <span className="detail-value">R$ {parseFloat(auction.starting_bid).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        <span className="detail-value">R$ {parseFloat(auction.starting_bid || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                       </div>
                       <div className="detail-item">
                         <span className="detail-label">Lance Atual:</span>
-                        <span className="detail-value">R$ {parseFloat(auction.current_bid).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        <span className="detail-value">R$ {parseFloat(auction.current_bid || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                       </div>
                       <div className="detail-item">
                         <span className="detail-label">Incremento:</span>
-                        <span className="detail-value">R$ {parseFloat(auction.bid_increment).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        <span className="detail-value">R$ {parseFloat(auction.bid_increment || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                       </div>
                       {auction.cashback_percentage > 0 && (
                         <div className="detail-item">
@@ -625,4 +629,3 @@ const Leiloes = () => {
 };
 
 export default Leiloes;
-

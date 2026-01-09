@@ -240,6 +240,7 @@ export const DashboardAdminCashback = () => {
       const response = await api.get(`/reports/cashback-by-user?${params.toString()}`);
       
       if (response.data.success) {
+        console.log('Dados de Cashback recebidos:', response.data.data.data); // Log para depuração
         setUsers(response.data.data.data);
         setPagination({
           current_page: response.data.data.current_page,

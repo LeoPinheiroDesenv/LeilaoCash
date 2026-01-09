@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Countdown from '../components/Countdown';
 import UserLayout from '../components/UserLayout';
@@ -8,7 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import './DashboardUsuario.css';
 
 const DashboardUsuario = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [isBuyCreditsModalOpen, setIsBuyCreditsModalOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(null); // 'credit_card' or 'pix'
   const [creditAmount, setCreditAmount] = useState('');
@@ -17,6 +17,7 @@ const DashboardUsuario = () => {
   const [pixData, setPixData] = useState(null);
   const [loadingPix, setLoadingPix] = useState(false);
   const [pixError, setPixError] = useState('');
+  const [pixSuccess, setPixSuccess] = useState('');
 
   // Credit Card states
   const [cardNumber, setCardNumber] = useState('');
@@ -27,6 +28,8 @@ const DashboardUsuario = () => {
   const [loadingCard, setLoadingCard] = useState(false);
   const [cardError, setCardError] = useState('');
   const [cardSuccess, setCardSuccess] = useState('');
+
+  const pollingIntervalRef = useRef(null);
 
   const activeAuctions = [
     {
@@ -41,29 +44,14 @@ const DashboardUsuario = () => {
       bids: '892',
       image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=800'
     },
-    {
-      id: 2,
-      title: 'MacBook Pro M3 14"',
-      price: 'R$ 8.234,50',
-      oldPrice: 'R$ 16.999',
-      cashbackPercent: '7%',
-      discount: '52',
-      timer: '00:59:55',
-      bids: '1205',
-      image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800'
-    },
-    {
-      id: 5,
-      title: 'Samsung Galaxy S24 Ultra',
-      price: 'R$ 5.678,50',
-      oldPrice: 'R$ 8.999',
-      cashbackPercent: '4%',
-      isHot: true,
-      timer: '01:29:55',
-      bids: '934',
-      image: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=800'
-    }
   ];
+
+  const stopPolling = () => {
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
+    }
+  };
 
   const handleOpenBuyCredits = (e) => {
     e.preventDefault();
@@ -73,6 +61,7 @@ const DashboardUsuario = () => {
 
   const handleCloseBuyCredits = () => {
     setIsBuyCreditsModalOpen(false);
+    stopPolling();
     resetStates();
   };
 
@@ -81,6 +70,7 @@ const DashboardUsuario = () => {
     setCreditAmount('');
     setPixData(null);
     setPixError('');
+    setPixSuccess('');
     setCardNumber('');
     setCardExpiration('');
     setCardCvv('');
@@ -96,6 +86,29 @@ const DashboardUsuario = () => {
     setPixError('');
     setCardError('');
     setCardSuccess('');
+  };
+
+  const startPolling = (transactionId) => {
+    pollingIntervalRef.current = setInterval(async () => {
+      try {
+        const response = await api.get(`/payments/${transactionId}/status`);
+        if (response.data.success && response.data.data.status === 'completed') {
+          stopPolling();
+          setPixSuccess('Pagamento aprovado! Seus créditos foram adicionados.');
+          // Atualizar saldo do usuário no contexto
+          const meResponse = await api.get('/auth/me');
+          if (meResponse.data.success) {
+            updateUser(meResponse.data.data);
+          }
+          setTimeout(() => {
+            handleCloseBuyCredits();
+          }, 3000);
+        }
+      } catch (error) {
+        console.error('Erro no polling de status:', error);
+        // Opcional: parar o polling após X tentativas
+      }
+    }, 5000); // Verifica a cada 5 segundos
   };
 
   const handleGeneratePix = async () => {
@@ -114,6 +127,7 @@ const DashboardUsuario = () => {
 
       if (response.data.success) {
         setPixData(response.data.data);
+        startPolling(response.data.data.id); // Inicia o polling
       } else {
         setPixError(response.data.message || 'Erro ao gerar Pix.');
       }
@@ -126,7 +140,6 @@ const DashboardUsuario = () => {
   };
 
   const getPaymentMethodId = (number) => {
-    // Lógica simples para detectar bandeira (apenas para exemplo, ideal usar biblioteca ou regex mais robusto)
     const bin = number.substring(0, 6);
     if (/^4/.test(bin)) return 'visa';
     if (/^5[1-5]/.test(bin)) return 'master';
@@ -174,9 +187,12 @@ const DashboardUsuario = () => {
 
       if (response.data.success) {
         setCardSuccess('Pagamento realizado com sucesso! Seus créditos foram adicionados.');
+        const meResponse = await api.get('/auth/me');
+        if (meResponse.data.success) {
+            updateUser(meResponse.data.data);
+        }
         setTimeout(() => {
             handleCloseBuyCredits();
-            window.location.reload(); // Recarregar para atualizar saldo
         }, 2000);
       } else {
         setCardError(response.data.message || 'Erro ao processar pagamento.');
@@ -232,128 +248,8 @@ const DashboardUsuario = () => {
                   </svg>
                 </div>
               </div>
-              <div className="stat-card">
-                <div className="stat-content">
-                  <p className="stat-label">Leilões Vencidos</p>
-                  <p className="stat-value">5</p>
-                  <p className="stat-description">Produtos arrematados</p>
-                </div>
-                <div className="stat-icon">
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
-                    <path d="M3 6h18"></path>
-                    <path d="M16 10a4 4 0 0 1-8 0"></path>
-                  </svg>
-                </div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-content">
-                  <p className="stat-label">Lances Ativos</p>
-                  <p className="stat-value">3</p>
-                  <p className="stat-description">Leilões participando</p>
-                </div>
-                <div className="stat-icon">
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
-                  </svg>
-                </div>
-              </div>
             </div>
-            <div className="quick-actions">
-              <h2>Ações Rápidas</h2>
-              <div className="actions-grid">
-                <Link to="/" className="action-card">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
-                    <path d="M3 6h18"></path>
-                    <path d="M16 10a4 4 0 0 1-8 0"></path>
-                  </svg>
-                  <span>Ver Leilões</span>
-                </Link>
-                <Link to="/dashboard/meus-lances" className="action-card">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="m14.5 12.5-8 8a2.119 2.119 0 1 1-3-3l8-8"></path>
-                    <path d="m16 16 6-6"></path>
-                    <path d="m8 8 6-6"></path>
-                    <path d="m9 7 8 8"></path>
-                    <path d="m21 11-8-8"></path>
-                  </svg>
-                  <span>Meus Lances</span>
-                </Link>
-                <Link to="/dashboard/meu-cashback" className="action-card">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path>
-                    <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path>
-                  </svg>
-                  <span>Meu Cashback</span>
-                </Link>
-                <Link to="/dashboard/minha-conta" className="action-card">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                  </svg>
-                  <span>Minha Conta</span>
-                </Link>
-              </div>
-            </div>
-            <div className="active-auctions">
-              <div className="section-header">
-                <h2>Seus Lances Ativos</h2>
-                <Link to="/dashboard/meus-lances" className="btn-ver-todos">
-                  Ver todos
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12h14"></path>
-                    <path d="m12 5 7 7-7 7"></path>
-                  </svg>
-                </Link>
-              </div>
-              <div className="auctions-grid">
-                {activeAuctions.map(auction => (
-                  <div key={auction.id} className="auction-card">
-                    <div className="auction-image-wrapper">
-                      <img src={auction.image} alt={auction.title} className="auction-image" />
-                      {auction.isHot && (
-                        <div className="badge-hot">Hot</div>
-                      )}
-                      {auction.discount && (
-                        <div className="discount-badge">-{auction.discount}%</div>
-                      )}
-                      {auction.cashbackPercent && (
-                        <div className="cashback-badge">{auction.cashbackPercent} Cashback</div>
-                      )}
-                      <div className="timer-badge">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5"/>
-                          <path d="M8 4v4l3 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                        </svg>
-                        <Countdown timeString={auction.timer} />
-                      </div>
-                    </div>
-                    <div className="auction-details">
-                      <h3>{auction.title}</h3>
-                      <div className="price-row">
-                        <span className="current-price">{auction.price}</span>
-                        {auction.oldPrice && (
-                          <span className="old-price">{auction.oldPrice}</span>
-                        )}
-                      </div>
-                      <div className="bids-count">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                          <circle cx="9" cy="7" r="4"></circle>
-                          <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-                          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                        </svg>
-                        {auction.bids} lances
-                      </div>
-                      <Link to={`/produto/${auction.id}`} className="btn-ver-leilao">Ver Leilão</Link>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
+            
             <Modal
               isOpen={isBuyCreditsModalOpen}
               onClose={handleCloseBuyCredits}
@@ -471,7 +367,9 @@ const DashboardUsuario = () => {
                   </button>
                   <h3>Pagamento via Pix</h3>
                   {pixError && <div className="alert alert-error" style={{marginBottom: '1rem', padding: '0.8rem', fontSize: '0.9rem'}}>{pixError}</div>}
-                  {!pixData ? (
+                  {pixSuccess && <div className="alert alert-success" style={{marginBottom: '1rem', padding: '0.8rem', fontSize: '0.9rem'}}>{pixSuccess}</div>}
+                  
+                  {!pixData && !pixSuccess ? (
                      <div className="form-group">
                       <label>Valor da Recarga (R$)</label>
                       <div className="input-with-button">
@@ -490,7 +388,7 @@ const DashboardUsuario = () => {
                         </button>
                       </div>
                     </div>
-                  ) : (
+                  ) : pixData && (
                     <div className="pix-content">
                       <p>Escaneie o QR Code abaixo para pagar:</p>
                       <div className="qr-code-placeholder" style={{ background: '#fff', padding: '10px', borderRadius: '8px' }}>
@@ -509,7 +407,7 @@ const DashboardUsuario = () => {
                         </div>
                       </div>
                       <p style={{ marginTop: '1rem', fontSize: '0.8rem', textAlign: 'center', color: '#666' }}>
-                        O pagamento será processado automaticamente após a confirmação.
+                        Aguardando pagamento... A tela atualizará automaticamente.
                       </p>
                     </div>
                   )}

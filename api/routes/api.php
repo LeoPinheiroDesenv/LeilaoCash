@@ -116,6 +116,7 @@ Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
     Route::prefix('payments')->group(function () {
         Route::post('/pix', [\App\Http\Controllers\Api\PaymentController::class, 'createPixPayment']);
         Route::post('/credit-card', [\App\Http\Controllers\Api\PaymentController::class, 'createCreditCardPayment']);
+        Route::get('/{id}/status', [\App\Http\Controllers\Api\PaymentController::class, 'getPaymentStatus']);
     });
 
     // Bidding Routes (for all authenticated users)
