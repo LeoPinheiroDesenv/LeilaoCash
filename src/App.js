@@ -15,7 +15,7 @@ import Termos from './pages/Termos';
 import Privacidade from './pages/Privacidade';
 import Regras from './pages/Regras';
 import RecuperarSenha from './pages/RecuperarSenha';
-import ResetPassword from './pages/ResetPassword'; // Importa o novo componente
+import ResetPassword from './pages/ResetPassword';
 import SubaDeNivel from './pages/SubaDeNivel';
 import Dashboard from './pages/Dashboard';
 import Configuracoes from './pages/Configuracoes';
@@ -23,6 +23,7 @@ import Usuarios from './pages/Usuarios';
 import Categorias from './pages/Categorias';
 import Produtos from './pages/Produtos';
 import Leiloes from './pages/Leiloes';
+import PublicAuctions from './pages/PublicAuctions'; // Importado
 import {
   DashboardAdminLances,
   DashboardAdminCashback,
@@ -121,6 +122,7 @@ function App() {
             
             {/* Rotas públicas */}
             <Route path="/" element={<Layout><HomePage /></Layout>} />
+            <Route path="/leiloes" element={<Layout><PublicAuctions /></Layout>} /> {/* Rota adicionada */}
             <Route path="/produto/:id" element={<Layout><ProductPage /></Layout>} />
             <Route path="/suba-de-nivel" element={<Layout><SubaDeNivel /></Layout>} />
             <Route path="/como-funciona" element={<Layout><ComoFunciona /></Layout>} />

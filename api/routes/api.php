@@ -27,6 +27,9 @@ Route::prefix('auth')->group(function () {
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 });
 
+// Webhooks (Public but secure logic inside)
+Route::post('/webhooks/mercadopago', [\App\Http\Controllers\Api\WebhookController::class, 'handleMercadoPago']);
+
 // Health check
 Route::get('/health', function () {
     return response()->json([

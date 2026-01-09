@@ -25,7 +25,11 @@ class AuctionController extends Controller
                 $search = $request->search;
                 $query->where(function($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")
-                      ->orWhere('description', 'like', "%{$search}%");
+                      ->orWhere('description', 'like', "%{$search}%")
+                      ->orWhereHas('products', function($q) use ($search) {
+                          $q->where('name', 'like', "%{$search}%")
+                            ->orWhere('description', 'like', "%{$search}%");
+                      });
                 });
             }
 
@@ -33,8 +37,15 @@ class AuctionController extends Controller
                 $query->where('status', $request->status);
             }
 
+            if ($request->has('category_id')) {
+                $categoryId = $request->category_id;
+                $query->whereHas('products', function($q) use ($categoryId) {
+                    $q->where('category_id', $categoryId);
+                });
+            }
+
             // Incluir relacionamentos
-            $query->with(['products', 'winner:id,name,email']);
+            $query->with(['products.categoryModel', 'winner:id,name,email']);
 
             // Paginação
             $perPage = $request->get('per_page', 15);
@@ -64,7 +75,7 @@ class AuctionController extends Controller
     public function show($id)
     {
         try {
-            $auction = Auction::with(['products', 'winner'])->findOrFail($id);
+            $auction = Auction::with(['products.categoryModel', 'winner'])->findOrFail($id);
 
             return response()->json([
                 'success' => true,
@@ -323,4 +334,3 @@ class AuctionController extends Controller
         }
     }
 }
-
