@@ -79,7 +79,7 @@ const HomePage = () => {
               ? (product.image_url.startsWith('http') 
                   ? product.image_url 
                   : `${process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:8000'}${product.image_url}`)
-              : 'https://via.placeholder.com/400x300?text=Sem+Imagem',
+              : `https://api.vibeget.net/uploads/padrao.jpg`,
             description: product.description || '',
             visits: product.visits || '0',
             type: product.categoryModel?.name || product.category || 'Geral',
