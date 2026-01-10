@@ -17,7 +17,7 @@ const CategoryChips = ({ categories = [], onSelectCategory, selectedCategory }) 
           onClick={() => onSelectCategory(cat.id)} 
           className={`chip ${selectedCategory === cat.id ? 'active' : ''}`}
         >
-          {cat.icon_emoji && <span className="chip-emoji">{cat.icon_emoji}</span>}
+          {cat.icon && <span className="chip-emoji">{cat.icon}</span>}
           <span className="chip-name">{cat.name}</span>
           {/* Opcional: Contagem de produtos */}
           {/* <span className="chip-count">{cat.products_count}</span> */}

@@ -4,6 +4,21 @@ import ProductSection from '../components/ProductSection';
 import api from '../services/api';
 import './PublicAuctions.css';
 
+// Função utilitária movida para fora do componente para evitar recriação
+const calculateTimeRemaining = (endDate) => {
+  const now = new Date();
+  const end = new Date(endDate);
+  const diff = end - now;
+
+  if (diff <= 0) return '00:00:00';
+
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+};
+
 const PublicAuctions = () => {
   const { getText } = useTheme();
   const [loading, setLoading] = useState(true);
@@ -14,20 +29,6 @@ const PublicAuctions = () => {
     category_id: ''
   });
   const [categories, setCategories] = useState([]);
-
-  const calculateTimeRemaining = (endDate) => {
-    const now = new Date();
-    const end = new Date(endDate);
-    const diff = end - now;
-
-    if (diff <= 0) return '00:00:00';
-
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-  };
 
   const loadCategories = async () => {
     try {
@@ -86,14 +87,19 @@ const PublicAuctions = () => {
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [filters]); // Dependência apenas de filters
 
   useEffect(() => {
     loadCategories();
   }, []);
 
   useEffect(() => {
-    loadAuctions();
+    // Adicionando debounce para evitar requisições excessivas na busca
+    const timeoutId = setTimeout(() => {
+        loadAuctions();
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
   }, [loadAuctions]);
 
   return (

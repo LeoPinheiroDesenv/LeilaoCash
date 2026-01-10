@@ -3,7 +3,7 @@ import './hero.css';
 import CategoryChips from './CategoryChips';
 import { useTheme } from '../contexts/ThemeContext';
 
-const Hero = ({ categories, selectedCategory, onSelectCategory }) => {
+const Hero = ({ categories, selectedCategory, onSelectCategory, searchTerm, onSearch }) => {
   const { getText } = useTheme();
 
   return (
@@ -18,7 +18,11 @@ const Hero = ({ categories, selectedCategory, onSelectCategory }) => {
           <svg className="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM19 19l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          <input placeholder={getText('text_hero_search_placeholder', 'Buscar produtos em leilão...')} />
+          <input 
+            placeholder={getText('text_hero_search_placeholder', 'Buscar produtos em leilão...')} 
+            value={searchTerm}
+            onChange={(e) => onSearch(e.target.value)}
+          />
         </div>
 
         <div className="hero-stats">

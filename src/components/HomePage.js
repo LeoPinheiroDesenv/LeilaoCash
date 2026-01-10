@@ -5,26 +5,28 @@ import WhyChooseUs from './WhyChooseUs';
 import ProductSection from './ProductSection';
 import api from '../services/api';
 
+// Função utilitária movida para fora do componente para evitar recriação
+const calculateTimeRemaining = (endDate) => {
+  const now = new Date();
+  const end = new Date(endDate);
+  const diff = end - now;
+
+  if (diff <= 0) return '00:00:00';
+
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+};
+
 const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [auctions, setAuctions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState(null);
-
-  const calculateTimeRemaining = (endDate) => {
-    const now = new Date();
-    const end = new Date(endDate);
-    const diff = end - now;
-
-    if (diff <= 0) return '00:00:00';
-
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-  };
 
   const loadCategories = async () => {
     try {
@@ -37,7 +39,7 @@ const HomePage = () => {
     }
   };
 
-  const loadAuctionsMemo = useCallback(async (categoryId = null) => {
+  const loadAuctionsMemo = useCallback(async (categoryId = null, search = '') => {
     try {
       setLoading(true);
       setError(null);
@@ -45,6 +47,9 @@ const HomePage = () => {
       let url = '/auctions/public?status=active&per_page=20';
       if (categoryId) {
         url += `&category_id=${categoryId}`;
+      }
+      if (search) {
+        url += `&search=${search}`;
       }
 
       // Buscar leilões ativos e agendados
@@ -109,24 +114,35 @@ const HomePage = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, []); // Dependências vazias, pois calculateTimeRemaining agora é externa
 
   useEffect(() => {
     loadCategories();
-    loadAuctionsMemo(selectedCategory);
-  }, [loadAuctionsMemo, selectedCategory]);
+    // Adicionando um debounce simples para evitar muitas requisições durante a digitação
+    const timeoutId = setTimeout(() => {
+        loadAuctionsMemo(selectedCategory, searchTerm);
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [loadAuctionsMemo, selectedCategory, searchTerm]);
 
   const handleSelectCategory = (categoryId) => {
     setSelectedCategory(categoryId);
   };
 
-  if (loading && !categories.length) {
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+  };
+
+  if (loading && !categories.length && !auctions.produtosDestaque) {
     return (
       <>
         <Hero 
             categories={categories} 
             selectedCategory={selectedCategory} 
-            onSelectCategory={handleSelectCategory} 
+            onSelectCategory={handleSelectCategory}
+            searchTerm={searchTerm}
+            onSearch={handleSearch}
         />
         <main>
           <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
@@ -145,12 +161,14 @@ const HomePage = () => {
         <Hero 
             categories={categories} 
             selectedCategory={selectedCategory} 
-            onSelectCategory={handleSelectCategory} 
+            onSelectCategory={handleSelectCategory}
+            searchTerm={searchTerm}
+            onSearch={handleSearch}
         />
         <main>
           <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
             <p style={{ color: '#E55F52', marginBottom: '1rem' }}>{error}</p>
-            <button onClick={() => loadAuctionsMemo(selectedCategory)} style={{ padding: '0.75rem 1.5rem', background: '#4A9FD8', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
+            <button onClick={() => loadAuctionsMemo(selectedCategory, searchTerm)} style={{ padding: '0.75rem 1.5rem', background: '#4A9FD8', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
               Tentar Novamente
             </button>
           </div>
@@ -165,10 +183,12 @@ const HomePage = () => {
       <Hero 
         categories={categories} 
         selectedCategory={selectedCategory} 
-        onSelectCategory={handleSelectCategory} 
+        onSelectCategory={handleSelectCategory}
+        searchTerm={searchTerm}
+        onSearch={handleSearch}
       />
       <main>
-        {auctions.produtosDestaque.length > 0 && (
+        {auctions.produtosDestaque && auctions.produtosDestaque.length > 0 && (
           <ProductSection 
             title="Em Destaque" 
             subtitle="Os leilões mais disputados"
@@ -176,7 +196,7 @@ const HomePage = () => {
             products={auctions.produtosDestaque}
           />
         )}
-        {auctions.produtosQuentes.length > 0 && (
+        {auctions.produtosQuentes && auctions.produtosQuentes.length > 0 && (
           <ProductSection 
             title="Ofertas Quentes" 
             subtitle="Preços irresistíveis"
@@ -184,7 +204,7 @@ const HomePage = () => {
             products={auctions.produtosQuentes}
           />
         )}
-        {auctions.produtosEncerrando.length > 0 && (
+        {auctions.produtosEncerrando && auctions.produtosEncerrando.length > 0 && (
           <ProductSection 
             title="Encerrando em Breve" 
             subtitle="Última chance!"
@@ -193,7 +213,9 @@ const HomePage = () => {
           />
         )}
         
-        {auctions.produtosDestaque.length === 0 && auctions.produtosQuentes.length === 0 && auctions.produtosEncerrando.length === 0 && (
+        {(!auctions.produtosDestaque || auctions.produtosDestaque.length === 0) && 
+         (!auctions.produtosQuentes || auctions.produtosQuentes.length === 0) && 
+         (!auctions.produtosEncerrando || auctions.produtosEncerrando.length === 0) && (
           <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
             <p style={{ color: '#8da4bf', fontSize: '1.1rem' }}>Nenhum leilão ativo no momento.</p>
             <p style={{ color: '#8da4bf', marginTop: '0.5rem' }}>Volte em breve para ver novos produtos!</p>

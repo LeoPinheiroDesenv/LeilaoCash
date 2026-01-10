@@ -1,11 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../components/AdminLayout';
 import api from '../services/api';
 import './Produtos.css';
 
 const Produtos = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [models, setModels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -30,8 +34,8 @@ const Produtos = () => {
     price: '',
     image: null,
     additional_images: [],
-    brand: '',
-    model: '',
+    brand_id: '',
+    product_model_id: '',
     specifications: {},
     is_active: true
   });
@@ -70,7 +74,17 @@ const Produtos = () => {
   useEffect(() => {
     loadProducts();
     loadCategories();
+    loadBrands();
   }, [loadProducts]);
+
+  // Carregar modelos quando a marca for selecionada
+  useEffect(() => {
+    if (formData.brand_id) {
+      loadModels(formData.brand_id);
+    } else {
+      setModels([]);
+    }
+  }, [formData.brand_id]);
 
   const loadCategories = async () => {
     try {
@@ -80,6 +94,28 @@ const Produtos = () => {
       }
     } catch (error) {
       console.error('Erro ao carregar categorias:', error);
+    }
+  };
+
+  const loadBrands = async () => {
+    try {
+      const response = await api.get('/brands?is_active=true');
+      if (response.data.success) {
+        setBrands(response.data.data);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar marcas:', error);
+    }
+  };
+
+  const loadModels = async (brandId) => {
+    try {
+      const response = await api.get(`/models?brand_id=${brandId}&is_active=true`);
+      if (response.data.success) {
+        setModels(response.data.data);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar modelos:', error);
     }
   };
 
@@ -93,11 +129,15 @@ const Produtos = () => {
         price: product.price || '',
         image: null,
         additional_images: [],
-        brand: product.brand || '',
-        model: product.model || '',
+        brand_id: product.brand_id || '',
+        product_model_id: product.product_model_id || '',
         specifications: product.specifications || {},
         is_active: product.is_active !== undefined ? product.is_active : true
       });
+      // Se tiver marca, carregar modelos
+      if (product.brand_id) {
+        loadModels(product.brand_id);
+      }
     } else {
       setEditingProduct(null);
       setFormData({
@@ -107,11 +147,12 @@ const Produtos = () => {
         price: '',
         image: null,
         additional_images: [],
-        brand: '',
-        model: '',
+        brand_id: '',
+        product_model_id: '',
         specifications: {},
         is_active: true
       });
+      setModels([]);
     }
     setShowModal(true);
   };
@@ -126,7 +167,6 @@ const Produtos = () => {
     const { name, value, type, checked, files } = e.target;
     if (type === 'file') {
       if (name === 'additional_images') {
-        // Permitir múltiplos arquivos (até 5)
         const fileArray = Array.from(files);
         const maxImages = 5;
         const currentCount = formData.additional_images.length;
@@ -178,17 +218,14 @@ const Produtos = () => {
       formDataToSend.append('description', formData.description || '');
       if (formData.category_id) formDataToSend.append('category_id', formData.category_id);
       formDataToSend.append('price', parseFloat(formData.price));
-      formDataToSend.append('brand', formData.brand || '');
-      formDataToSend.append('model', formData.model || '');
-      // Converter boolean para string para FormData
+      if (formData.brand_id) formDataToSend.append('brand_id', formData.brand_id);
+      if (formData.product_model_id) formDataToSend.append('product_model_id', formData.product_model_id);
       formDataToSend.append('is_active', formData.is_active ? '1' : '0');
       
-      // Imagem principal
       if (formData.image) {
         formDataToSend.append('image', formData.image);
       }
       
-      // Imagens adicionais (upload de arquivos)
       if (formData.additional_images && formData.additional_images.length > 0) {
         formData.additional_images.forEach((img, index) => {
           if (img instanceof File) {
@@ -299,13 +336,21 @@ const Produtos = () => {
               </select>
             </div>
           </div>
-          <button className="btn-primary" onClick={() => handleOpenModal()}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            Novo Produto
-          </button>
+          <div className="header-actions">
+            <button className="btn-secondary" onClick={() => navigate('/dashboard/marcas')}>
+              Gerenciar Marcas
+            </button>
+            <button className="btn-secondary" onClick={() => navigate('/dashboard/modelos')}>
+              Gerenciar Modelos
+            </button>
+            <button className="btn-primary" onClick={() => handleOpenModal()}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              Novo Produto
+            </button>
+          </div>
         </div>
 
         {loading ? (
@@ -474,23 +519,32 @@ const Produtos = () => {
                 <div className="form-row">
                   <div className="form-group">
                     <label>Marca</label>
-                    <input
-                      type="text"
-                      name="brand"
-                      value={formData.brand}
+                    <select
+                      name="brand_id"
+                      value={formData.brand_id}
                       onChange={handleInputChange}
-                      className="form-input"
-                    />
+                      className="form-select"
+                    >
+                      <option value="">Selecione...</option>
+                      {brands.map(brand => (
+                        <option key={brand.id} value={brand.id}>{brand.name}</option>
+                      ))}
+                    </select>
                   </div>
                   <div className="form-group">
                     <label>Modelo</label>
-                    <input
-                      type="text"
-                      name="model"
-                      value={formData.model}
+                    <select
+                      name="product_model_id"
+                      value={formData.product_model_id}
                       onChange={handleInputChange}
-                      className="form-input"
-                    />
+                      className="form-select"
+                      disabled={!formData.brand_id}
+                    >
+                      <option value="">Selecione...</option>
+                      {models.map(model => (
+                        <option key={model.id} value={model.id}>{model.name}</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 

@@ -40,7 +40,7 @@ Route::get('/health', function () {
 });
 
 // Public routes - Categories and Products (for homepage)
-Route::get('/categories', [\App\Http\Controllers\Api\CategoryController::class, 'index']);
+Route::get('/categories/public', [\App\Http\Controllers\Api\CategoryController::class, 'index']);
 Route::get('/products/public', [\App\Http\Controllers\Api\ProductController::class, 'index']);
 Route::get('/products/public/{id}', [\App\Http\Controllers\Api\ProductController::class, 'show']);
 Route::get('/auctions/public', [\App\Http\Controllers\Api\AuctionController::class, 'index']);
@@ -156,6 +156,24 @@ Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
             Route::get('/{id}', [\App\Http\Controllers\Api\CategoryController::class, 'show']);
             Route::put('/{id}', [\App\Http\Controllers\Api\CategoryController::class, 'update']);
             Route::delete('/{id}', [\App\Http\Controllers\Api\CategoryController::class, 'destroy']);
+        });
+
+        // Brand management
+        Route::prefix('brands')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Api\BrandController::class, 'index']);
+            Route::post('/', [\App\Http\Controllers\Api\BrandController::class, 'store']);
+            Route::get('/{id}', [\App\Http\Controllers\Api\BrandController::class, 'show']);
+            Route::put('/{id}', [\App\Http\Controllers\Api\BrandController::class, 'update']);
+            Route::delete('/{id}', [\App\Http\Controllers\Api\BrandController::class, 'destroy']);
+        });
+
+        // Product Model management
+        Route::prefix('models')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Api\ProductModelController::class, 'index']);
+            Route::post('/', [\App\Http\Controllers\Api\ProductModelController::class, 'store']);
+            Route::get('/{id}', [\App\Http\Controllers\Api\ProductModelController::class, 'show']);
+            Route::put('/{id}', [\App\Http\Controllers\Api\ProductModelController::class, 'update']);
+            Route::delete('/{id}', [\App\Http\Controllers\Api\ProductModelController::class, 'destroy']);
         });
 
         // Product management

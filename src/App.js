@@ -23,7 +23,9 @@ import Usuarios from './pages/Usuarios';
 import Categorias from './pages/Categorias';
 import Produtos from './pages/Produtos';
 import Leiloes from './pages/Leiloes';
-import PublicAuctions from './pages/PublicAuctions'; // Importado
+import PublicAuctions from './pages/PublicAuctions';
+import DashboardAdminMarcas from './pages/DashboardAdminMarcas'; // Importado
+import DashboardAdminModelos from './pages/DashboardAdminModelos'; // Importado
 import {
   DashboardAdminLances,
   DashboardAdminCashback,
@@ -65,6 +67,16 @@ function App() {
             <Route path="/dashboard/categorias" element={
               <ProtectedRoute adminOnly={true}>
                 <Categorias />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/marcas" element={
+              <ProtectedRoute adminOnly={true}>
+                <DashboardAdminMarcas />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/modelos" element={
+              <ProtectedRoute adminOnly={true}>
+                <DashboardAdminModelos />
               </ProtectedRoute>
             } />
             <Route path="/dashboard/produtos" element={
@@ -122,7 +134,7 @@ function App() {
             
             {/* Rotas públicas */}
             <Route path="/" element={<Layout><HomePage /></Layout>} />
-            <Route path="/leiloes" element={<Layout><PublicAuctions /></Layout>} /> {/* Rota adicionada */}
+            <Route path="/leiloes" element={<Layout><PublicAuctions /></Layout>} />
             <Route path="/produto/:id" element={<Layout><ProductPage /></Layout>} />
             <Route path="/suba-de-nivel" element={<Layout><SubaDeNivel /></Layout>} />
             <Route path="/como-funciona" element={<Layout><ComoFunciona /></Layout>} />

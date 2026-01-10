@@ -18,8 +18,10 @@ class Product extends Model
         'price',
         'image_url',
         'images',
-        'brand',
-        'model',
+        'brand', // Mantido para compatibilidade temporária
+        'model', // Mantido para compatibilidade temporária
+        'brand_id',
+        'product_model_id',
         'specifications',
         'is_active',
         'auction_id',
@@ -52,6 +54,22 @@ class Product extends Model
     }
 
     /**
+     * Relacionamento com marca
+     */
+    public function brandModel()
+    {
+        return $this->belongsTo(Brand::class, 'brand_id');
+    }
+
+    /**
+     * Relacionamento com modelo
+     */
+    public function productModel()
+    {
+        return $this->belongsTo(ProductModel::class, 'product_model_id');
+    }
+
+    /**
      * Relacionamento com favoritos
      */
     public function favorites()
@@ -67,4 +85,3 @@ class Product extends Model
         return $this->is_active && $this->auction_id === null;
     }
 }
-

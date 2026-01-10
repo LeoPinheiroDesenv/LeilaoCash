@@ -28,7 +28,12 @@ class AuctionController extends Controller
                       ->orWhere('description', 'like', "%{$search}%")
                       ->orWhereHas('products', function($q) use ($search) {
                           $q->where('name', 'like', "%{$search}%")
-                            ->orWhere('description', 'like', "%{$search}%");
+                            ->orWhere('description', 'like', "%{$search}%")
+                            ->orWhere('brand', 'like', "%{$search}%")
+                            ->orWhere('model', 'like', "%{$search}%")
+                            ->orWhereHas('categoryModel', function($q) use ($search) {
+                                $q->where('name', 'like', "%{$search}%");
+                            });
                       });
                 });
             }
@@ -40,7 +45,8 @@ class AuctionController extends Controller
             if ($request->has('category_id')) {
                 $categoryId = $request->category_id;
                 $query->whereHas('products', function($q) use ($categoryId) {
-                    $q->where('category_id', $categoryId);
+                    $q->where('category_id', $categoryId)
+                      ->orWhere('category', $categoryId); // Caso ainda usem o nome da categoria no campo texto
                 });
             }
 
