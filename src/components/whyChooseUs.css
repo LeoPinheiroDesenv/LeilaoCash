@@ -34,9 +34,16 @@
 
 .why-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 32px;
   margin-top: 24px;
+}
+
+@media (max-width: 1200px) {
+  .why-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
 }
 
 .why-card {
@@ -145,7 +152,11 @@
 /* Animações de entrada */
 .why-card {
   animation: fadeInUp 0.6s ease-out forwards;
-  opacity: 0;
+}
+
+/* Garantir que as animações não conflitem com o hover */
+.why-card.animated {
+  opacity: 1;
 }
 
 .why-card:nth-child(1) {

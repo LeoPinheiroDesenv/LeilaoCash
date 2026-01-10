@@ -21,17 +21,26 @@ class AuctionController extends Controller
             $query = Auction::query();
 
             // Filtros
-            if ($request->has('search')) {
-                $search = $request->search;
+            if ($request->has('search') && !empty(trim($request->search))) {
+                $search = trim($request->search);
                 $query->where(function($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")
                       ->orWhere('description', 'like', "%{$search}%")
                       ->orWhereHas('products', function($q) use ($search) {
                           $q->where('name', 'like', "%{$search}%")
                             ->orWhere('description', 'like', "%{$search}%")
+                            // Buscar nos campos diretos (compatibilidade)
                             ->orWhere('brand', 'like', "%{$search}%")
                             ->orWhere('model', 'like', "%{$search}%")
+                            ->orWhere('category', 'like', "%{$search}%")
+                            // Buscar nos relacionamentos
                             ->orWhereHas('categoryModel', function($q) use ($search) {
+                                $q->where('name', 'like', "%{$search}%");
+                            })
+                            ->orWhereHas('brandModel', function($q) use ($search) {
+                                $q->where('name', 'like', "%{$search}%");
+                            })
+                            ->orWhereHas('productModel', function($q) use ($search) {
                                 $q->where('name', 'like', "%{$search}%");
                             });
                       });
@@ -50,8 +59,13 @@ class AuctionController extends Controller
                 });
             }
 
-            // Incluir relacionamentos
-            $query->with(['products.categoryModel', 'winner:id,name,email']);
+            // Incluir relacionamentos necessários para a busca
+            $query->with([
+                'products.categoryModel',
+                'products.brandModel',
+                'products.productModel',
+                'winner:id,name,email'
+            ]);
 
             // Paginação
             $perPage = $request->get('per_page', 15);
@@ -81,7 +95,12 @@ class AuctionController extends Controller
     public function show($id)
     {
         try {
-            $auction = Auction::with(['products.categoryModel', 'winner'])->findOrFail($id);
+            $auction = Auction::with([
+                'products.categoryModel',
+                'products.brandModel',
+                'products.productModel',
+                'winner'
+            ])->findOrFail($id);
 
             return response()->json([
                 'success' => true,

@@ -221,14 +221,39 @@ const ProductPage = () => {
       return;
     }
 
+    if (!product || !product.id) {
+      console.error('Produto não encontrado');
+      return;
+    }
+
     try {
-      const response = await api.post(`/favorites/${product.id}/toggle`);
-      if (response.data.success) {
-        setIsFavorite(response.data.data.is_favorite);
+      setIsCheckingFavorite(true);
+      const response = await api.post(`/favorites/${product.id}/toggle`, {}, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.data && response.data.success) {
+        setIsFavorite(response.data.data?.is_favorite ?? !isFavorite);
+      } else {
+        throw new Error('Resposta inválida da API');
       }
     } catch (error) {
       console.error('Erro ao favoritar produto:', error);
-      alert(getText('text_favorite_error', 'Erro ao favoritar produto. Tente novamente.'));
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          getText('text_favorite_error', 'Erro ao favoritar produto. Tente novamente.');
+      
+      if (error.response?.status === 401) {
+        // Token expirado ou inválido
+        navigate('/login', { state: { from: `/produto/${id}` } });
+      } else {
+        alert(errorMessage);
+      }
+    } finally {
+      setIsCheckingFavorite(false);
     }
   };
 

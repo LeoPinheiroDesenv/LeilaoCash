@@ -148,17 +148,18 @@ const AdminLayout = ({ children, pageTitle, pageSubtitle }) => {
         </div>
       </aside>
       <main className="admin-main">
-        <header className="page-header">
-          <h1>{pageTitle || 'Dashboard'}</h1>
-        </header>
         <div className="dashboard-content">
-          {pageSubtitle && (
+          {pageSubtitle ? (
             <div className="content-header">
               <div>
                 <h1 className="page-title">{pageTitle || 'Dashboard'}</h1>
                 <p className="page-subtitle">{pageSubtitle}</p>
               </div>
             </div>
+          ) : (
+            <header className="page-header">
+              <h1>{pageTitle || 'Dashboard'}</h1>
+            </header>
           )}
           {children}
         </div>

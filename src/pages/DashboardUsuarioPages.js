@@ -389,16 +389,22 @@ export const DashboardUsuarioMeusLances = () => {
           total: response.data.data.total || 0
         });
 
-        // Calcular estatísticas
-        const total = bidsData.length;
+        // Calcular estatísticas dos dados retornados (página atual)
+        // Nota: Para estatísticas totais precisaríamos de uma API separada ou usar o total da paginação
+        const total = response.data.data.total || pagination.total || bidsData.length;
         const winning = bidsData.filter(b => b.is_winning).length;
-        const activeAuctions = bidsData.filter(b => b.auction?.status === 'active').length;
+        const activeAuctions = bidsData.filter(b => {
+          const auction = b.auction;
+          if (!auction) return false;
+          return auction.status === 'active';
+        }).length;
         const leading = bidsData.filter(b => {
           const auction = b.auction;
           if (!auction) return false;
+          if (auction.status !== 'active') return false;
           const currentBid = parseFloat(auction.current_bid || auction.starting_bid || 0);
           const myBid = parseFloat(b.amount);
-          return auction.status === 'active' && myBid >= currentBid;
+          return myBid >= currentBid;
         }).length;
 
         setStats({ total, winning, active: activeAuctions, leading });

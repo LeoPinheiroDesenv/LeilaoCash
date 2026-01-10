@@ -27,19 +27,27 @@
 .filter-select {
   width: 100%;
   padding: 0.875rem 1.25rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 10px;
   color: #e6eef8;
   font-size: 1rem;
   transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.filter-select option {
+  background-color: #0a1628;
+  color: #e6eef8;
+  padding: 10px;
 }
 
 .filter-input:focus,
 .filter-select:focus {
   outline: none;
   border-color: #4A9FD8;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(74, 159, 216, 0.2);
 }
 
 .filter-input::placeholder {
@@ -336,8 +344,8 @@
 .form-input,
 .form-select {
   padding: 0.875rem 1.25rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 10px;
   color: #e6eef8;
   font-size: 1rem;
@@ -345,10 +353,18 @@
 }
 
 .form-input:focus,
+.form-select option {
+  background-color: #0a1628;
+  color: #e6eef8;
+  padding: 10px;
+}
+
+.form-input:focus,
 .form-select:focus {
   outline: none;
   border-color: #4A9FD8;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(74, 159, 216, 0.2);
 }
 
 .form-input::placeholder {

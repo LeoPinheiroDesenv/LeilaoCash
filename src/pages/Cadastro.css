@@ -120,9 +120,14 @@
 .input-wrapper svg:first-of-type {
   position: absolute;
   left: 16px;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(74, 159, 216, 0.7);
   pointer-events: none;
   z-index: 1;
+  transition: color 0.2s;
+}
+
+.input-wrapper:has(input:focus) svg:first-of-type {
+  color: rgba(74, 159, 216, 1);
 }
 
 .input-wrapper input {
@@ -137,7 +142,8 @@
 }
 
 .input-wrapper input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(157, 176, 200, 0.7);
+  opacity: 1;
 }
 
 .input-wrapper input:focus {

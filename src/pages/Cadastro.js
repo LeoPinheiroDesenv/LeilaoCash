@@ -21,10 +21,35 @@ const Cadastro = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const formatCPF = (value) => {
+    const cpf = value.replace(/\D/g, '');
+    if (cpf.length <= 11) {
+      return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    }
+    return value;
+  };
+
+  const formatPhone = (value) => {
+    const phone = value.replace(/\D/g, '');
+    if (phone.length <= 11) {
+      return phone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+    }
+    return value;
+  };
+
   const handleChange = (e) => {
+    const { name, value } = e.target;
+    let formattedValue = value;
+
+    if (name === 'cpf') {
+      formattedValue = formatCPF(value);
+    } else if (name === 'telefone') {
+      formattedValue = formatPhone(value);
+    }
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: formattedValue
     });
   };
 
@@ -40,13 +65,17 @@ const Cadastro = () => {
     setLoading(true);
 
     try {
+      // Remover formatação antes de enviar
+      const cpfClean = formData.cpf.replace(/\D/g, '');
+      const phoneClean = formData.telefone.replace(/\D/g, '');
+
       const response = await api.post('/auth/register', {
         name: formData.nome,
         email: formData.email,
         password: formData.senha,
         password_confirmation: formData.confirmarSenha,
-        phone: formData.telefone,
-        cpf: formData.cpf
+        phone: phoneClean,
+        cpf: cpfClean
       });
 
       if (response.data.success) {
@@ -56,7 +85,18 @@ const Cadastro = () => {
       }
     } catch (err) {
       console.error('Erro no cadastro:', err);
-      setError(err.response?.data?.message || 'Erro ao realizar cadastro. Tente novamente.');
+      
+      if (err.response?.data?.errors) {
+        // Erros de validação do backend
+        const errors = err.response.data.errors;
+        const firstErrorKey = Object.keys(errors)[0];
+        const firstError = Array.isArray(errors[firstErrorKey]) 
+          ? errors[firstErrorKey][0] 
+          : errors[firstErrorKey];
+        setError(firstError || err.response?.data?.message || 'Erro ao realizar cadastro.');
+      } else {
+        setError(err.response?.data?.message || 'Erro ao realizar cadastro. Tente novamente.');
+      }
     } finally {
       setLoading(false);
     }

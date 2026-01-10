@@ -32,7 +32,7 @@ const PublicAuctions = () => {
 
   const loadCategories = async () => {
     try {
-      const response = await api.get('/categories?is_active=true');
+      const response = await api.get('/categories/public?is_active=true');
       if (response.data.success) {
         setCategories(response.data.data);
       }
@@ -48,7 +48,9 @@ const PublicAuctions = () => {
       
       let url = '/auctions/public?status=active&per_page=50';
       if (filters.category_id) url += `&category_id=${filters.category_id}`;
-      if (filters.search) url += `&search=${filters.search}`;
+      if (filters.search && filters.search.trim()) {
+        url += `&search=${encodeURIComponent(filters.search.trim())}`;
+      }
 
       const response = await api.get(url, {
         headers: { 'Accept': 'application/json' }
@@ -63,7 +65,7 @@ const PublicAuctions = () => {
             title: product.name,
             price: `R$ ${parseFloat(auction.current_bid || auction.starting_bid).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
             oldPrice: `R$ ${parseFloat(product.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-            cashbackPercent: `${parseFloat(auction.cashback_percentage || 0).toFixed(0)}%`,
+            cashbackPercent: parseFloat(auction.cashback_percentage || 0).toFixed(0),
             discount: Math.round(((parseFloat(product.price) - parseFloat(auction.current_bid || auction.starting_bid)) / parseFloat(product.price)) * 100),
             isHot: auction.status === 'active',
             timer: auction.end_date ? calculateTimeRemaining(auction.end_date) : '00:00:00',

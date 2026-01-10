@@ -35,6 +35,20 @@
   border-color: transparent;
   color: #fff;
   box-shadow: 0 4px 12px rgba(74, 159, 216, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.chip.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+  border-radius: 999px;
+  z-index: -1;
 }
 
 .chip-emoji {

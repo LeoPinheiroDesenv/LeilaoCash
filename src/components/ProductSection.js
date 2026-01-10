@@ -1,8 +1,10 @@
 import React, { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AuctionCard from './AuctionCard';
 
 function ProductSection({ title, subtitle, icon, products }) {
   const scrollContainerRef = useRef(null);
+  const navigate = useNavigate();
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -14,6 +16,10 @@ function ProductSection({ title, subtitle, icon, products }) {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollBy({ left: 320, behavior: 'smooth' });
     }
+  };
+
+  const handleSeeAll = () => {
+    navigate('/leiloes');
   };
 
   if (!products || products.length === 0) {
@@ -31,7 +37,7 @@ function ProductSection({ title, subtitle, icon, products }) {
             </h2>
             <p>{subtitle}</p>
           </div>
-          <button className="btn-see-all">
+          <button className="btn-see-all" onClick={handleSeeAll}>
             Ver todos
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M5 12h14"/>

@@ -24,6 +24,11 @@ export default function AuctionCard({
         {isHot && <div className="badge badge-hot">Hot</div>}
         {isEnded && <div className="badge badge-danger">Encerrado</div>}
         {discount && !isEnded && <div className="discount-badge">-{discount}%</div>}
+        {cashbackPercent && (
+          <div className="cashback-badge">
+            {cashbackPercent}% Cashback
+          </div>
+        )}
       </div>
       <div className="card-body">
         <h3 className="card-title">{title}</h3>
@@ -31,11 +36,6 @@ export default function AuctionCard({
           <div className="card-price">{price}</div>
           {oldPrice && <div className="card-old">{oldPrice}</div>}
         </div>
-        {cashbackPercent && (
-          <div className="cashback-badge">
-            {cashbackPercent}% Cashback
-          </div>
-        )}
         {timer && !isEnded && (
           <div className="timer">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">

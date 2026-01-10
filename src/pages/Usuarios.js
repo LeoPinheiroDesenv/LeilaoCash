@@ -90,12 +90,30 @@ const Usuarios = () => {
   const handleOpenModal = (user = null) => {
     if (user) {
       setEditingUser(user);
+      // Formatar CPF e telefone ao editar
+      const formatCPFForEdit = (cpf) => {
+        if (!cpf) return '';
+        const clean = cpf.replace(/\D/g, '');
+        return clean.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+      };
+      
+      const formatPhoneForEdit = (phone) => {
+        if (!phone) return '';
+        const clean = phone.replace(/\D/g, '');
+        if (clean.length === 11) {
+          return clean.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+        } else if (clean.length === 10) {
+          return clean.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+        }
+        return phone;
+      };
+
       setFormData({
         name: user.name || '',
         email: user.email || '',
         password: '',
-        cpf: user.cpf || '',
-        phone: user.phone || '',
+        cpf: formatCPFForEdit(user.cpf),
+        phone: formatPhoneForEdit(user.phone),
         birth_date: user.birth_date || '',
         address: user.address || '',
         city: user.city || '',
@@ -132,11 +150,38 @@ const Usuarios = () => {
     setMessage({ type: '', text: '' });
   };
 
+  const formatCPF = (value) => {
+    const cpf = value.replace(/\D/g, '');
+    if (cpf.length <= 11) {
+      return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    }
+    return value;
+  };
+
+  const formatPhone = (value) => {
+    const phone = value.replace(/\D/g, '');
+    if (phone.length <= 11) {
+      if (phone.length <= 10) {
+        return phone.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+      }
+      return phone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+    }
+    return value;
+  };
+
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
+    let formattedValue = value;
+
+    if (name === 'cpf') {
+      formattedValue = formatCPF(value);
+    } else if (name === 'phone') {
+      formattedValue = formatPhone(value);
+    }
+
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : formattedValue
     }));
 
     // Limpar permissões se mudar para tipo que não precisa
@@ -170,9 +215,32 @@ const Usuarios = () => {
     try {
       const dataToSend = { ...formData };
       
+      // Remover formatação de CPF e telefone antes de enviar
+      if (dataToSend.cpf) {
+        dataToSend.cpf = dataToSend.cpf.replace(/\D/g, '');
+      }
+      if (dataToSend.phone) {
+        dataToSend.phone = dataToSend.phone.replace(/\D/g, '');
+      }
+      
       // Não enviar senha se estiver vazia (edição)
       if (editingUser && !dataToSend.password) {
         delete dataToSend.password;
+      }
+
+      // Garantir que campos vazios sejam null ao invés de string vazia
+      if (dataToSend.cpf && dataToSend.cpf.trim() === '') {
+        dataToSend.cpf = null;
+      }
+      if (dataToSend.phone && dataToSend.phone.trim() === '') {
+        dataToSend.phone = null;
+      }
+
+      // Garantir que is_active é boolean
+      if (typeof dataToSend.is_active === 'undefined') {
+        dataToSend.is_active = true;
+      } else {
+        dataToSend.is_active = Boolean(dataToSend.is_active);
       }
 
       let response;

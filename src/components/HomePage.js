@@ -30,7 +30,7 @@ const HomePage = () => {
 
   const loadCategories = async () => {
     try {
-      const response = await api.get('/categories?is_active=true');
+      const response = await api.get('/categories/public?is_active=true');
       if (response.data.success) {
         setCategories(response.data.data);
       }
@@ -48,8 +48,8 @@ const HomePage = () => {
       if (categoryId) {
         url += `&category_id=${categoryId}`;
       }
-      if (search) {
-        url += `&search=${search}`;
+      if (search && search.trim()) {
+        url += `&search=${encodeURIComponent(search.trim())}`;
       }
 
       // Buscar leilões ativos e agendados
@@ -69,7 +69,7 @@ const HomePage = () => {
             title: product.name,
             price: `R$ ${parseFloat(auction.current_bid || auction.starting_bid).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
             oldPrice: `R$ ${parseFloat(product.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-            cashbackPercent: `${parseFloat(auction.cashback_percentage || 0).toFixed(0)}%`,
+            cashbackPercent: parseFloat(auction.cashback_percentage || 0).toFixed(0),
             discount: Math.round(((parseFloat(product.price) - parseFloat(auction.current_bid || auction.starting_bid)) / parseFloat(product.price)) * 100),
             isHot: auction.status === 'active',
             timer: auction.end_date ? calculateTimeRemaining(auction.end_date) : '00:00:00',
@@ -90,23 +90,35 @@ const HomePage = () => {
           }))
         );
 
-        // Dividir produtos em grupos para as seções
-        const total = products.length;
-        const produtosDestaque = products.slice(0, Math.ceil(total * 0.4));
-        const produtosQuentes = products.slice(Math.ceil(total * 0.4), Math.ceil(total * 0.7));
-        const produtosEncerrando = products.slice(Math.ceil(total * 0.7));
+        // Se uma categoria estiver selecionada OU houver pesquisa, mostrar todos os produtos sem dividir em seções
+        if (categoryId || search) {
+          setAuctions({
+            produtosCategoria: products,
+            produtosDestaque: [],
+            produtosQuentes: [],
+            produtosEncerrando: []
+          });
+        } else {
+          // Se não houver categoria selecionada nem pesquisa, dividir produtos em grupos para as seções
+          const total = products.length;
+          const produtosDestaque = products.slice(0, Math.ceil(total * 0.4));
+          const produtosQuentes = products.slice(Math.ceil(total * 0.4), Math.ceil(total * 0.7));
+          const produtosEncerrando = products.slice(Math.ceil(total * 0.7));
 
-        setAuctions({
-          produtosDestaque,
-          produtosQuentes,
-          produtosEncerrando
-        });
+          setAuctions({
+            produtosCategoria: [],
+            produtosDestaque,
+            produtosQuentes,
+            produtosEncerrando
+          });
+        }
       }
     } catch (error) {
       console.error('Erro ao carregar leilões:', error);
       setError('Erro ao carregar produtos. Tente novamente mais tarde.');
       // Em caso de erro, usar arrays vazios
       setAuctions({
+        produtosCategoria: [],
         produtosDestaque: [],
         produtosQuentes: [],
         produtosEncerrando: []
@@ -134,7 +146,7 @@ const HomePage = () => {
     setSearchTerm(term);
   };
 
-  if (loading && !categories.length && !auctions.produtosDestaque) {
+  if (loading && !categories.length && !auctions.produtosDestaque && !auctions.produtosCategoria) {
     return (
       <>
         <Hero 
@@ -188,7 +200,22 @@ const HomePage = () => {
         onSearch={handleSearch}
       />
       <main>
-        {auctions.produtosDestaque && auctions.produtosDestaque.length > 0 && (
+        {/* Se uma categoria estiver selecionada OU houver pesquisa, mostrar resultados */}
+        {(selectedCategory || searchTerm) && auctions.produtosCategoria && auctions.produtosCategoria.length > 0 && (
+          <ProductSection 
+            title={
+              searchTerm 
+                ? `Resultados da busca: "${searchTerm}"`
+                : categories.find(cat => cat.id === selectedCategory)?.name || 'Produtos da Categoria'
+            } 
+            subtitle={`${auctions.produtosCategoria.length} produto(s) encontrado(s)`}
+            icon={searchTerm ? "🔍" : "📦"}
+            products={auctions.produtosCategoria}
+          />
+        )}
+
+        {/* Se nenhuma categoria estiver selecionada e não houver pesquisa, mostrar seções normais */}
+        {!selectedCategory && !searchTerm && auctions.produtosDestaque && auctions.produtosDestaque.length > 0 && (
           <ProductSection 
             title="Em Destaque" 
             subtitle="Os leilões mais disputados"
@@ -196,7 +223,7 @@ const HomePage = () => {
             products={auctions.produtosDestaque}
           />
         )}
-        {auctions.produtosQuentes && auctions.produtosQuentes.length > 0 && (
+        {!selectedCategory && !searchTerm && auctions.produtosQuentes && auctions.produtosQuentes.length > 0 && (
           <ProductSection 
             title="Ofertas Quentes" 
             subtitle="Preços irresistíveis"
@@ -204,7 +231,7 @@ const HomePage = () => {
             products={auctions.produtosQuentes}
           />
         )}
-        {auctions.produtosEncerrando && auctions.produtosEncerrando.length > 0 && (
+        {!selectedCategory && !searchTerm && auctions.produtosEncerrando && auctions.produtosEncerrando.length > 0 && (
           <ProductSection 
             title="Encerrando em Breve" 
             subtitle="Última chance!"
@@ -213,12 +240,24 @@ const HomePage = () => {
           />
         )}
         
-        {(!auctions.produtosDestaque || auctions.produtosDestaque.length === 0) && 
-         (!auctions.produtosQuentes || auctions.produtosQuentes.length === 0) && 
-         (!auctions.produtosEncerrando || auctions.produtosEncerrando.length === 0) && (
+        {/* Mensagem quando não há produtos */}
+        {((selectedCategory || searchTerm)
+          ? (!auctions.produtosCategoria || auctions.produtosCategoria.length === 0)
+          : ((!auctions.produtosDestaque || auctions.produtosDestaque.length === 0) && 
+             (!auctions.produtosQuentes || auctions.produtosQuentes.length === 0) && 
+             (!auctions.produtosEncerrando || auctions.produtosEncerrando.length === 0))
+        ) && (
           <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
-            <p style={{ color: '#8da4bf', fontSize: '1.1rem' }}>Nenhum leilão ativo no momento.</p>
-            <p style={{ color: '#8da4bf', marginTop: '0.5rem' }}>Volte em breve para ver novos produtos!</p>
+            <p style={{ color: '#8da4bf', fontSize: '1.1rem' }}>
+              {searchTerm
+                ? `Nenhum produto encontrado para "${searchTerm}".`
+                : selectedCategory 
+                  ? 'Nenhum produto encontrado nesta categoria no momento.' 
+                  : 'Nenhum leilão ativo no momento.'}
+            </p>
+            <p style={{ color: '#8da4bf', marginTop: '0.5rem' }}>
+              {searchTerm ? 'Tente buscar por outro termo.' : 'Volte em breve para ver novos produtos!'}
+            </p>
           </div>
         )}
         

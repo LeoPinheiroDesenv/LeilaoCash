@@ -37,7 +37,7 @@ const DashboardUsuario = () => {
       title: 'iPhone 15 Pro Max 256GB',
       price: 'R$ 4.523,00',
       oldPrice: 'R$ 9.999',
-      cashbackPercent: '5%',
+      cashbackPercent: '5',
       discount: '55',
       isHot: true,
       timer: '01:59:55',

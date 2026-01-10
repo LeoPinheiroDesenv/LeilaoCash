@@ -80,7 +80,7 @@ export const ThemeProvider = ({ children }) => {
       document.body.style.backgroundImage = 'none';
     }
 
-    document.title = themeSettings.site_name || 'LeilaoCash';
+    document.title = themeSettings.site_name || 'VibeGet - Leilões Online com Cashback';
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
       metaDescription.setAttribute('content', themeSettings.site_description || 'Leilões Online com Cashback');

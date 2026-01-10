@@ -99,6 +99,14 @@ const Categorias = () => {
         sort_order: parseInt(formData.sort_order) || 0
       };
 
+      // Se o slug estiver vazio, não enviar (será gerado automaticamente pelo backend)
+      if (!dataToSend.slug || dataToSend.slug.trim() === '') {
+        delete dataToSend.slug;
+      }
+
+      // Garantir que is_active é boolean
+      dataToSend.is_active = Boolean(dataToSend.is_active);
+
       let response;
       if (editingCategory) {
         response = await api.put(`/categories/${editingCategory.id}`, dataToSend);
