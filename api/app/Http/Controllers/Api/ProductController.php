@@ -89,7 +89,15 @@ class ProductController extends Controller
     public function show($id)
     {
         try {
-            $product = Product::with('auction')->findOrFail($id);
+            $product = Product::with([
+                'auction.bids' => function($query) {
+                    $query->latest()->limit(10)->with('user:id,name');
+                },
+                'auction.winner:id,name',
+                'categoryModel',
+                'brandModel',
+                'productModel'
+            ])->findOrFail($id);
 
             return response()->json([
                 'success' => true,
@@ -123,6 +131,8 @@ class ProductController extends Controller
                 'images.*' => 'url|max:500',
                 'brand' => 'nullable|string|max:100',
                 'model' => 'nullable|string|max:100',
+                'brand_id' => 'nullable|exists:brands,id',
+                'product_model_id' => 'nullable|exists:product_models,id',
                 'specifications' => 'nullable|array',
                 'is_active' => ['nullable', function ($attribute, $value, $fail) {
                     if (!in_array($value, [true, false, 'true', 'false', '1', '0', 1, 0, 'on', 'off'], true)) {
@@ -232,6 +242,8 @@ class ProductController extends Controller
                 'images.*' => 'url|max:500',
                 'brand' => 'nullable|string|max:100',
                 'model' => 'nullable|string|max:100',
+                'brand_id' => 'nullable|exists:brands,id',
+                'product_model_id' => 'nullable|exists:product_models,id',
                 'specifications' => 'nullable|array',
                 'is_active' => ['nullable', function ($attribute, $value, $fail) {
                     if (!in_array($value, [true, false, 'true', 'false', '1', '0', 1, 0, 'on', 'off'], true)) {
@@ -398,4 +410,3 @@ class ProductController extends Controller
         }
     }
 }
-

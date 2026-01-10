@@ -47,6 +47,17 @@ class TextSettingsSeeder extends Seeder
             'text_section_encerrando_title' => 'Encerrando em Breve',
             'text_section_encerrando_subtitle' => 'Última chance!',
 
+            // Why Choose Us
+            'text_why_title' => 'Por que comprar na VibeGet?',
+            'text_why_card_1_title' => 'Uma Nova Forma de Adquirir',
+            'text_why_card_1_desc' => 'Ao invés de comprar de forma convencional, você participa de uma Vibe interativa onde o Get que você está disposto a investir é o que define sua chance de ganhar. Isso transforma cada Vibe em uma experiência emocionante!',
+            'text_why_card_2_title' => 'Cash Back Sempre ao Seu Lado',
+            'text_why_card_2_desc' => 'Não importa se você ganha ou perde a Vibe, você sempre ganha Cash back! Mesmo não sendo o Champion Get, você recebe 40% de volta do valor que investiu, para continuar participando de mais Vibes. Mais oportunidades, mais chances de ganhar!',
+            'text_why_card_3_title' => 'Produtos Cobiçados',
+            'text_why_card_3_desc' => 'Oferecemos uma ampla variedade de produtos que atendem aos mais diversos gostos. A cada Vibe, você tem a chance de adquirir itens que são realmente desejados por todos.',
+            'text_why_card_4_title' => 'Agilidade e Praticidade',
+            'text_why_card_4_desc' => 'Nosso cadastro é rápido e gratuito, e a recarga de crédito pode ser feita de forma simples por Pix ou Cartão de Crédito. Tudo é feito para ser rápido, seguro e sem complicação, permitindo que você participe de Vibes sem perder tempo.',
+
             // Footer
             'text_footer_sobre' => 'Sobre Nós',
             'text_footer_sobre_desc' => 'A maior plataforma de leilões com cashback do Brasil. Produtos novos, lacrados e com garantia.',

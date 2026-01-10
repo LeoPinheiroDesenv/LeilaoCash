@@ -40,7 +40,7 @@ Route::get('/health', function () {
 });
 
 // Public routes - Categories and Products (for homepage)
-Route::get('/categories/public', [\App\Http\Controllers\Api\CategoryController::class, 'index']);
+Route::get('/categories', [\App\Http\Controllers\Api\CategoryController::class, 'index']);
 Route::get('/products/public', [\App\Http\Controllers\Api\ProductController::class, 'index']);
 Route::get('/products/public/{id}', [\App\Http\Controllers\Api\ProductController::class, 'show']);
 Route::get('/auctions/public', [\App\Http\Controllers\Api\AuctionController::class, 'index']);
@@ -124,6 +124,13 @@ Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
 
     // Bidding Routes (for all authenticated users)
     Route::post('/auctions/{id}/bids', [\App\Http\Controllers\Api\BidController::class, 'store']);
+
+    // Favorites Routes (for all authenticated users)
+    Route::prefix('favorites')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Api\FavoriteController::class, 'index']);
+        Route::post('/{productId}/toggle', [\App\Http\Controllers\Api\FavoriteController::class, 'toggle']);
+        Route::get('/{productId}/check', [\App\Http\Controllers\Api\FavoriteController::class, 'check']);
+    });
 
     // Admin only routes
     Route::middleware('admin')->group(function () {
@@ -218,13 +225,6 @@ Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
         Route::prefix('logs')->group(function () {
             Route::get('/', [\App\Http\Controllers\Api\LogController::class, 'index']);
             Route::delete('/', [\App\Http\Controllers\Api\LogController::class, 'clear']);
-        });
-
-        // Favorites
-        Route::prefix('favorites')->group(function () {
-            Route::get('/', [\App\Http\Controllers\Api\FavoriteController::class, 'index']);
-            Route::post('/{productId}/toggle', [\App\Http\Controllers\Api\FavoriteController::class, 'toggle']);
-            Route::get('/{productId}/check', [\App\Http\Controllers\Api\FavoriteController::class, 'check']);
         });
 
         // Mercado Pago Validation (Admin only)

@@ -501,6 +501,19 @@
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+.mobile-only {
+    display: none;
+}
+
+@media (max-width: 1024px) {
+    .mobile-only {
+        display: block;
+    }
+    .desktop-only {
+        display: none;
+    }
+}
+
 .bid-history-section h3 {
   color: var(--color-text);
   font-size: 1.25rem;

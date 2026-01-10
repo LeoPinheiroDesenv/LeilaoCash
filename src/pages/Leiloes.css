@@ -436,15 +436,6 @@
   color: #e6eef8;
   padding: 10px;
 }
-  width: 100%;
-  padding: 0.75rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: #e6eef8;
-  font-size: 0.95rem;
-  font-family: inherit;
-}
 
 .form-input:focus,
 .form-textarea:focus,
@@ -654,4 +645,3 @@
 .products-selection::-webkit-scrollbar-thumb:hover {
   background: #4A9FD8;
 }
-

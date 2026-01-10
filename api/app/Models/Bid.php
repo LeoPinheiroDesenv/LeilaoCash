@@ -15,7 +15,9 @@ class Bid extends Model
         'auction_id',
         'product_id',
         'amount',
-        'is_winning'
+        'is_winning',
+        'ip_address',
+        'user_agent'
     ];
 
     protected $casts = [
