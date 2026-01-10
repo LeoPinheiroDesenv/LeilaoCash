@@ -9,6 +9,10 @@ const ConfiguracoesTextos = ({ settings, onInputChange }) => {
   const pageGroups = useMemo(() => {
     const contentSettings = settings.content || [];
     const socialSettings = settings.social || [];
+    const textSettings = settings.text || []; // Incluir configurações do grupo 'text'
+    
+    // Combinar content e text para facilitar a filtragem
+    const allTextSettings = [...contentSettings, ...textSettings];
     
     const groups = {
       home: {
@@ -19,9 +23,24 @@ const ConfiguracoesTextos = ({ settings, onInputChange }) => {
             <polyline points="9 22 9 12 15 12 15 22"></polyline>
           </svg>
         ),
-        settings: contentSettings.filter(s => 
-          s.key.startsWith('home_') || s.key.startsWith('why_')
+        settings: allTextSettings.filter(s => 
+          s.key.startsWith('home_') || 
+          s.key.startsWith('why_') || 
+          s.key.startsWith('text_why_') ||
+          s.key.startsWith('text_hero_') ||
+          s.key.startsWith('text_section_')
         )
+      },
+      why_choose_us: {
+        name: 'Por que Escolher',
+        icon: (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <path d="M12 17h.01"></path>
+          </svg>
+        ),
+        settings: allTextSettings.filter(s => s.key.startsWith('text_why_'))
       },
       como_funciona: {
         name: 'Como Funciona',
@@ -32,7 +51,7 @@ const ConfiguracoesTextos = ({ settings, onInputChange }) => {
             <path d="M12 8h.01"></path>
           </svg>
         ),
-        settings: contentSettings.filter(s => s.key === 'page_como_funciona')
+        settings: allTextSettings.filter(s => s.key === 'page_como_funciona')
       },
       categorias: {
         name: 'Categorias',
@@ -44,7 +63,7 @@ const ConfiguracoesTextos = ({ settings, onInputChange }) => {
             <rect x="3" y="14" width="7" height="7"></rect>
           </svg>
         ),
-        settings: contentSettings.filter(s => s.key === 'page_categorias')
+        settings: allTextSettings.filter(s => s.key === 'page_categorias')
       },
       termos: {
         name: 'Termos',
@@ -57,7 +76,7 @@ const ConfiguracoesTextos = ({ settings, onInputChange }) => {
             <polyline points="10 9 9 9 8 9"></polyline>
           </svg>
         ),
-        settings: contentSettings.filter(s => s.key === 'page_termos')
+        settings: allTextSettings.filter(s => s.key === 'page_termos')
       },
       faq: {
         name: 'FAQ',
@@ -68,7 +87,7 @@ const ConfiguracoesTextos = ({ settings, onInputChange }) => {
             <path d="M12 17h.01"></path>
           </svg>
         ),
-        settings: contentSettings.filter(s => s.key === 'page_faq')
+        settings: allTextSettings.filter(s => s.key === 'page_faq')
       },
       privacidade: {
         name: 'Privacidade',
@@ -78,7 +97,7 @@ const ConfiguracoesTextos = ({ settings, onInputChange }) => {
             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
           </svg>
         ),
-        settings: contentSettings.filter(s => s.key === 'page_privacidade')
+        settings: allTextSettings.filter(s => s.key === 'page_privacidade')
       },
       regras: {
         name: 'Regras',
@@ -91,7 +110,7 @@ const ConfiguracoesTextos = ({ settings, onInputChange }) => {
             <line x1="10" y1="9" x2="8" y2="9"></line>
           </svg>
         ),
-        settings: contentSettings.filter(s => s.key === 'page_regras')
+        settings: allTextSettings.filter(s => s.key === 'page_regras')
       },
       contato: {
         name: 'Contato',
@@ -101,7 +120,7 @@ const ConfiguracoesTextos = ({ settings, onInputChange }) => {
             <polyline points="22,6 12,13 2,6"></polyline>
           </svg>
         ),
-        settings: contentSettings.filter(s => s.key === 'page_contato')
+        settings: allTextSettings.filter(s => s.key === 'page_contato')
       },
       suba_de_nivel: {
         name: 'Suba de Nível',
@@ -110,7 +129,26 @@ const ConfiguracoesTextos = ({ settings, onInputChange }) => {
             <polyline points="18 15 12 9 6 15"></polyline>
           </svg>
         ),
-        settings: contentSettings.filter(s => s.key === 'page_suba_de_nivel')
+        settings: allTextSettings.filter(s => s.key === 'page_suba_de_nivel')
+      },
+      interface: {
+        name: 'Interface Geral',
+        icon: (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="3" y1="9" x2="21" y2="9"></line>
+            <line x1="9" y1="21" x2="9" y2="9"></line>
+          </svg>
+        ),
+        settings: allTextSettings.filter(s => 
+          !s.key.startsWith('home_') && 
+          !s.key.startsWith('why_') && 
+          !s.key.startsWith('text_why_') && 
+          !s.key.startsWith('text_hero_') && 
+          !s.key.startsWith('text_section_') &&
+          !s.key.startsWith('page_') &&
+          !s.key.startsWith('social_')
+        )
       },
       redes_sociais: {
         name: 'Redes Sociais',
@@ -125,7 +163,7 @@ const ConfiguracoesTextos = ({ settings, onInputChange }) => {
 
     // Filtrar apenas grupos que têm settings
     return Object.entries(groups).filter(([_, group]) => group.settings.length > 0);
-  }, [settings.content, settings.social]);
+  }, [settings.content, settings.social, settings.text]);
 
   const renderTextEditor = (setting) => (
     <div key={setting.key} className="setting-item-full">
@@ -206,4 +244,3 @@ const ConfiguracoesTextos = ({ settings, onInputChange }) => {
 };
 
 export default ConfiguracoesTextos;
-

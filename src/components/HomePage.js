@@ -30,7 +30,7 @@ const HomePage = () => {
 
   const loadCategories = async () => {
     try {
-      const response = await api.get('/categories/public?is_active=true');
+      const response = await api.get('/categories?is_active=true');
       if (response.data.success) {
         setCategories(response.data.data);
       }
