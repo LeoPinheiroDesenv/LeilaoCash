@@ -78,7 +78,7 @@ const HomePage = () => {
             image: product.image_url 
               ? (product.image_url.startsWith('http') 
                   ? product.image_url 
-                  : `${process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:8000'}${product.image_url}`)
+                  : `${process.env.REACT_APP_API_URL?.replace('', '') || 'http://localhost:8000'}${product.image_url}`)
               : `https://api.vibeget.net/uploads/padrao.jpg`,
             description: product.description || '',
             visits: product.visits || '0',

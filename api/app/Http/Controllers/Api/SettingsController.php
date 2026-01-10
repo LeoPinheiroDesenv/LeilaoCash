@@ -24,14 +24,14 @@ class SettingsController extends Controller
                 'is_admin' => $request->user()?->is_admin,
                 'url' => $request->fullUrl(),
             ]);
-            
+
             $settings = Setting::all()->groupBy('group');
-            
+
             Log::info('[SettingsController] Configurações retornadas com sucesso', [
                 'settings_count' => $settings->count(),
                 'groups' => $settings->keys()->toArray()
             ]);
-            
+
             return response()->json([
                 'success' => true,
                 'data' => $settings
@@ -41,7 +41,7 @@ class SettingsController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erro ao buscar configurações',
@@ -57,7 +57,7 @@ class SettingsController extends Controller
     {
         try {
             $settings = Setting::getByGroup($group);
-            
+
             return response()->json([
                 'success' => true,
                 'data' => $settings
@@ -84,9 +84,9 @@ class SettingsController extends Controller
                 'is_admin' => $request->user()?->is_admin,
                 'url' => $request->fullUrl(),
             ]);
-            
+
             $settings = Setting::getAllSettings();
-            
+
             return response()->json([
                 'success' => true,
                 'data' => $settings
@@ -96,7 +96,7 @@ class SettingsController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erro ao buscar configurações',
@@ -124,7 +124,7 @@ class SettingsController extends Controller
 
         try {
             $setting = Setting::where('key', $key)->first();
-            
+
             if (!$setting) {
                 return response()->json([
                     'success' => false,
@@ -206,8 +206,8 @@ class SettingsController extends Controller
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
             $image->move(public_path('uploads'), $imageName);
-            
-            $imageUrl = '/uploads/' . $imageName;
+
+            $imageUrl = 'https://api.vibeget.net/uploads/' . $imageName;
 
             // Update setting
             $setting = Setting::where('key', $request->key)->first();
@@ -216,7 +216,7 @@ class SettingsController extends Controller
                 if ($setting->value && file_exists(public_path($setting->value))) {
                     unlink(public_path($setting->value));
                 }
-                
+
                 $setting->value = $imageUrl;
                 $setting->save();
             }

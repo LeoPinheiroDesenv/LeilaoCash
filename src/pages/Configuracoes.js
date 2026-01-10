@@ -9,6 +9,9 @@ import { useTheme } from '../contexts/ThemeContext';
 import Modal from '../components/Modal';
 import './Configuracoes.css';
 
+// Base URL da API (remove /api do final)
+const API_BASE_URL = (process.env.REACT_APP_API_URL || 'http://localhost:8000/api').replace('/api', '');
+
 const Configuracoes = () => {
   const { isAuthenticated, isAdmin } = useAuth();
   const { refreshTheme } = useTheme();
@@ -205,7 +208,10 @@ const Configuracoes = () => {
       <div className="image-upload-wrapper">
         {setting.value && (
           <div className="image-preview">
-            <img src={`http://localhost:8000${setting.value}`} alt="Preview" />
+            <img 
+              src={setting.value.startsWith('http') ? setting.value : `${API_BASE_URL}${setting.value}`} 
+              alt="Preview" 
+            />
           </div>
         )}
         <input
