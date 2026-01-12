@@ -292,7 +292,6 @@ export const DashboardUsuarioMinhaConta = () => {
               <input 
                 type="text" 
                 value={formData.cpf}
-                disabled
               />
             </div>
           </div>

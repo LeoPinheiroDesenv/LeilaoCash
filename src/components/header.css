@@ -72,6 +72,12 @@
     width: 100%;
 }
 
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
 .auth-buttons {
     display: flex;
     gap: 12px;
@@ -113,6 +119,39 @@
     box-shadow: 0 8px 24px rgba(229, 95, 82, 0.4);
 }
 
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: #e6eef8;
+    cursor: pointer;
+    padding: 0.5rem;
+    z-index: 1001;
+}
+
+.mobile-menu-overlay {
+    position: fixed;
+    top: 80px; /* Altura do header */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(7, 16, 38, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 999;
+    padding: 2rem;
+}
+
+.mobile-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.mobile-nav .nav-link {
+    font-size: 1.5rem;
+}
+
 @media (max-width: 1200px) {
     .main-nav {
         gap: 1rem;
@@ -130,5 +169,13 @@
     
     .header-content {
         gap: 1rem;
+    }
+
+    .menu-toggle {
+        display: block;
+    }
+
+    .auth-buttons .btn-login, .auth-buttons .btn-register {
+        display: none; /* Opcional: esconder botões de login/cadastro no mobile */
     }
 }

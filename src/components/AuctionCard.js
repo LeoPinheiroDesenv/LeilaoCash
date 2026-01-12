@@ -23,7 +23,7 @@ export default function AuctionCard({
         <img src={image} alt={title} className="media-placeholder" />
         {isHot && <div className="badge badge-hot">Hot</div>}
         {isEnded && <div className="badge badge-danger">Encerrado</div>}
-        {discount && !isEnded && <div className="discount-badge">-{discount}%</div>}
+        {discount && !isEnded && <div className="discount-badge">-{discount}</div>}
         {cashbackPercent && (
           <div className="cashback-badge">
             {cashbackPercent}% Cashback

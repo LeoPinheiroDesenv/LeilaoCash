@@ -40,7 +40,7 @@ Route::get('/health', function () {
 });
 
 // Public routes - Categories and Products (for homepage)
-Route::get('/categories', [\App\Http\Controllers\Api\CategoryController::class, 'index']);
+Route::get('/categories/public', [\App\Http\Controllers\Api\CategoryController::class, 'index']);
 Route::get('/products/public', [\App\Http\Controllers\Api\ProductController::class, 'index']);
 Route::get('/products/public/{id}', [\App\Http\Controllers\Api\ProductController::class, 'show']);
 Route::get('/auctions/public', [\App\Http\Controllers\Api\AuctionController::class, 'index']);
