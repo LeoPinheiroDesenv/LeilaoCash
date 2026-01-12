@@ -20,27 +20,22 @@ class AuctionController extends Controller
         try {
             $query = Auction::query();
 
+            Log::info('[AuctionController] Index chamado', $request->all());
+
             // Filtros
-            if ($request->has('search') && !empty(trim($request->search))) {
-                $search = trim($request->search);
+            if ($request->has('search') && !empty($request->search)) {
+                $search = $request->search;
+                Log::info('[AuctionController] Aplicando filtro de busca: ' . $search);
+
                 $query->where(function($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")
                       ->orWhere('description', 'like', "%{$search}%")
                       ->orWhereHas('products', function($q) use ($search) {
                           $q->where('name', 'like', "%{$search}%")
                             ->orWhere('description', 'like', "%{$search}%")
-                            // Buscar nos campos diretos (compatibilidade)
                             ->orWhere('brand', 'like', "%{$search}%")
                             ->orWhere('model', 'like', "%{$search}%")
-                            ->orWhere('category', 'like', "%{$search}%")
-                            // Buscar nos relacionamentos
                             ->orWhereHas('categoryModel', function($q) use ($search) {
-                                $q->where('name', 'like', "%{$search}%");
-                            })
-                            ->orWhereHas('brandModel', function($q) use ($search) {
-                                $q->where('name', 'like', "%{$search}%");
-                            })
-                            ->orWhereHas('productModel', function($q) use ($search) {
                                 $q->where('name', 'like', "%{$search}%");
                             });
                       });
@@ -51,21 +46,15 @@ class AuctionController extends Controller
                 $query->where('status', $request->status);
             }
 
-            if ($request->has('category_id')) {
+            if ($request->has('category_id') && !empty($request->category_id)) {
                 $categoryId = $request->category_id;
                 $query->whereHas('products', function($q) use ($categoryId) {
-                    $q->where('category_id', $categoryId)
-                      ->orWhere('category', $categoryId); // Caso ainda usem o nome da categoria no campo texto
+                    $q->where('category_id', $categoryId);
                 });
             }
 
-            // Incluir relacionamentos necessários para a busca
-            $query->with([
-                'products.categoryModel',
-                'products.brandModel',
-                'products.productModel',
-                'winner:id,name,email'
-            ]);
+            // Incluir relacionamentos
+            $query->with(['products.categoryModel', 'winner:id,name,email']);
 
             // Paginação
             $perPage = $request->get('per_page', 15);
@@ -95,12 +84,7 @@ class AuctionController extends Controller
     public function show($id)
     {
         try {
-            $auction = Auction::with([
-                'products.categoryModel',
-                'products.brandModel',
-                'products.productModel',
-                'winner'
-            ])->findOrFail($id);
+            $auction = Auction::with(['products.categoryModel', 'winner'])->findOrFail($id);
 
             return response()->json([
                 'success' => true,
