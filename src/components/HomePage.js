@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import Hero from './Hero';
+import Header from './Header';
 import WhyChooseUs from './WhyChooseUs';
 import ProductSection from './ProductSection';
 import api from '../services/api';
@@ -137,12 +138,11 @@ const HomePage = () => {
   if (loading && !categories.length && !auctions.produtosDestaque) {
     return (
       <>
+        <Header searchTerm={searchTerm} onSearch={handleSearch} />
         <Hero 
             categories={categories} 
             selectedCategory={selectedCategory} 
             onSelectCategory={handleSelectCategory}
-            searchTerm={searchTerm}
-            onSearch={handleSearch}
         />
         <main>
           <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
@@ -158,12 +158,11 @@ const HomePage = () => {
   if (error) {
     return (
       <>
+        <Header searchTerm={searchTerm} onSearch={handleSearch} />
         <Hero 
             categories={categories} 
             selectedCategory={selectedCategory} 
             onSelectCategory={handleSelectCategory}
-            searchTerm={searchTerm}
-            onSearch={handleSearch}
         />
         <main>
           <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
@@ -180,12 +179,11 @@ const HomePage = () => {
 
   return (
     <>
+      <Header searchTerm={searchTerm} onSearch={handleSearch} />
       <Hero 
         categories={categories} 
         selectedCategory={selectedCategory} 
         onSelectCategory={handleSelectCategory}
-        searchTerm={searchTerm}
-        onSearch={handleSearch}
       />
       <main>
         {auctions.produtosDestaque && auctions.produtosDestaque.length > 0 && (

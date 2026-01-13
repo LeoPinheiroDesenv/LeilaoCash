@@ -1,17 +1,18 @@
 :root {
-  /* Cores customizáveis - podem ser sobrescritas pelo ThemeContext */
-  --color-primary: #E55F52;
-  --color-secondary: #4A9FD8;
-  --color-background: #0a1628;
-  --color-text: #e6eef8;
+  /* Cores customizáveis - inspiradas no site de referência */
+  --color-primary: #ff4b2b;
+  --color-secondary: #00d2ff;
+  --color-background: #06090f;
+  --color-surface: #0d1117;
+  --color-text: #f0f6fc;
+  --color-text-muted: #8b949e;
   
-  /* Cores legadas para compatibilidade */
-  --color-coral: var(--color-primary);
-  --color-blue: var(--color-secondary);
-  --color-dark-bg: var(--color-background);
-  --color-text-light: var(--color-text);
+  /* Gradientes */
+  --gradient-primary: linear-gradient(90deg, #ff4b2b, #ff416c);
+  --gradient-secondary: linear-gradient(90deg, #00d2ff, #3a7bd5);
+  --gradient-action: linear-gradient(90deg, #ff4b2b, #3a7bd5);
   
-  /* Fontes customizáveis */
+  /* Fontes */
   --font-primary: 'Inter', system-ui, -apple-system, sans-serif;
   --font-secondary: 'Orbitron', system-ui, sans-serif;
 }

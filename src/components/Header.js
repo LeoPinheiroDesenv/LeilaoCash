@@ -1,26 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import './header.css';
 
-const Header = () => {
+const Header = ({ searchTerm, onSearch }) => {
   const { isAuthenticated } = useAuth();
   const { getLogoUrl, getText } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const logoSrc = getLogoUrl();
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <header className="site-header">
+    <header className={`site-header ${isScrolled ? 'scrolled' : ''}`}>
       <div className="container">
         <div className="header-content">
           <Link to="/" className="logo">
             <img src={logoSrc} alt="Logo" className="logo-full" />
           </Link>
+          
+          <div className="header-search">
+            <svg className="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM19 19l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <input 
+              placeholder={getText('text_hero_search_placeholder', 'Buscar produtos em leilão...')} 
+              value={searchTerm}
+              onChange={(e) => onSearch(e.target.value)}
+            />
+          </div>
+
           <nav className="main-nav">
-            <Link to="/leiloes" className="nav-link">{getText('text_header_leiloes', 'Leilões')}</Link>
-            <Link to="/como-funciona" className="nav-link">{getText('text_header_como_funciona', 'Como Funciona')}</Link>
-            <Link to="/suba-de-nivel" className="nav-link">{getText('text_header_suba_de_nivel', 'Suba de Nível')}</Link>
+            <Link to="/" className="nav-link">{getText('text_header_home', 'Início')}</Link>
+            <a href="#destaques" className="nav-link">{getText('text_header_highlights', 'Destaques')}</a>
+            <a href="#encerrando" className="nav-link">{getText('text_header_ending_soon', 'Encerrando')}</a>
           </nav>
           <div className="header-actions">
             <div className="auth-buttons">
@@ -29,7 +50,7 @@ const Header = () => {
               ) : (
                 <>
                   <Link to="/login" className="btn-login">{getText('text_header_login', 'Entrar')}</Link>
-                  <Link to="/cadastro" className="btn-register">{getText('text_header_cadastro', 'Cadastre-se Grátis')}</Link>
+                  <Link to="/cadastro" className="btn-register">{getText('text_header_cadastro', 'Cadastrar')}</Link>
                 </>
               )}
             </div>
@@ -52,9 +73,9 @@ const Header = () => {
       {isMenuOpen && (
         <div className="mobile-menu-overlay">
           <nav className="mobile-nav">
-            <Link to="/leiloes" className="nav-link" onClick={() => setIsMenuOpen(false)}>{getText('text_header_leiloes', 'Leilões')}</Link>
-            <Link to="/como-funciona" className="nav-link" onClick={() => setIsMenuOpen(false)}>{getText('text_header_como_funciona', 'Como Funciona')}</Link>
-            <Link to="/suba-de-nivel" className="nav-link" onClick={() => setIsMenuOpen(false)}>{getText('text_header_suba_de_nivel', 'Suba de Nível')}</Link>
+            <Link to="/" className="nav-link" onClick={() => setIsMenuOpen(false)}>{getText('text_header_home', 'Início')}</Link>
+            <a href="#destaques" className="nav-link" onClick={() => setIsMenuOpen(false)}>{getText('text_header_highlights', 'Destaques')}</a>
+            <a href="#encerrando" className="nav-link" onClick={() => setIsMenuOpen(false)}>{getText('text_header_ending_soon', 'Encerrando')}</a>
           </nav>
         </div>
       )}
