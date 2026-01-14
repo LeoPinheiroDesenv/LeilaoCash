@@ -11,14 +11,11 @@ const Hero = ({ categories, selectedCategory, onSelectCategory, searchTerm, onSe
       <div className="hero-inner">
         <div className="cashback-banner">
           <span className="banner-icon">⚡</span>
-          {getText('text_hero_tag', 'Até 10% de Cashback em cada lance')}
+          {getText('text_hero_tag', '#LeilõesDeCentavos')}
         </div>
         
         <h1 className="hero-title">
-          {getText('text_hero_title_1', 'Leilões Online com')}
-          <div className="hero-title-highlight">
-            <span>{getText('text_hero_title_highlight', 'Cashback Real')}</span>
-          </div>
+          {getText('text_hero_title', 'Leilões Online com Cashback Real')}
         </h1>
         
         <p className="hero-sub">

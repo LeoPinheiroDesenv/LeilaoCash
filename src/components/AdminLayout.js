@@ -1,15 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import '../pages/DashboardAdmin.css';
-import logo from '../assets/images/logo-vibeget.png';
 
 const AdminLayout = ({ children, pageTitle, pageSubtitle }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { getLogoUrl, settings } = useTheme();
+  const [expandedMenu, setExpandedMenu] = useState({});
 
   const handleLogout = async () => {
     await logout();
@@ -22,14 +22,31 @@ const AdminLayout = ({ children, pageTitle, pageSubtitle }) => {
     { path: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
     { path: '/dashboard/usuarios', label: 'Usuários', icon: 'users' },
     { path: '/dashboard/categorias', label: 'Categorias', icon: 'categories' },
+    { path: '/dashboard/marcas', label: 'Marcas', icon: 'categories' },
+    { path: '/dashboard/modelos', label: 'Modelos', icon: 'categories' },
     { path: '/dashboard/produtos', label: 'Produtos', icon: 'products' },
     { path: '/dashboard/leiloes', label: 'Leilões', icon: 'auctions' },
     { path: '/dashboard/lances', label: 'Lances', icon: 'bids' },
     { path: '/dashboard/cashback', label: 'Cashback', icon: 'cashback' },
     { path: '/dashboard/transacoes', label: 'Transações', icon: 'transactions' },
     { path: '/dashboard/relatorios', label: 'Relatórios', icon: 'reports' },
-    { path: '/dashboard/configuracoes', label: 'Configurações', icon: 'settings' }
+    { 
+      label: 'Configurações', 
+      icon: 'settings',
+      subItems: [
+        { path: '/dashboard/configuracoes/layout', label: 'Layout' },
+        { path: '/dashboard/configuracoes/textos', label: 'Textos' },
+        { path: '/dashboard/configuracoes/sistema', label: 'Sistema' }
+      ]
+    }
   ];
+
+  const toggleSubMenu = (label) => {
+    setExpandedMenu(prev => ({
+      ...prev,
+      [label]: !prev[label]
+    }));
+  };
 
   const getIcon = (iconName) => {
     const icons = {
@@ -115,14 +132,54 @@ const AdminLayout = ({ children, pageTitle, pageSubtitle }) => {
         </div>
         <nav className="sidebar-nav">
           {menuItems.map(item => (
-            <Link 
-              key={item.path} 
-              to={item.path} 
-              className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
-            >
-              {getIcon(item.icon)}
-              <span>{item.label}</span>
-            </Link>
+            <div key={item.label}>
+              {item.subItems ? (
+                <>
+                  <div 
+                    className={`nav-item ${expandedMenu[item.label] ? 'expanded' : ''}`}
+                    onClick={() => toggleSubMenu(item.label)}
+                    style={{ cursor: 'pointer', justifyContent: 'space-between' }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      {getIcon(item.icon)}
+                      <span>{item.label}</span>
+                    </div>
+                    <svg 
+                      width="16" 
+                      height="16" 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      style={{ transform: expandedMenu[item.label] ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s' }}
+                    >
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </div>
+                  {expandedMenu[item.label] && (
+                    <div className="sub-menu">
+                      {item.subItems.map(subItem => (
+                        <Link 
+                          key={subItem.path} 
+                          to={subItem.path} 
+                          className={`nav-item sub-item ${location.pathname === subItem.path ? 'active' : ''}`}
+                        >
+                          <span>{subItem.label}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <Link 
+                  to={item.path} 
+                  className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
+                >
+                  {getIcon(item.icon)}
+                  <span>{item.label}</span>
+                </Link>
+              )}
+            </div>
           ))}
         </nav>
         <div className="sidebar-footer">
