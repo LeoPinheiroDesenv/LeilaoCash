@@ -23,15 +23,15 @@
 
 .App {
   min-height: 100vh;
-  background: var(--color-background);
+  background: #080c16;
   color: var(--color-text);
   font-family: var(--font-primary);
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 2rem;
 }
 
 .product-section {
@@ -52,14 +52,14 @@
 }
 
 .section-title-group h2 {
-  font-size: 24px;
+  font-size: 28px;
   margin: 0 0 8px 0;
   color: #e6eef8;
   display: flex;
   align-items: center;
   gap: 12px;
-  font-weight: 700;
-  line-height: 32px;
+  font-weight: 800;
+  line-height: 36px;
   font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
 }
 
@@ -91,6 +91,11 @@
 
 .btn-see-all:hover {
   color: #E55F52;
+}
+
+.btn-see-all svg {
+  margin-left: 8px;
+  vertical-align: middle;
 }
 
 .carousel-wrapper {
@@ -185,9 +190,9 @@
 .cta-section h2 {
   font-size: 36px;
   margin: 0 0 16px 0;
-  color: #e6eef8;
+  color: #f8fafc;
   font-weight: 800;
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-primary, 'Inter', sans-serif);
 }
 
 .cta-section p {
@@ -214,8 +219,11 @@
   border-radius: 12px;
   font-weight: 700;
   font-size: 16px;
+  font-family: var(--font-primary, 'Inter', sans-serif);
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .btn-cta-primary:hover {
@@ -225,14 +233,17 @@
 
 .btn-cta-secondary {
   background: rgba(255, 255, 255, 0.05);
-  color: #e6eef8;
+  color: #f8fafc;
   border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 16px 32px;
   border-radius: 12px;
   font-weight: 600;
   font-size: 16px;
+  font-family: var(--font-primary, 'Inter', sans-serif);
   cursor: pointer;
   transition: background 0.2s;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .btn-cta-secondary:hover {
@@ -356,10 +367,11 @@ body {
 }
 
 .site-main {
-  padding-top: var(--header-initial-height);
+  padding-top: 66px;
   transition: padding-top 0.3s ease;
+  background: #080c16;
 }
 
 .site-header.scrolled + .site-main {
-  padding-top: var(--header-scrolled-height);
+  padding-top: 66px;
 }

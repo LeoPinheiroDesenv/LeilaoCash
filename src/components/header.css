@@ -1,21 +1,31 @@
 .site-header {
-    background: transparent;
-    padding: 24px 0;
-    position: absolute;
+    background: rgba(11, 17, 30, 0.9);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    padding: 0;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
+    z-index: 50;
     transition: all 0.3s ease;
+    border-bottom: 1px solid rgba(29, 40, 58, 0.7);
+}
+
+.topbar {
+    display: none;
 }
 
 .site-header.scrolled {
-    background: rgba(7, 8, 13, 0.8);
-    backdrop-filter: blur(12px);
-    padding: 16px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(11, 17, 30, 0.95);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    padding: 0;
+    border-bottom: 1px solid rgba(29, 40, 58, 0.7);
 }
-
+.site-header.scrolled .logo-full {
+    height: 40px;
+}
 .site-header .container {
     max-width: 1400px;
     margin: 0 auto;
@@ -26,6 +36,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    min-height: 66px;
+    gap: 16px;
 }
 
 .logo-full {
@@ -34,22 +46,82 @@
 
 .main-nav {
     display: flex;
-    gap: 2.5rem;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    gap: 32px;
+    align-items: center;
 }
 
-.nav-link {
-    color: #8da4bf;
+.main-nav .nav-link {
+    color: #f8fafc;
     text-decoration: none;
-    font-weight: 500;
     font-size: 14px;
-    transition: color 0.3s;
+    font-weight: 500;
+    transition: color 0.2s;
+    font-family: var(--font-primary, 'Inter', sans-serif);
 }
 
-.nav-link:hover {
-    color: #fff;
+.main-nav .nav-link:hover {
+    color: #4A9FD8;
+}
+
+.header-search {
+    flex: 1;
+    max-width: 400px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin: 0 2rem; /* Adicionar margem para separar do logo e dos botões */
+}
+
+.logo { display: flex; align-items: center; gap: 12px; }
+
+.auth-buttons .btn-login { color: #f8fafc; }
+.auth-buttons .btn-register { padding: 8px 20px; }
+
+.header-search .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.4);
+    pointer-events: none;
+}
+
+.header-search input {
+    width: 100%;
+    padding: 10px 14px 10px 44px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    color: #f8fafc;
+    font-size: 14px;
+    font-family: var(--font-primary, 'Inter', sans-serif);
+    transition: all 0.2s;
+}
+
+.header-search input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.header-search input:focus {
+    outline: none;
+    border-color: rgba(88, 78, 255, 0.5);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 12px rgba(88, 78, 255, 0.15);
+}
+
+@media (max-width: 992px) {
+    .header-search {
+        display: none;
+    }
+
+    .main-nav {
+        display: none; /* Ocultar em telas menores */
+    }
+
+    .menu-toggle {
+        display: block; /* Mostrar o botão de menu em telas menores */
+    }
 }
 
 .auth-buttons {
@@ -107,6 +179,7 @@
     backdrop-filter: blur(10px);
     z-index: 999;
     padding: 2rem;
+    display: block; /* Renderado condicionalmente em Header.js */
 }
 
 .mobile-nav {
@@ -120,50 +193,3 @@
     font-size: 1.5rem;
 }
 
-@media (max-width: 1200px) {
-    .main-nav {
-        gap: 1rem;
-    }
-    
-    .nav-link {
-        font-size: 14px;
-    }
-}
-
-.header-search {
-    flex: 1;
-    max-width: 400px;
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.header-search .search-icon {
-    position: absolute;
-    left: 12px;
-    color: rgba(255, 255, 255, 0.4);
-    pointer-events: none;
-}
-
-.header-search input {
-    width: 100%;
-    padding: 8px 12px 8px 38px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.05);
-    color: inherit;
-    font-size: 14px;
-    transition: all 0.2s;
-}
-
-.header-search input:focus {
-    outline: none;
-    border-color: var(--color-secondary);
-    background: rgba(255, 255, 255, 0.1);
-}
-
-@media (max-width: 992px) {
-    .header-search {
-        display: none;
-    }
-}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -24,8 +24,8 @@ import Categorias from './pages/Categorias';
 import Produtos from './pages/Produtos';
 import Leiloes from './pages/Leiloes';
 import PublicAuctions from './pages/PublicAuctions';
-import DashboardAdminMarcas from './pages/DashboardAdminMarcas'; // Importado
-import DashboardAdminModelos from './pages/DashboardAdminModelos'; // Importado
+import DashboardAdminMarcas from './pages/DashboardAdminMarcas';
+import DashboardAdminModelos from './pages/DashboardAdminModelos';
 import {
   DashboardAdminLances,
   DashboardAdminCashback,
@@ -39,6 +39,12 @@ import {
 } from './pages/DashboardUsuarioPages';
 
 function App() {
+  const [searchTerm, setSearchTerm] = React.useState('');
+
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+  };
+
   return (
     <ThemeProvider>
       <Router>
@@ -109,7 +115,20 @@ function App() {
                 <DashboardAdminRelatorios />
               </ProtectedRoute>
             } />
-            <Route path="/dashboard/configuracoes" element={
+            
+            {/* Rotas de Configurações */}
+            <Route path="/dashboard/configuracoes" element={<Navigate to="/dashboard/configuracoes/layout" replace />} />
+            <Route path="/dashboard/configuracoes/layout" element={
+              <ProtectedRoute adminOnly={true}>
+                <Configuracoes />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/configuracoes/textos" element={
+              <ProtectedRoute adminOnly={true}>
+                <Configuracoes />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/configuracoes/sistema" element={
               <ProtectedRoute adminOnly={true}>
                 <Configuracoes />
               </ProtectedRoute>
@@ -133,8 +152,8 @@ function App() {
             } />
             
             {/* Rotas públicas */}
-            <Route path="/" element={<Layout><HomePage /></Layout>} />
-            <Route path="/leiloes" element={<Layout><PublicAuctions /></Layout>} />
+            <Route path="/" element={<Layout onSearch={handleSearch}><HomePage searchTerm={searchTerm} onSearch={handleSearch} /></Layout>} />
+            <Route path="/leiloes" element={<Layout onSearch={handleSearch}><PublicAuctions searchTerm={searchTerm} /></Layout>} />
             <Route path="/produto/:id" element={<Layout><ProductPage /></Layout>} />
             <Route path="/suba-de-nivel" element={<Layout><SubaDeNivel /></Layout>} />
             <Route path="/como-funciona" element={<Layout><ComoFunciona /></Layout>} />

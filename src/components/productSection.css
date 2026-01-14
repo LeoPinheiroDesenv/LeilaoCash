@@ -1,80 +1,167 @@
 .product-section {
-  padding: 60px 0;
+  padding: 80px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  background: #080c16;
 }
 
-.product-section .container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 2rem;
+.product-section:last-of-type {
+  border-bottom: none;
 }
 
 .section-header {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   margin-bottom: 32px;
   gap: 20px;
-  text-align: center;
-}
-
-.section-title-group {
-  text-align: center;
 }
 
 .section-title-group h2 {
-  font-size: 32px;
-  margin: 0;
-  color: var(--color-text);
-  font-weight: 800;
+  font-size: 22px;
+  margin: 0 0 8px 0;
+  color: #f8fafc;
   display: flex;
   align-items: center;
   gap: 12px;
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
-  justify-content: center;
-}
-
-.section-title-group h2.no-icon {
-  display: block;
-}
-
-.section-title-group p {
-  margin: 6px 0 0 0;
-  color: #9fb0c8;
-  font-size: 14px;
+  font-weight: 800;
+  line-height: 28px;
+  font-family: var(--font-primary, 'Inter', sans-serif);
 }
 
 .section-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(90deg,#584eff,#b95bff);
+  background: linear-gradient(90deg, #9747ff, #584eff);
   color: #fff;
   font-size: 18px;
+  box-shadow: 0 6px 14px rgba(151, 71, 255, 0.2);
+  font-style: normal;
+  flex-shrink: 0;
 }
 
-.grid {
+.section-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.section-title-group p {
+  margin: 0;
+  color: #9fb0c8;
+  font-size: 15px;
+}
+
+.section-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-see-all {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #f8fafc;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-primary, 'Inter', sans-serif);
+  transition: all 0.2s ease;
+}
+
+.btn-see-all:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(88, 78, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-see-all svg {
+  transition: transform 0.2s ease;
+}
+
+.btn-see-all:hover svg {
+  transform: translateX(2px);
+}
+
+.carousel-controls {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.carousel-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e6eef8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.carousel-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--color-secondary);
+}
+
+.carousel-wrapper {
+  position: relative;
+}
+
+.carousel-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: 8px;
+  scroll-snap-type: x mandatory;
+}
+
+@media (min-width: 1400px) {
+  .carousel-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.carousel-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel-grid > * {
+  scroll-snap-align: start;
 }
 
 @media (max-width: 1200px) {
-  .grid {
-    grid-template-columns: repeat(3, 1fr);
+  .carousel-grid {
+    grid-auto-columns: 240px;
   }
 }
 
 @media (max-width: 992px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
+  .carousel-grid {
+    grid-auto-columns: calc(50% - 12px);
+  }
+  .carousel-controls {
+    display: none; /* Ocultar botões em telas menores, priorizando o scroll por toque */
   }
 }
 
 @media (max-width: 640px) {
-  .grid {
-    grid-template-columns: 1fr;
+  .carousel-grid {
+    grid-auto-columns: calc(80% - 12px);
   }
 }

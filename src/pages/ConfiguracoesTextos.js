@@ -28,7 +28,11 @@ const ConfiguracoesTextos = ({ settings, onInputChange }) => {
           s.key.startsWith('why_') || 
           s.key.startsWith('text_why_') ||
           s.key.startsWith('text_hero_') ||
-          s.key.startsWith('text_section_')
+          s.key.startsWith('text_section_') ||
+          s.key.startsWith('icon_section_') ||
+          s.key === 'text_ver_todos' ||
+          s.key === 'text_cta_title' ||
+          s.key === 'text_cta_subtitle'
         )
       },
       why_choose_us: {

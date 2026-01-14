@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -10,6 +10,13 @@ const AdminLayout = ({ children, pageTitle, pageSubtitle }) => {
   const { user, logout } = useAuth();
   const { getLogoUrl, settings } = useTheme();
   const [expandedMenu, setExpandedMenu] = useState({});
+
+  // Expandir automaticamente o menu de Configurações se estiver em uma página de configurações
+  useEffect(() => {
+    if (location.pathname.includes('/configuracoes')) {
+      setExpandedMenu(prev => ({ ...prev, 'Configurações': true }));
+    }
+  }, [location.pathname]);
 
   const handleLogout = async () => {
     await logout();

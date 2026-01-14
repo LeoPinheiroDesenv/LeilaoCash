@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import AdminLayout from '../components/AdminLayout';
 import ConfiguracoesLayout from './ConfiguracoesLayout';
 import ConfiguracoesTextos from './ConfiguracoesTextos';
@@ -15,6 +16,9 @@ const API_BASE_URL = (process.env.REACT_APP_API_URL || 'http://localhost:8000/ap
 const Configuracoes = () => {
   const { isAuthenticated, isAdmin } = useAuth();
   const { refreshTheme } = useTheme();
+  const location = useLocation();
+  const navigate = useNavigate();
+  
   const [settings, setSettings] = useState({
     theme: [],
     appearance: [],
@@ -27,9 +31,19 @@ const Configuracoes = () => {
   const [saving, setSaving] = useState(false);
   const [validating, setValidating] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
-  const [activeTab, setActiveTab] = useState('layout');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState({ title: '', message: '', success: false });
+
+  // Determinar a aba ativa com base na URL
+  const getActiveTabFromPath = () => {
+    const path = location.pathname;
+    if (path.includes('/layout')) return 'layout';
+    if (path.includes('/textos')) return 'textos';
+    if (path.includes('/sistema')) return 'sistema';
+    return 'layout'; // Default
+  };
+
+  const activeTab = getActiveTabFromPath();
 
   const loadSettings = useCallback(async () => {
     try {
@@ -410,7 +424,7 @@ const Configuracoes = () => {
         <div className="settings-tabs">
           <button
             className={`tab-button ${activeTab === 'layout' ? 'active' : ''}`}
-            onClick={() => setActiveTab('layout')}
+            onClick={() => navigate('/dashboard/configuracoes/layout')}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -421,7 +435,7 @@ const Configuracoes = () => {
           </button>
           <button
             className={`tab-button ${activeTab === 'textos' ? 'active' : ''}`}
-            onClick={() => setActiveTab('textos')}
+            onClick={() => navigate('/dashboard/configuracoes/textos')}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -433,54 +447,28 @@ const Configuracoes = () => {
             Textos
           </button>
           <button
-            className={`tab-button ${activeTab === 'appearance' ? 'active' : ''}`}
-            onClick={() => setActiveTab('appearance')}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <circle cx="8.5" cy="8.5" r="1.5"></circle>
-              <polyline points="21 15 16 10 5 21"></polyline>
-            </svg>
-            Imagens
-          </button>
-          <button
-            className={`tab-button ${activeTab === 'general' ? 'active' : ''}`}
-            onClick={() => setActiveTab('general')}
+            className={`tab-button ${activeTab === 'sistema' ? 'active' : ''}`}
+            onClick={() => navigate('/dashboard/configuracoes/sistema')}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="12" cy="12" r="3"></circle>
               <path d="M12 1v6m0 6v6m-9-9h6m6 0h6"></path>
             </svg>
-            Geral
-          </button>
-          <button
-            className={`tab-button ${activeTab === 'payment' ? 'active' : ''}`}
-            onClick={() => setActiveTab('payment')}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-              <line x1="1" y1="10" x2="23" y2="10"></line>
-            </svg>
-            Pagamentos
-          </button>
-          <button
-            className={`tab-button ${activeTab === 'logs' ? 'active' : ''}`}
-            onClick={() => setActiveTab('logs')}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
-              <polyline points="13 2 13 9 20 9"></polyline>
-            </svg>
-            Logs
+            Sistema
           </button>
         </div>
 
         <div className="settings-content">
           {activeTab === 'layout' && (
-            <ConfiguracoesLayout 
-              settings={settings} 
-              onInputChange={handleInputChange} 
-            />
+            <>
+              <ConfiguracoesLayout 
+                settings={settings} 
+                onInputChange={handleInputChange} 
+              />
+              <div className="settings-divider"></div>
+              <h3 className="section-subtitle">Imagens do Sistema</h3>
+              {renderAppearanceSettings()}
+            </>
           )}
 
           {activeTab === 'textos' && (
@@ -490,13 +478,21 @@ const Configuracoes = () => {
             />
           )}
 
-          {activeTab === 'appearance' && renderAppearanceSettings()}
-          
-          {activeTab === 'general' && renderGeneralSettings()}
+          {activeTab === 'sistema' && (
+            <>
+              <h3 className="section-subtitle">Configurações Gerais</h3>
+              {renderGeneralSettings()}
+              
+              <div className="settings-divider"></div>
+              
+              {renderPaymentSettings()}
 
-          {activeTab === 'payment' && renderPaymentSettings()}
-
-          {activeTab === 'logs' && <ConfiguracoesLogs />}
+              <div className="settings-divider"></div>
+              
+              <h3 className="section-subtitle">Logs do Sistema</h3>
+              <ConfiguracoesLogs />
+            </>
+          )}
         </div>
 
         <div className="settings-actions">

@@ -17,6 +17,7 @@ class TextSettingsSeeder extends Seeder
         $texts = [
             // Geral
             'text_ver_todos' => ['value' => 'Ver Todos', 'desc' => 'Botão Ver Todos'],
+            'text_ver_leilao' => ['value' => 'Ver Leilão', 'desc' => 'Botão Ver Leilão'],
             'text_comprar_creditos' => ['value' => 'Comprar Créditos', 'desc' => 'Botão Comprar Créditos'],
             'text_dar_lance' => ['value' => 'Dar Lance', 'desc' => 'Botão Dar Lance'],
             'text_salvar' => ['value' => 'Salvar', 'desc' => 'Botão Salvar'],

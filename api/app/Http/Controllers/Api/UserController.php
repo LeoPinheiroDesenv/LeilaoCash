@@ -85,7 +85,11 @@ class UserController extends Controller
     public function store(Request $request)
     {
         try {
-            $validator = Validator::make($request->all(), [
+            // Prepara dados para validação convertendo is_active para booleano real
+            $data = $request->all();
+            $data['is_active'] = $request->boolean('is_active');
+
+            $validator = Validator::make($data, [
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:8',
@@ -144,7 +148,7 @@ class UserController extends Controller
                 'user_type' => $request->user_type,
                 'is_admin' => in_array($request->user_type, ['principal', 'secondary']),
                 'permissions' => $request->user_type === 'secondary' ? $request->permissions : null,
-                'is_active' => $request->get('is_active', true),
+                'is_active' => $request->boolean('is_active', true),
             ]);
 
             Log::info('[UserController] Usuário criado', [
@@ -180,7 +184,13 @@ class UserController extends Controller
         try {
             $user = User::findOrFail($id);
 
-            $validator = Validator::make($request->all(), [
+            // Prepara dados para validação
+            $data = $request->all();
+            if ($request->has('is_active')) {
+                $data['is_active'] = $request->boolean('is_active');
+            }
+
+            $validator = Validator::make($data, [
                 'name' => 'sometimes|required|string|max:255',
                 'email' => ['sometimes', 'required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($id)],
                 'password' => 'sometimes|string|min:8',
@@ -355,4 +365,3 @@ class UserController extends Controller
         ]);
     }
 }
-

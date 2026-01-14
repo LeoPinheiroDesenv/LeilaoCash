@@ -21,13 +21,15 @@ const calculateTimeRemaining = (endDate) => {
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
 
-const HomePage = () => {
+const HomePage = ({ searchTerm, onSearch }) => {
   const { getText } = useTheme();
   const [loading, setLoading] = useState(true);
   const [auctions, setAuctions] = useState([]);
+  const [featured, setFeatured] = useState([]);
+  const [hotOffers, setHotOffers] = useState([]);
+  const [endingSoon, setEndingSoon] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState(null);
 
   const loadCategories = async () => {
@@ -65,6 +67,7 @@ const HomePage = () => {
         const auctionsData = response.data.data.data || response.data.data || [];
         
         // Transformar leilões em formato de produtos para exibição
+        const nowDate = new Date();
         const products = auctionsData.flatMap(auction => 
           (auction.products || []).map(product => ({
             id: product.id,
@@ -75,6 +78,7 @@ const HomePage = () => {
             discount: Math.round(((parseFloat(product.price) - parseFloat(auction.current_bid || auction.starting_bid)) / parseFloat(product.price)) * 100),
             isHot: auction.status === 'active',
             timer: auction.end_date ? calculateTimeRemaining(auction.end_date) : '00:00:00',
+            remainingSeconds: auction.end_date ? Math.max(0, Math.floor((new Date(auction.end_date) - nowDate) / 1000)) : 0,
             bids: auction.bids_count || '0',
             url: `/produto/${product.id}`,
             image: product.image_url 
@@ -92,27 +96,23 @@ const HomePage = () => {
           }))
         );
 
-        // Dividir produtos em grupos para as seções
-        const total = products.length;
-        const produtosDestaque = products.slice(0, Math.ceil(total * 0.4));
-        const produtosQuentes = products.slice(Math.ceil(total * 0.4), Math.ceil(total * 0.7));
-        const produtosEncerrando = products.slice(Math.ceil(total * 0.7));
+        setAuctions(products);
 
-        setAuctions({
-          produtosDestaque,
-          produtosQuentes,
-          produtosEncerrando
-        });
+        // Preencher seções: Em Destaque (mais disputados), Ofertas Quentes (maior desconto), Encerrando em Breve (menor tempo restante)
+        const productsWithBids = products.map(p => ({...p, bidsCount: parseInt(p.bids, 10) || 0}));
+
+        const featuredList = [...productsWithBids].sort((a,b) => b.bidsCount - a.bidsCount).slice(0, 8);
+        const hotList = [...productsWithBids].sort((a,b) => (b.discount || 0) - (a.discount || 0)).slice(0, 8);
+        const endingList = [...productsWithBids].filter(p => p.remainingSeconds > 0).sort((a,b) => a.remainingSeconds - b.remainingSeconds).slice(0, 8);
+
+        setFeatured(featuredList);
+        setHotOffers(hotList);
+        setEndingSoon(endingList);
       }
     } catch (error) {
       console.error('Erro ao carregar leilões:', error);
       setError('Erro ao carregar produtos. Tente novamente mais tarde.');
-      // Em caso de erro, usar arrays vazios
-      setAuctions({
-        produtosDestaque: [],
-        produtosQuentes: [],
-        produtosEncerrando: []
-      });
+      setAuctions([]);
     } finally {
       setLoading(false);
     }
@@ -120,7 +120,6 @@ const HomePage = () => {
 
   useEffect(() => {
     loadCategories();
-    // Adicionando um debounce simples para evitar muitas requisições durante a digitação
     const timeoutId = setTimeout(() => {
         loadAuctionsMemo(selectedCategory, searchTerm);
     }, 500);
@@ -132,19 +131,13 @@ const HomePage = () => {
     setSelectedCategory(categoryId);
   };
 
-  const handleSearch = (term) => {
-    setSearchTerm(term);
-  };
-
-  if (loading && !categories.length && !auctions.produtosDestaque) {
+  if (loading && !categories.length && !auctions.length) {
     return (
       <>
         <Hero 
             categories={categories} 
             selectedCategory={selectedCategory} 
             onSelectCategory={handleSelectCategory}
-            searchTerm={searchTerm}
-            onSearch={handleSearch}
         />
         <main>
           <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
@@ -164,8 +157,6 @@ const HomePage = () => {
             categories={categories} 
             selectedCategory={selectedCategory} 
             onSelectCategory={handleSelectCategory}
-            searchTerm={searchTerm}
-            onSearch={handleSearch}
         />
         <main>
           <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
@@ -186,67 +177,40 @@ const HomePage = () => {
         categories={categories} 
         selectedCategory={selectedCategory} 
         onSelectCategory={handleSelectCategory}
-        searchTerm={searchTerm}
-        onSearch={handleSearch}
+        onSearch={onSearch}
       />
       <main>
-        {/* Se uma categoria estiver selecionada OU houver pesquisa, mostrar resultados */}
-        {(selectedCategory || searchTerm) && auctions.produtosCategoria && auctions.produtosCategoria.length > 0 && (
-          <ProductSection 
-            title={
-              searchTerm 
-                ? `${getText('text_search_results', 'Resultados da busca:')} "${searchTerm}"`
-                : categories.find(cat => cat.id === selectedCategory)?.name || getText('text_category_products', 'Produtos da Categoria')
-            } 
-            subtitle={`${auctions.produtosCategoria.length} ${getText('text_products_found', 'produto(s) encontrado(s)')}`}
-            icon={searchTerm ? "🔍" : "📦"}
-            products={auctions.produtosCategoria}
-          />
-        )}
-
-        {/* Se nenhuma categoria estiver selecionada e não houver pesquisa, mostrar seções normais */}
-        {!selectedCategory && !searchTerm && auctions.produtosDestaque && auctions.produtosDestaque.length > 0 && (
           <ProductSection 
             title={getText('text_section_destaques_title', 'Em Destaque')} 
             subtitle={getText('text_section_destaques_subtitle', 'Os leilões mais disputados')}
             icon={getText('icon_section_destaques', '⭐')}
-            products={auctions.produtosDestaque}
+            products={featured}
+            viewAllLink="/?filter=featured"
           />
-        )}
-        {!selectedCategory && !searchTerm && auctions.produtosQuentes && auctions.produtosQuentes.length > 0 && (
+
           <ProductSection 
             title={getText('text_section_quentes_title', 'Ofertas Quentes')} 
             subtitle={getText('text_section_quentes_subtitle', 'Preços irresistíveis')}
             icon={getText('icon_section_quentes', '🔥')}
-            products={auctions.produtosQuentes}
+            products={hotOffers}
+            viewAllLink="/?filter=hot"
           />
-        )}
-        {!selectedCategory && !searchTerm && auctions.produtosEncerrando && auctions.produtosEncerrando.length > 0 && (
+
           <ProductSection 
             title={getText('text_section_encerrando_title', 'Encerrando em Breve')} 
             subtitle={getText('text_section_encerrando_subtitle', 'Última chance!')}
             icon={getText('icon_section_encerrando', '⏰')}
-            products={auctions.produtosEncerrando}
+            products={endingSoon}
+            viewAllLink="/?filter=ending"
           />
-        )}
         
-        {/* Mensagem quando não há produtos */}
-        {((selectedCategory || searchTerm)
-          ? (!auctions.produtosCategoria || auctions.produtosCategoria.length === 0)
-          : ((!auctions.produtosDestaque || auctions.produtosDestaque.length === 0) && 
-             (!auctions.produtosQuentes || auctions.produtosQuentes.length === 0) && 
-             (!auctions.produtosEncerrando || auctions.produtosEncerrando.length === 0))
-        ) && (
+        {auctions.length === 0 && (
           <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
             <p style={{ color: '#8da4bf', fontSize: '1.1rem' }}>
-              {searchTerm
-                ? `${getText('text_no_products_found_search', 'Nenhum produto encontrado para')} "${searchTerm}".`
-                : selectedCategory 
-                  ? getText('text_no_products_found_category', 'Nenhum produto encontrado nesta categoria no momento.') 
-                  : getText('text_no_active_auctions', 'Nenhum leilão ativo no momento.')}
+              Nenhum leilão ativo no momento.
             </p>
             <p style={{ color: '#8da4bf', marginTop: '0.5rem' }}>
-              {searchTerm ? getText('text_try_another_term', 'Tente buscar por outro termo.') : getText('text_come_back_soon', 'Volte em breve para ver novos produtos!')}
+              Volte em breve para ver novos produtos!
             </p>
           </div>
         )}

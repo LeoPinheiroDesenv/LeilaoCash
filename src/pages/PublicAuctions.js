@@ -19,13 +19,12 @@ const calculateTimeRemaining = (endDate) => {
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
 
-const PublicAuctions = () => {
+const PublicAuctions = ({ searchTerm }) => {
   const { getText } = useTheme();
   const [loading, setLoading] = useState(true);
   const [auctions, setAuctions] = useState([]);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
-    search: '',
     category_id: ''
   });
   const [categories, setCategories] = useState([]);
@@ -48,8 +47,8 @@ const PublicAuctions = () => {
       
       let url = '/auctions/public?status=active&per_page=50';
       if (filters.category_id) url += `&category_id=${filters.category_id}`;
-      if (filters.search && filters.search.trim()) {
-        url += `&search=${encodeURIComponent(filters.search.trim())}`;
+      if (searchTerm && searchTerm.trim()) {
+        url += `&search=${encodeURIComponent(searchTerm.trim())}`;
       }
 
       const response = await api.get(url, {
@@ -89,7 +88,7 @@ const PublicAuctions = () => {
     } finally {
       setLoading(false);
     }
-  }, [filters]); // Dependência apenas de filters
+  }, [filters, searchTerm]); // Dependência de filters e searchTerm
 
   useEffect(() => {
     loadCategories();
@@ -113,13 +112,6 @@ const PublicAuctions = () => {
         </div>
 
         <div className="filters-bar">
-          <input 
-            type="text" 
-            placeholder={getText('text_search_placeholder', 'Buscar produtos...')}
-            value={filters.search}
-            onChange={(e) => setFilters({...filters, search: e.target.value})}
-            className="search-input"
-          />
           <select 
             value={filters.category_id}
             onChange={(e) => setFilters({...filters, category_id: e.target.value})}
