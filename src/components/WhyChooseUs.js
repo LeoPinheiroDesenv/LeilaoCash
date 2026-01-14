@@ -9,7 +9,7 @@ export default function WhyChooseUs() {
     <section className="why-choose-us-section">
       <div className="container">
         <div className="why-header">
-          <h2>{getText('text_why_title', 'Por que comprar na VibeGet?')}</h2>
+          <h2>{getText('text_why_title', 'Por que comprar na LeilãoCash?')}</h2>
         </div>
         
         <div className="why-grid">

@@ -163,17 +163,6 @@ const ProductPage = () => {
     return `R$ ${parseFloat(price).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleString('pt-BR', { 
-      day: '2-digit', 
-      month: '2-digit', 
-      hour: '2-digit', 
-      minute: '2-digit'
-    });
-  };
-
   const calculateTimeRemaining = (endDate) => {
     if (!endDate) return '00:00:00';
     const now = new Date();
@@ -232,14 +221,39 @@ const ProductPage = () => {
       return;
     }
 
+    if (!product || !product.id) {
+      console.error('Produto não encontrado');
+      return;
+    }
+
     try {
-      const response = await api.post(`/favorites/${product.id}/toggle`);
-      if (response.data.success) {
-        setIsFavorite(response.data.data.is_favorite);
+      setIsCheckingFavorite(true);
+      const response = await api.post(`/favorites/${product.id}/toggle`, {}, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.data && response.data.success) {
+        setIsFavorite(response.data.data?.is_favorite ?? !isFavorite);
+      } else {
+        throw new Error('Resposta inválida da API');
       }
     } catch (error) {
       console.error('Erro ao favoritar produto:', error);
-      alert(getText('text_favorite_error', 'Erro ao favoritar produto. Tente novamente.'));
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          getText('text_favorite_error', 'Erro ao favoritar produto. Tente novamente.');
+      
+      if (error.response?.status === 401) {
+        // Token expirado ou inválido
+        navigate('/login', { state: { from: `/produto/${id}` } });
+      } else {
+        alert(errorMessage);
+      }
+    } finally {
+      setIsCheckingFavorite(false);
     }
   };
 
@@ -364,34 +378,6 @@ const ProductPage = () => {
                   ))}
                 </div>
               )}
-
-              {settings?.show_bid_history === 'true' && (
-                <div className="bid-history-section">
-                    <h3>{getText('text_bid_history', 'Histórico de Lances')}</h3>
-                    <div className="bid-history-list">
-                    {auction.bids && auction.bids.length > 0 ? (
-                        auction.bids.map(bid => (
-                        <div key={bid.id} className="bid-history-item">
-                            <div className="bid-user">
-                            <div className="bid-avatar">
-                                {bid.user?.name ? bid.user.name.charAt(0).toUpperCase() : '?'}
-                            </div>
-                            <div className="bid-user-info">
-                                <p className="bid-user-name">{formatWinnerName(bid.user?.name)}</p>
-                                <p className="bid-timestamp">{formatDate(bid.created_at)}</p>
-                            </div>
-                            </div>
-                            <div className="bid-amount">
-                            {formatPrice(bid.amount)}
-                            </div>
-                        </div>
-                        ))
-                    ) : (
-                        <p className="no-bids">{getText('text_no_bids_yet', 'Nenhum lance ainda. Seja o primeiro!')}</p>
-                    )}
-                    </div>
-                </div>
-              )}
             </div>
 
             <div className="product-info">
@@ -408,6 +394,94 @@ const ProductPage = () => {
                 <span className="product-status">{product.is_active ? getText('text_active', 'Ativo') : getText('text_inactive', 'Inativo')}</span>
               </div>
               <h1>{product.name}</h1>
+
+              <div className="product-meta-info">
+                <div className="meta-row">
+                  <div className="meta-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <span className="meta-label">{getText('text_visits', 'Visitas')}:</span>
+                    <span className="meta-value">{product.visits || '1,234'}</span>
+                  </div>
+                  <div className="meta-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 7h-9"></path>
+                      <path d="M14 17H5"></path>
+                      <circle cx="17" cy="17" r="3"></circle>
+                      <circle cx="7" cy="7" r="3"></circle>
+                    </svg>
+                    <span className="meta-label">{getText('text_category', 'Categoria')}:</span>
+                    <span className="meta-value">{product.categoryModel?.name || product.category || 'Geral'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {(product.brand || product.model) && (
+                <div className="product-info-section">
+                  <h3>{getText('text_information', 'Informações')}</h3>
+                  <div className="info-grid">
+                    {product.brand && (
+                      <div className="info-item">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                          <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        <div>
+                          <span className="info-label">{getText('text_brand', 'Marca')}:</span>
+                          <span className="info-value">{product.brand}</span>
+                        </div>
+                      </div>
+                    )}
+                    {product.model && (
+                      <div className="info-item">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                          <line x1="16" y1="2" x2="16" y2="6"></line>
+                          <line x1="8" y1="2" x2="8" y2="6"></line>
+                          <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <div>
+                          <span className="info-label">{getText('text_model', 'Modelo')}:</span>
+                          <span className="info-value">{product.model}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {auction && (
+                <div className="get-section">
+                  <h3>{getText('text_auction', 'Leilão')}</h3>
+                  <div className="get-info-grid">
+                    <div className="get-info-item">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M14.5 12.5l-8 8a2.119 2.119 0 1 1-3-3l8-8"></path>
+                        <path d="m16 16 6-6"></path>
+                        <path d="m8 8 6-6"></path>
+                        <path d="m9 7 8 8"></path>
+                        <path d="m21 11-8-8"></path>
+                      </svg>
+                      <div>
+                        <span className="get-label">{getText('text_status', 'Status')}:</span>
+                        <span className="get-value">{auction.status === 'active' ? getText('text_active', 'Ativo') : auction.status === 'scheduled' ? getText('text_scheduled', 'Agendado') : getText('text_finished', 'Encerrado')}</span>
+                      </div>
+                    </div>
+                    <div className="get-info-item">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="12" y1="1" x2="12" y2="23"></line>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                      </svg>
+                      <div>
+                        <span className="get-label">{getText('text_starting_bid', 'Lance Inicial')}:</span>
+                        <span className="get-value">{formatPrice(auction.starting_bid || product.price)}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {auction.end_date && (
                 <div className="timer-section">
@@ -430,7 +504,7 @@ const ProductPage = () => {
                   <p className="price-value">{formatPrice(currentBid)}</p>
                 </div>
                 <div className="price-group">
-                  <p className="price-label">{getText('text_product_price', 'Valor de mercado')}</p>
+                  <p className="price-label">{getText('text_product_price', 'Preço do produto')}</p>
                   <p className="price-old">{formatPrice(product.price)}</p>
                 </div>
               </div>
@@ -572,65 +646,17 @@ const ProductPage = () => {
                   </div>
                 </div>
               )}
-
-              <div className="product-meta-info">
-                <div className="meta-row">
-                  <div className="meta-item">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                      <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
-                    <span className="meta-label">{getText('text_visits', 'Visitas')}:</span>
-                    <span className="meta-value">{product.visits || '1,234'}</span>
-                  </div>
-                  <div className="meta-item">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M20 7h-9"></path>
-                      <path d="M14 17H5"></path>
-                      <circle cx="17" cy="17" r="3"></circle>
-                      <circle cx="7" cy="7" r="3"></circle>
-                    </svg>
-                    <span className="meta-label">{getText('text_category', 'Categoria')}:</span>
-                    <span className="meta-value">{product.categoryModel?.name || product.category || 'Geral'}</span>
-                  </div>
-                </div>
-              </div>
-
-              {(product.brand || product.model) && (
-                <div className="product-info-section">
-                  <h3>{getText('text_information', 'Informações')}</h3>
-                  <div className="info-grid">
-                    {product.brand && (
-                      <div className="info-item">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                          <circle cx="12" cy="10" r="3"></circle>
-                        </svg>
-                        <div>
-                          <span className="info-label">{getText('text_brand', 'Marca')}:</span>
-                          <span className="info-value">{product.brand}</span>
-                        </div>
-                      </div>
-                    )}
-                    {product.model && (
-                      <div className="info-item">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                          <line x1="16" y1="2" x2="16" y2="6"></line>
-                          <line x1="8" y1="2" x2="8" y2="6"></line>
-                          <line x1="3" y1="10" x2="21" y2="10"></line>
-                        </svg>
-                        <div>
-                          <span className="info-label">{getText('text_model', 'Modelo')}:</span>
-                          <span className="info-value">{product.model}</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
+
+          {settings?.show_bid_history === 'true' && (
+            <div className="bid-history-section">
+                <h3>{getText('text_bid_history', 'Histórico de Lances')}</h3>
+                <div className="bid-history-list">
+                <p className="no-bids">{getText('text_bid_history_soon', 'Histórico de lances será implementado em breve.')}</p>
+                </div>
+            </div>
+          )}
           </div>
         </section>
       </main>

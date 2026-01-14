@@ -19,8 +19,7 @@ const CategoryChips = ({ categories = [], onSelectCategory, selectedCategory }) 
         >
           {cat.icon && <span className="chip-emoji">{cat.icon}</span>}
           <span className="chip-name">{cat.name}</span>
-          {/* Opcional: Contagem de produtos */}
-          {/* <span className="chip-count">{cat.products_count}</span> */}
+          <span className="chip-count">{cat.products_count || 0}</span>
         </button>
       ))}
     </div>

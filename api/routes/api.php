@@ -30,6 +30,9 @@ Route::prefix('auth')->group(function () {
 // Webhooks (Public but secure logic inside)
 Route::post('/webhooks/mercadopago', [\App\Http\Controllers\Api\WebhookController::class, 'handleMercadoPago']);
 
+// Setup Route (Temporary - remove in production or protect)
+Route::get('/setup/text-settings', [\App\Http\Controllers\Api\SetupController::class, 'runTextSeeder']);
+
 // Health check
 Route::get('/health', function () {
     return response()->json([

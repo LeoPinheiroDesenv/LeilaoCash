@@ -2,7 +2,7 @@
   /* Cores customizáveis - inspiradas no site de referência */
   --color-primary: #ff4b2b;
   --color-secondary: #00d2ff;
-  --color-background: #06090f;
+  --color-background: #05080d;
   --color-surface: #0d1117;
   --color-text: #f0f6fc;
   --color-text-muted: #8b949e;
@@ -15,6 +15,10 @@
   /* Fontes */
   --font-primary: 'Inter', system-ui, -apple-system, sans-serif;
   --font-secondary: 'Orbitron', system-ui, sans-serif;
+  
+  /* Header height variables */
+  --header-initial-height: 88px; /* 24px padding top + 24px padding bottom + 40px logo height */
+  --header-scrolled-height: 60px; /* 16px padding top + 16px padding bottom + 28px adjusted logo height */
 }
 
 .App {
@@ -349,4 +353,13 @@ body {
   font-family: var(--font-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.site-main {
+  padding-top: var(--header-initial-height);
+  transition: padding-top 0.3s ease;
+}
+
+.site-header.scrolled + .site-main {
+  padding-top: var(--header-scrolled-height);
 }

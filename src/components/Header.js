@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import './header.css';
 
-const Header = ({ searchTerm, onSearch }) => {
+const Header = () => {
   const { isAuthenticated } = useAuth();
   const { getLogoUrl, getText } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -27,17 +27,6 @@ const Header = ({ searchTerm, onSearch }) => {
             <img src={logoSrc} alt="Logo" className="logo-full" />
           </Link>
           
-          <div className="header-search">
-            <svg className="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM19 19l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <input 
-              placeholder={getText('text_hero_search_placeholder', 'Buscar produtos em leilão...')} 
-              value={searchTerm}
-              onChange={(e) => onSearch(e.target.value)}
-            />
-          </div>
-
           <nav className="main-nav">
             <Link to="/" className="nav-link">{getText('text_header_home', 'Início')}</Link>
             <a href="#destaques" className="nav-link">{getText('text_header_highlights', 'Destaques')}</a>
@@ -57,7 +46,10 @@ const Header = ({ searchTerm, onSearch }) => {
             <button className="menu-toggle" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 {isMenuOpen ? (
-                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <>
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </>
                 ) : (
                   <>
                     <line x1="3" y1="12" x2="21" y2="12" />
