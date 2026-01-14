@@ -103,17 +103,35 @@
   color: #fff;
 }
 
-.timer {
-  color: #fff;
-  font-size: 14px;
-  font-weight: 800;
-  display: flex;
+.timer-pills {
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(0,0,0,0.45);
-  padding: 6px 12px;
-  border-radius: 10px;
-  backdrop-filter: blur(4px);
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 800;
+  font-size: 12px;
+}
+
+.timer-pill {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  font-variant-numeric: tabular-nums;
+}
+
+.timer-sep {
+  opacity: 0.75;
+  font-weight: 700;
 }
 
 .card-content {
@@ -145,37 +163,26 @@
 }
 
 
-.price-section {
+.price-row {
   display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-top: 8px;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 4px;
 }
 
-.price-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.price-group .current-price {
-  font-size: 28px;
+.current-price {
+  font-size: 26px;
   font-weight: 900;
   line-height: 1;
-  background: linear-gradient(90deg, #4A9FD8, #584eff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  margin: 0;
+  color: #4A9FD8;
+  font-variant-numeric: tabular-nums;
 }
 
-.price-group .market-price {
-  font-size: 14px;
+.market-price {
+  font-size: 13px;
   color: #7a90a6;
   text-decoration: line-through;
-  line-height: 1;
-  margin: 0;
+  font-variant-numeric: tabular-nums;
 }
 
 .meta-row {

@@ -85,6 +85,40 @@
   gap: 0.75rem;
 }
 
+.text-location-hint {
+  font-size: 0.875rem;
+  color: #4A9FD8;
+  background: rgba(74, 159, 216, 0.1);
+  border-left: 3px solid #4A9FD8;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  margin-top: -0.25rem;
+  margin-bottom: 0.5rem;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.text-subgroup {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.text-subgroup:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.text-subgroup-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #e6eef8;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(74, 159, 216, 0.2);
+}
+
 .section-subtitle {
   font-size: 1.25rem;
   font-weight: 600;

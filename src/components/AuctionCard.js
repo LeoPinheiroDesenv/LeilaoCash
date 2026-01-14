@@ -1,11 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Countdown from './Countdown';
 import { useTheme } from '../contexts/ThemeContext';
 import './auctionCard.css';
 
 const AuctionCard = ({ product }) => {
   const { getText } = useTheme();
+
+  const [hours = '00', minutes = '00', seconds = '00'] = String(product.timer || '00:00:00').split(':');
+
   return (
     <div className="card">
       <div className="card-media">
@@ -31,12 +33,12 @@ const AuctionCard = ({ product }) => {
           </div>
         </div>
         <div className="bottom-overlay">
-          <div className="timer">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="9" />
-              <path d="M12 7v6l4 2" />
-            </svg>
-            <Countdown timeString={product.timer} />
+          <div className="timer-pills" aria-label={getText('text_time_remaining', 'Tempo restante')}>
+            <span className="timer-pill">{hours}</span>
+            <span className="timer-sep">:</span>
+            <span className="timer-pill">{minutes}</span>
+            <span className="timer-sep">:</span>
+            <span className="timer-pill">{seconds}</span>
           </div>
         </div>
       </div>
@@ -44,11 +46,9 @@ const AuctionCard = ({ product }) => {
         <h3 className="product-title">
           <Link to={product.url}>{product.title}</Link>
         </h3>
-        <div className="price-section">
-          <div className="price-group">
-            <p className="current-price">{product.price}</p>
-            <p className="market-price">{product.oldPrice}</p>
-          </div>
+        <div className="price-row">
+          <span className="current-price">{product.price}</span>
+          <span className="market-price">{product.oldPrice}</span>
         </div>
         <div className="meta-row">
           <div className="bids-count">

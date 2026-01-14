@@ -35,9 +35,9 @@ const Header = ({ onSearch, showSearch = true }) => {
             <img src={logoSrc} alt="Logo" className="logo-full" />
           </Link>
           <nav className="main-nav">
-            <Link to="/" className="nav-link">Início</Link>
-            <Link to="/?filter=featured" className="nav-link">Destaques</Link>
-            <Link to="/?filter=ending" className="nav-link">Encerrando</Link>
+            <Link to="/" className="nav-link">{getText('text_header_home', 'Início')}</Link>
+            <Link to="/?filter=featured" className="nav-link">{getText('text_header_highlights', 'Destaques')}</Link>
+            <Link to="/?filter=ending" className="nav-link">{getText('text_header_ending_soon', 'Encerrando')}</Link>
           </nav>
           
           {showSearch && (
@@ -47,7 +47,7 @@ const Header = ({ onSearch, showSearch = true }) => {
               </svg>
               <input 
                 type="text" 
-                placeholder="Buscar leilão..." 
+                placeholder={getText('text_header_search_placeholder', 'Buscar leilão...')} 
                 value={searchTerm}
                 onChange={handleSearchChange}
               />
