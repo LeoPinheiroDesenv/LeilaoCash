@@ -12,11 +12,14 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   
   const { login, isAuthenticated, user } = useAuth();
-  const { getText } = useTheme();
+  const { getText,getLogoUrl } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
   const from = location.state?.from || '/dashboard';
+
+ const logoSrc = getLogoUrl();
+
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -46,9 +49,9 @@ const Login = () => {
   return (
     <div className="auth-page">
       <div className="auth-container">
-        <Link to="/" className="auth-logo">
-          <div className="auth-logo-icon">LC</div>
-        </Link>
+        <Link to="/" className="logo">
+                    <img src={logoSrc} alt="Logo" className="logo-full" />
+                  </Link>
         <div className="auth-content">
           <h1>{getText('text_login_title', 'Bem-vindo de volta')}</h1>
           <p>{getText('text_login_subtitle', 'Entre na sua conta para continuar')}</p>

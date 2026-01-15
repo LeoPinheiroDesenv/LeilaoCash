@@ -1,17 +1,15 @@
 export const maskCPF = (value) => {
-  return value
-    .replace(/\D/g, '') // Remove tudo o que não é dígito
-    .replace(/(\d{3})(\d)/, '$1.$2') // Coloca um ponto entre o terceiro e o quarto dígitos
-    .replace(/(\d{3})(\d)/, '$1.$2') // Coloca um ponto entre o terceiro e o quarto dígitos de novo (para o segundo bloco de números)
-    .replace(/(\d{3})(\d{1,2})/, '$1-$2') // Coloca um hífen entre o terceiro e o quarto dígitos
-    .replace(/(-\d{2})\d+?$/, '$1'); // Captura apenas os dois últimos dígitos
+  // Remove tudo que não é dígito e limita a 11 caracteres
+  const cleaned = value.replace(/\D/g, '').slice(0, 11);
+  // Aplica a máscara 000.000.000-00
+  return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
 };
 
 export const maskPhone = (value) => {
-  return value
-    .replace(/\D/g, '') // Remove tudo o que não é dígito
-    .replace(/^(\d{2})(\d)/g, '($1) $2') // Coloca parênteses em volta dos dois primeiros dígitos
-    .replace(/(\d)(\d{4})$/, '$1-$2'); // Coloca hífen entre o quarto e o quinto dígitos
+  // Remove tudo que não é dígito e limita a 11 caracteres
+  const cleaned = value.replace(/\D/g, '').slice(0, 11);
+  // Aplica a máscara (00) 00000 0000
+  return cleaned.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2 $3');
 };
 
 export const maskCEP = (value) => {

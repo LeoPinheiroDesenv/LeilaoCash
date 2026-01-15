@@ -27,13 +27,15 @@ export const ThemeProvider = ({ children }) => {
       const response = await api.get('/settings/public');
       if (response.data.success) {
         const newSettings = response.data.data;
+        console.log('[Theme] Configurações carregadas:', newSettings);
         setSettings(newSettings);
         applyTheme(newSettings);
       } else {
+        console.warn('[Theme] Resposta sem sucesso:', response.data);
         applyTheme({});
       }
     } catch (error) {
-      console.warn('[Theme] Erro ao carregar configurações, usando padrão:', error.message);
+      console.error('[Theme] Erro ao carregar configurações:', error.message);
       applyTheme({});
     } finally {
       setLoading(false);
@@ -59,19 +61,54 @@ export const ThemeProvider = ({ children }) => {
         root.style.setProperty(cssVar, themeSettings[key] || fallback);
     };
 
+    // Cores Base
     apply('primary_color', '--color-primary', '#E55F52');
     apply('secondary_color', '--color-secondary', '#4A9FD8');
     apply('background_color', '--color-background', '#0a1628');
     apply('text_color', '--color-text', '#e6eef8');
 
+    // Cores Específicas (Header, Hero, Cards, Footer)
+    // Itera sobre todas as chaves que começam com 'color_' e aplica como variável CSS
+    Object.keys(themeSettings).forEach(key => {
+        if (key.startsWith('color_')) {
+            const cssVar = '--' + key.replace(/_/g, '-');
+            root.style.setProperty(cssVar, themeSettings[key]);
+        }
+    });
+
+    // Fallbacks para cores específicas se não existirem no banco
+    if (!themeSettings['color_header_bg']) root.style.setProperty('--color-header-bg', 'rgba(7, 16, 38, 0.8)');
+    if (!themeSettings['color_header_link']) root.style.setProperty('--color-header-link', '#9fb0c8');
+    if (!themeSettings['color_header_link_hover']) root.style.setProperty('--color-header-link-hover', '#e6eef8');
+    
+    if (!themeSettings['color_hero_bg']) root.style.setProperty('--color-hero-bg', '#07080d');
+    if (!themeSettings['color_hero_title']) root.style.setProperty('--color-hero-title', '#ffffff');
+    if (!themeSettings['color_hero_subtitle']) root.style.setProperty('--color-hero-subtitle', '#8da4bf');
+    
+    if (!themeSettings['color_card_bg']) root.style.setProperty('--color-card-bg', '#0D1529');
+    if (!themeSettings['color_card_border']) root.style.setProperty('--color-card-border', 'rgba(255, 255, 255, 0.1)');
+    if (!themeSettings['color_card_title']) root.style.setProperty('--color-card-title', '#ffffff');
+    if (!themeSettings['color_card_price']) root.style.setProperty('--color-card-price', '#584eff');
+    
+    if (!themeSettings['color_footer_bg']) root.style.setProperty('--color-footer-bg', '#061026');
+    if (!themeSettings['color_footer_text']) root.style.setProperty('--color-footer-text', '#9fb0c8');
+    if (!themeSettings['color_footer_title']) root.style.setProperty('--color-footer-title', '#e6eef8');
+
+
     if (themeSettings.font_primary) {
       loadGoogleFont(themeSettings.font_primary);
       root.style.setProperty('--font-primary', `'${themeSettings.font_primary}', system-ui, sans-serif`);
+    } else {
+      // Se não tiver font_primary, usar o padrão
+      root.style.setProperty('--font-primary', "'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif");
     }
     
     if (themeSettings.font_secondary) {
       loadGoogleFont(themeSettings.font_secondary);
       root.style.setProperty('--font-secondary', `'${themeSettings.font_secondary}', system-ui, sans-serif`);
+    } else {
+      // Se não tiver font_secondary, usar o padrão
+      root.style.setProperty('--font-secondary', "'Orbitron', system-ui, sans-serif");
     }
 
     if (themeSettings.background_image) {
@@ -92,7 +129,21 @@ export const ThemeProvider = ({ children }) => {
   };
 
   const refreshTheme = async () => {
-    await loadSettings();
+    try {
+      console.log('[Theme] Recarregando configurações...');
+      const response = await api.get('/settings/public');
+      if (response.data.success) {
+        const newSettings = response.data.data;
+        console.log('[Theme] Configurações recarregadas:', newSettings);
+        setSettings(newSettings);
+        applyTheme(newSettings);
+        console.log('[Theme] Tema aplicado com sucesso');
+      } else {
+        console.warn('[Theme] Erro na resposta:', response.data);
+      }
+    } catch (error) {
+      console.error('[Theme] Erro ao recarregar configurações:', error.message);
+    }
   };
 
   const getLogoUrl = () => {
@@ -102,8 +153,9 @@ export const ThemeProvider = ({ children }) => {
     return settings.logo_url || '/logo-vibeget.png';
   };
 
+  // Retorna o valor da configuração ou o defaultValue se não existir
   const getText = (key, defaultValue = '') => {
-    return settings[key] || defaultValue;
+    return settings[key] !== undefined && settings[key] !== null ? settings[key] : defaultValue;
   };
 
   const value = {

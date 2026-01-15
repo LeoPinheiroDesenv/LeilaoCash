@@ -193,14 +193,8 @@ class AuthController extends Controller
         $user = $request->user();
 
         $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|string|max:255',
-            'phone' => 'sometimes|string|max:20',
-            'birth_date' => 'sometimes|date',
-            'address' => 'sometimes|string|max:255',
-            'city' => 'sometimes|string|max:100',
-            'state' => 'sometimes|string|max:2',
-            'zip_code' => 'sometimes|string|max:10',
-        ]);
+            'name' => 'sometimes|string|max:255'
+                ]);
 
         if ($validator->fails()) {
             return response()->json([

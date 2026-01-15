@@ -12,9 +12,7 @@ use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
-    /**
-     * Listar todos os produtos
-     */
+    // ... (index, show methods remain the same)
     public function index(Request $request)
     {
         try {
@@ -83,9 +81,6 @@ class ProductController extends Controller
         }
     }
 
-    /**
-     * Obter um produto específico
-     */
     public function show($id)
     {
         try {
@@ -117,29 +112,24 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         try {
-            $validator = Validator::make($request->all(), [
+            $rules = [
                 'name' => 'required|string|max:255',
-                'description' => 'nullable|string',
-                'category' => 'nullable|string|max:100',
-                'category_id' => 'nullable|exists:categories,id',
                 'price' => 'required|numeric|min:0',
-                'image_url' => 'nullable|url|max:500',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB max
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
                 'additional_images' => 'nullable|array|max:5',
                 'additional_images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120',
-                'images' => 'nullable|array',
-                'images.*' => 'url|max:500',
-                'brand' => 'nullable|string|max:100',
-                'model' => 'nullable|string|max:100',
-                'brand_id' => 'nullable|exists:brands,id',
-                'product_model_id' => 'nullable|exists:product_models,id',
-                'specifications' => 'nullable|array',
-                'is_active' => ['nullable', function ($attribute, $value, $fail) {
-                    if (!in_array($value, [true, false, 'true', 'false', '1', '0', 1, 0, 'on', 'off'], true)) {
-                        $fail('O campo :attribute deve ser um valor booleano.');
-                    }
-                }],
-            ]);
+            ];
+
+            $messages = [
+                'image.image' => 'O arquivo principal deve ser uma imagem.',
+                'image.mimes' => 'A imagem principal deve ser do tipo: jpeg, png, jpg, gif, webp.',
+                'image.max' => 'A imagem principal não pode ser maior que 5MB.',
+                'additional_images.*.image' => 'O arquivo adicional deve ser uma imagem.',
+                'additional_images.*.mimes' => 'As imagens adicionais devem ser do tipo: jpeg, png, jpg, gif, webp.',
+                'additional_images.*.max' => 'Cada imagem adicional não pode ser maior que 5MB.',
+            ];
+
+            $validator = Validator::make($request->all(), $rules, $messages);
 
             if ($validator->fails()) {
                 return response()->json([
@@ -151,12 +141,10 @@ class ProductController extends Controller
 
             $data = $request->except(['image', 'additional_images']);
 
-            // Converter is_active para boolean
             if (isset($data['is_active'])) {
                 $data['is_active'] = filter_var($data['is_active'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? true;
             }
 
-            // Upload de imagem principal
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
                 $imageName = 'product_' . time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
@@ -164,16 +152,14 @@ class ProductController extends Controller
                 $data['image_url'] = 'https://api.vibeget.net/uploads/products/' . $imageName;
             }
 
-            // Upload de imagens adicionais (até 5)
             $uploadedImages = [];
             if ($request->hasFile('additional_images')) {
                 $additionalImages = $request->file('additional_images');
-                // Se for um único arquivo, converter para array
                 if (!is_array($additionalImages)) {
                     $additionalImages = [$additionalImages];
                 }
                 foreach ($additionalImages as $index => $img) {
-                    if ($index >= 5) break; // Limitar a 5 imagens
+                    if ($index >= 5) break;
                     if ($img && $img->isValid()) {
                         $imageName = 'product_' . time() . '_' . uniqid() . '_' . $index . '.' . $img->getClientOriginalExtension();
                         $img->move(public_path('uploads/products'), $imageName);
@@ -182,7 +168,6 @@ class ProductController extends Controller
                 }
             }
 
-            // Combinar imagens enviadas via URL com imagens enviadas via upload
             $allImages = [];
             if (!empty($uploadedImages)) {
                 $allImages = array_merge($allImages, $uploadedImages);
@@ -191,7 +176,7 @@ class ProductController extends Controller
                 $allImages = array_merge($allImages, array_filter($data['images']));
             }
             if (!empty($allImages)) {
-                $data['images'] = array_slice($allImages, 0, 5); // Garantir máximo de 5
+                $data['images'] = array_slice(array_unique($allImages), 0, 5);
             }
 
             $product = Product::create($data);
@@ -228,29 +213,24 @@ class ProductController extends Controller
         try {
             $product = Product::findOrFail($id);
 
-            $validator = Validator::make($request->all(), [
+            $rules = [
                 'name' => 'sometimes|required|string|max:255',
-                'description' => 'nullable|string',
-                'category' => 'nullable|string|max:100',
-                'category_id' => 'nullable|exists:categories,id',
                 'price' => 'sometimes|required|numeric|min:0',
-                'image_url' => 'nullable|url|max:500',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB max
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
                 'additional_images' => 'nullable|array|max:5',
                 'additional_images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120',
-                'images' => 'nullable|array',
-                'images.*' => 'url|max:500',
-                'brand' => 'nullable|string|max:100',
-                'model' => 'nullable|string|max:100',
-                'brand_id' => 'nullable|exists:brands,id',
-                'product_model_id' => 'nullable|exists:product_models,id',
-                'specifications' => 'nullable|array',
-                'is_active' => ['nullable', function ($attribute, $value, $fail) {
-                    if (!in_array($value, [true, false, 'true', 'false', '1', '0', 1, 0, 'on', 'off'], true)) {
-                        $fail('O campo :attribute deve ser um valor booleano.');
-                    }
-                }],
-            ]);
+            ];
+
+            $messages = [
+                'image.image' => 'O arquivo principal deve ser uma imagem.',
+                'image.mimes' => 'A imagem principal deve ser do tipo: jpeg, png, jpg, gif, webp.',
+                'image.max' => 'A imagem principal não pode ser maior que 5MB.',
+                'additional_images.*.image' => 'O arquivo adicional deve ser uma imagem.',
+                'additional_images.*.mimes' => 'As imagens adicionais devem ser do tipo: jpeg, png, jpg, gif, webp.',
+                'additional_images.*.max' => 'Cada imagem adicional não pode ser maior que 5MB.',
+            ];
+
+            $validator = Validator::make($request->all(), $rules, $messages);
 
             if ($validator->fails()) {
                 return response()->json([
@@ -262,14 +242,11 @@ class ProductController extends Controller
 
             $data = $request->except(['image', 'additional_images']);
 
-            // Converter is_active para boolean
             if (isset($data['is_active'])) {
                 $data['is_active'] = filter_var($data['is_active'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? $product->is_active;
             }
 
-            // Upload de imagem principal
             if ($request->hasFile('image')) {
-                // Deletar imagem antiga se existir
                 if ($product->image_url && file_exists(public_path($product->image_url))) {
                     unlink(public_path($product->image_url));
                 }
@@ -280,16 +257,14 @@ class ProductController extends Controller
                 $data['image_url'] = 'https://api.vibeget.net/uploads/products/' . $imageName;
             }
 
-            // Upload de imagens adicionais (até 5)
             $uploadedImages = [];
             if ($request->hasFile('additional_images')) {
                 $additionalImages = $request->file('additional_images');
-                // Se for um único arquivo, converter para array
                 if (!is_array($additionalImages)) {
                     $additionalImages = [$additionalImages];
                 }
                 foreach ($additionalImages as $index => $img) {
-                    if ($index >= 5) break; // Limitar a 5 imagens
+                    if ($index >= 5) break;
                     if ($img && $img->isValid()) {
                         $imageName = 'product_' . time() . '_' . uniqid() . '_' . $index . '.' . $img->getClientOriginalExtension();
                         $img->move(public_path('uploads/products'), $imageName);
@@ -298,21 +273,16 @@ class ProductController extends Controller
                 }
             }
 
-            // Combinar imagens existentes com novas
             $allImages = [];
-            // Manter imagens existentes que não foram removidas
             if (!empty($product->images) && is_array($product->images)) {
                 $allImages = $product->images;
             }
-            // Adicionar novas imagens enviadas via upload
             if (!empty($uploadedImages)) {
                 $allImages = array_merge($allImages, $uploadedImages);
             }
-            // Adicionar imagens enviadas via URL
             if (!empty($data['images']) && is_array($data['images'])) {
                 $allImages = array_merge($allImages, array_filter($data['images']));
             }
-            // Limitar a 5 imagens e remover duplicatas
             if (!empty($allImages)) {
                 $data['images'] = array_slice(array_unique($allImages), 0, 5);
             }
@@ -351,7 +321,6 @@ class ProductController extends Controller
         try {
             $product = Product::findOrFail($id);
 
-            // Verificar se o produto está em um leilão ativo
             if ($product->auction_id) {
                 $auction = $product->auction;
                 if ($auction && in_array($auction->status, ['scheduled', 'active'])) {

@@ -20,6 +20,7 @@ const Produtos = () => {
     category_id: '',
     is_active: ''
   });
+
   const [pagination, setPagination] = useState({
     current_page: 1,
     last_page: 1,

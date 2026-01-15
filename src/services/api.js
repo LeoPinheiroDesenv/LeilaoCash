@@ -59,12 +59,8 @@ api.interceptors.request.use(
       }
     }
     
-    if (!token) {
-      console.warn('[API Interceptor] Requisição sem token:', {
-        url: config.url,
-        method: config.method
-      });
-    }
+    // Removido log de aviso para requisições sem token, pois é esperado para rotas públicas
+    
     return config;
   },
   (error) => {
@@ -272,4 +268,3 @@ export const authService = {
 };
 
 export default api;
-

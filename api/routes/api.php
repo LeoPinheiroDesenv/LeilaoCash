@@ -47,7 +47,10 @@ Route::get('/categories/public', [\App\Http\Controllers\Api\CategoryController::
 Route::get('/products/public', [\App\Http\Controllers\Api\ProductController::class, 'index']);
 Route::get('/products/public/{id}', [\App\Http\Controllers\Api\ProductController::class, 'show']);
 Route::get('/auctions/public', [\App\Http\Controllers\Api\AuctionController::class, 'index']);
+Route::get('/auctions/home', [\App\Http\Controllers\Api\AuctionController::class, 'home']); // Nova rota
 Route::get('/auctions/public/{id}', [\App\Http\Controllers\Api\AuctionController::class, 'show']);
+Route::get('/settings/public', [\App\Http\Controllers\Api\SettingsController::class, 'getPublic']);
+
 
 // Protected routes
 Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
@@ -138,7 +141,7 @@ Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
     // Admin only routes
     Route::middleware('admin')->group(function () {
         // Settings public (apenas admin)
-        Route::get('/settings/public', [\App\Http\Controllers\Api\SettingsController::class, 'getPublic']);
+        //Route::get('/settings/public', [\App\Http\Controllers\Api\SettingsController::class, 'getPublic']);
 
         // Settings management
         Route::prefix('settings')->group(function () {

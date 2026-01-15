@@ -151,22 +151,17 @@ const Usuarios = () => {
   };
 
   const formatCPF = (value) => {
-    const cpf = value.replace(/\D/g, '');
-    if (cpf.length <= 11) {
-      return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-    }
-    return value;
+    // Remove tudo que não é dígito e limita a 11 caracteres
+    const cleaned = value.replace(/\D/g, '').slice(0, 11);
+    // Aplica a máscara 000.000.000-00
+    return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
   };
 
   const formatPhone = (value) => {
-    const phone = value.replace(/\D/g, '');
-    if (phone.length <= 11) {
-      if (phone.length <= 10) {
-        return phone.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
-      }
-      return phone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
-    }
-    return value;
+    // Remove tudo que não é dígito e limita a 11 caracteres
+    const cleaned = value.replace(/\D/g, '').slice(0, 11);
+    // Aplica a máscara (00) 00000 0000
+    return cleaned.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2 $3');
   };
 
   const handleInputChange = (e) => {

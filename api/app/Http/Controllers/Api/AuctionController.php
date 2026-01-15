@@ -90,6 +90,51 @@ class AuctionController extends Controller
     }
 
     /**
+     * Obter dados para a home page
+     */
+    public function home()
+    {
+        try {
+
+            // Destaques: Leilões ativos com mais lances
+            $featured = Auction::where('status', 'active')
+                ->with(['products.categoryModel', 'winner:id,name'])
+                ->orderBy('bids_count', 'desc')
+                ->take(4)
+                ->get();
+
+            // Ofertas Quentes: Leilões ativos mais recentes (ou outra lógica de "quente")
+            $hot = Auction::where('status', 'active')
+                ->with(['products.categoryModel', 'winner:id,name'])
+                ->orderBy('created_at', 'desc')
+                ->take(4)
+                ->get();
+
+            // Encerrando: Leilões ativos com menor tempo restante
+            $ending = Auction::where('status', 'active')
+                ->where('end_date', '>', now())
+                ->with(['products.categoryModel', 'winner:id,name'])
+                ->orderBy('end_date', 'asc')
+                ->take(4)
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'featured' => $featured,
+                    'hot' => $hot,
+                    'ending' => $ending
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('[AuctionController] Erro ao carregar home', [
+                'error' => $e->getMessage()
+            ]);
+            return response()->json(['success' => false, 'message' => 'Erro ao carregar dados'], 500);
+        }
+    }
+
+    /**
      * Obter um leilão específico
      */
     public function show($id)

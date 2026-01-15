@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import Hero from './Hero';
 import WhyChooseUs from './WhyChooseUs';
 import ProductSection from './ProductSection';
+import AuctionCard from './AuctionCard';
 import api from '../services/api';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -23,11 +24,15 @@ const calculateTimeRemaining = (endDate) => {
 
 const HomePage = ({ searchTerm, onSearch }) => {
   const { getText } = useTheme();
+  const [searchParams] = useSearchParams();
+  const filter = searchParams.get('filter');
+  
   const [loading, setLoading] = useState(true);
   const [auctions, setAuctions] = useState([]);
   const [featured, setFeatured] = useState([]);
   const [hotOffers, setHotOffers] = useState([]);
   const [endingSoon, setEndingSoon] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [error, setError] = useState(null);
@@ -62,13 +67,13 @@ const HomePage = ({ searchTerm, onSearch }) => {
           'Accept': 'application/json'
         }
       });
-      
+
       if (response.data.success) {
         const auctionsData = response.data.data.data || response.data.data || [];
-        
+
         // Transformar leilões em formato de produtos para exibição
         const nowDate = new Date();
-        const products = auctionsData.flatMap(auction => 
+        const products = auctionsData.flatMap(auction =>
           (auction.products || []).map(product => ({
             id: product.id,
             title: product.name,
@@ -81,9 +86,9 @@ const HomePage = ({ searchTerm, onSearch }) => {
             remainingSeconds: auction.end_date ? Math.max(0, Math.floor((new Date(auction.end_date) - nowDate) / 1000)) : 0,
             bids: auction.bids_count || '0',
             url: `/produto/${product.id}`,
-            image: product.image_url 
-              ? (product.image_url.startsWith('http') 
-                  ? product.image_url 
+            image: product.image_url
+              ? (product.image_url.startsWith('http')
+                  ? product.image_url
                   : `${process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:8000'}${product.image_url}`)
               : `${process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:8000'}/uploads/padrao.jpg`,
             description: product.description || '',
@@ -101,9 +106,9 @@ const HomePage = ({ searchTerm, onSearch }) => {
         // Preencher seções: Em Destaque (mais disputados), Ofertas Quentes (maior desconto), Encerrando em Breve (menor tempo restante)
         const productsWithBids = products.map(p => ({...p, bidsCount: parseInt(p.bids, 10) || 0}));
 
-        const featuredList = [...productsWithBids].sort((a,b) => b.bidsCount - a.bidsCount).slice(0, 8);
-        const hotList = [...productsWithBids].sort((a,b) => (b.discount || 0) - (a.discount || 0)).slice(0, 8);
-        const endingList = [...productsWithBids].filter(p => p.remainingSeconds > 0).sort((a,b) => a.remainingSeconds - b.remainingSeconds).slice(0, 8);
+        const featuredList = [...productsWithBids].sort((a,b) => b.bidsCount - a.bidsCount).slice(0, 4);
+        const hotList = [...productsWithBids].sort((a,b) => (b.discount || 0) - (a.discount || 0)).slice(0, 4);
+        const endingList = [...productsWithBids].filter(p => p.remainingSeconds > 0).sort((a,b) => a.remainingSeconds - b.remainingSeconds).slice(0, 4);
 
         setFeatured(featuredList);
         setHotOffers(hotList);
@@ -126,6 +131,32 @@ const HomePage = ({ searchTerm, onSearch }) => {
 
     return () => clearTimeout(timeoutId);
   }, [loadAuctionsMemo, selectedCategory, searchTerm]);
+
+  // Effect para aplicar filtros quando há query params
+  useEffect(() => {
+    if (filter && auctions.length > 0) {
+      let filtered = [];
+      const productsWithBids = auctions.map(p => ({...p, bidsCount: parseInt(p.bids, 10) || 0}));
+      
+      switch(filter) {
+        case 'featured':
+          filtered = [...productsWithBids].sort((a,b) => b.bidsCount - a.bidsCount);
+          break;
+        case 'hot':
+          filtered = [...productsWithBids].sort((a,b) => (b.discount || 0) - (a.discount || 0));
+          break;
+        case 'ending':
+          filtered = [...productsWithBids].filter(p => p.remainingSeconds > 0).sort((a,b) => a.remainingSeconds - b.remainingSeconds);
+          break;
+        default:
+          filtered = auctions;
+      }
+      
+      setFilteredProducts(filtered);
+    } else {
+      setFilteredProducts([]);
+    }
+  }, [filter, auctions]);
 
   const handleSelectCategory = (categoryId) => {
     setSelectedCategory(categoryId);
@@ -180,51 +211,94 @@ const HomePage = ({ searchTerm, onSearch }) => {
         onSearch={onSearch}
       />
       <main>
-          <ProductSection 
-            title={getText('text_section_destaques_title', 'Em Destaque')} 
-            subtitle={getText('text_section_destaques_subtitle', 'Os leilões mais disputados')}
-            icon={getText('icon_section_destaques', '⭐')}
-            products={featured}
-            viewAllLink="/?filter=featured"
-          />
-
-          <ProductSection 
-            title={getText('text_section_quentes_title', 'Ofertas Quentes')} 
-            subtitle={getText('text_section_quentes_subtitle', 'Preços irresistíveis')}
-            icon={getText('icon_section_quentes', '🔥')}
-            products={hotOffers}
-            viewAllLink="/?filter=hot"
-          />
-
-          <ProductSection 
-            title={getText('text_section_encerrando_title', 'Encerrando em Breve')} 
-            subtitle={getText('text_section_encerrando_subtitle', 'Última chance!')}
-            icon={getText('icon_section_encerrando', '⏰')}
-            products={endingSoon}
-            viewAllLink="/?filter=ending"
-          />
-        
-        {auctions.length === 0 && (
-          <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
-            <p style={{ color: '#8da4bf', fontSize: '1.1rem' }}>
-              Nenhum leilão ativo no momento.
-            </p>
-            <p style={{ color: '#8da4bf', marginTop: '0.5rem' }}>
-              Volte em breve para ver novos produtos!
-            </p>
-          </div>
-        )}
-        
-        <section className="cta-section">
-          <div className="container">
-            <h2>{getText('text_cta_title', 'Comece a ganhar Cashback agora!')}</h2>
-            <p>{getText('text_cta_subtitle', 'Cadastre-se gratuitamente e participe dos melhores leilões online do Brasil.')}</p>
-            <div className="cta-buttons">
-              <Link to="/cadastro" className="btn-cta-primary">{getText('text_header_cadastro', 'Criar Conta Grátis')}</Link>
-              <Link to="/como-funciona" className="btn-cta-secondary">{getText('text_header_como_funciona', 'Como Funciona')}</Link>
+        {filter && filteredProducts.length > 0 ? (
+          <div className="container" style={{ padding: '2rem' }}>
+            <div style={{ marginBottom: '2rem' }}>
+              <Link to="/" style={{ color: '#4A9FD8', textDecoration: 'none', fontSize: '0.9rem' }}>
+                ← Voltar
+              </Link>
+              <h1 style={{ marginTop: '1rem', marginBottom: '0.5rem', fontSize: '2rem', color: '#fff' }}>
+                {filter === 'featured' && getText('text_section_destaques_title', 'Em Destaque')}
+                {filter === 'hot' && getText('text_section_quentes_title', 'Ofertas Quentes')}
+                {filter === 'ending' && getText('text_section_encerrando_title', 'Encerrando em Breve')}
+              </h1>
+              <p style={{ color: '#8da4bf' }}>
+                {filter === 'featured' && getText('text_section_destaques_subtitle', 'Os leilões mais disputados')}
+                {filter === 'hot' && getText('text_section_quentes_subtitle', 'Preços irresistíveis')}
+                {filter === 'ending' && getText('text_section_encerrando_subtitle', 'Última chance!')}
+              </p>
+              <p style={{ color: '#8da4bf', marginTop: '0.5rem', fontSize: '0.9rem' }}>
+                {filteredProducts.length} produto{filteredProducts.length !== 1 ? 's' : ''} encontrado{filteredProducts.length !== 1 ? 's' : ''}
+              </p>
+            </div>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
+              gap: '1.5rem'
+            }}>
+              {filteredProducts.map((product, index) => (
+                <AuctionCard key={index} product={product} />
+              ))}
             </div>
           </div>
-        </section>
+        ) : filter && filteredProducts.length === 0 ? (
+          <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
+            <Link to="/" style={{ color: '#4A9FD8', textDecoration: 'none', fontSize: '0.9rem' }}>
+              ← Voltar
+            </Link>
+            <p style={{ color: '#8da4bf', fontSize: '1.1rem', marginTop: '2rem' }}>
+              Nenhum produto encontrado nesta categoria.
+            </p>
+          </div>
+        ) : (
+          <>
+            <ProductSection
+              title={getText('text_section_destaques_title', 'Em Destaque')}
+              subtitle={getText('text_section_destaques_subtitle', 'Os leilões mais disputados')}
+              icon={getText('icon_section_destaques', '⭐')}
+              products={featured}
+              viewAllLink="/?filter=featured"
+            />
+
+            <ProductSection 
+              title={getText('text_section_quentes_title', 'Ofertas Quentes')} 
+              subtitle={getText('text_section_quentes_subtitle', 'Preços irresistíveis')}
+              icon={getText('icon_section_quentes', '🔥')}
+              products={hotOffers}
+              viewAllLink="/?filter=hot"
+            />
+
+            <ProductSection 
+              title={getText('text_section_encerrando_title', 'Encerrando em Breve')} 
+              subtitle={getText('text_section_encerrando_subtitle', 'Última chance!')}
+              icon={getText('icon_section_encerrando', '⏰')}
+              products={endingSoon}
+              viewAllLink="/?filter=ending"
+            />
+
+            {auctions.length === 0 && (
+              <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
+                <p style={{ color: '#8da4bf', fontSize: '1.1rem' }}>
+                  Nenhum leilão ativo no momento.
+                </p>
+                <p style={{ color: '#8da4bf', marginTop: '0.5rem' }}>
+                  Volte em breve para ver novos produtos!
+                </p>
+              </div>
+            )}
+            
+            <section className="cta-section">
+              <div className="container">
+                <h2>{getText('text_cta_title', 'Comece a ganhar Cashback agora!')}</h2>
+                <p>{getText('text_cta_subtitle', 'Cadastre-se gratuitamente e participe dos melhores leilões online do Brasil.')}</p>
+                <div className="cta-buttons">
+                  <Link to="/cadastro" className="btn-cta-primary">{getText('text_header_cadastro', 'Criar Conta Grátis')}</Link>
+                  <Link to="/como-funciona" className="btn-cta-secondary">{getText('text_header_como_funciona', 'Como Funciona')}</Link>
+                </div>
+              </div>
+            </section>
+          </>
+        )}
       </main>
       <WhyChooseUs />
     </>

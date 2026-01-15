@@ -88,6 +88,13 @@ const DashboardUsuario = () => {
     setCardSuccess('');
   };
 
+  const formatCPF = (value) => {
+    // Remove tudo que não é dígito e limita a 11 caracteres
+    const cleaned = value.replace(/\D/g, '').slice(0, 11);
+    // Aplica a máscara 000.000.000-00
+    return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  };
+
   const startPolling = (transactionId) => {
     pollingIntervalRef.current = setInterval(async () => {
       try {
@@ -351,7 +358,7 @@ const DashboardUsuario = () => {
                         type="text" 
                         placeholder="000.000.000-00" 
                         value={cardCpf}
-                        onChange={(e) => setCardCpf(e.target.value)}
+                        onChange={(e) => setCardCpf(formatCPF(e.target.value))}
                         required
                       />
                     </div>

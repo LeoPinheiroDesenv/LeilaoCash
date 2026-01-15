@@ -55,14 +55,40 @@ export const DashboardUsuarioMinhaConta = () => {
       }
     } catch (error) {
       console.error('Erro ao carregar dados do usuário:', error);
-      setMessage({ type: 'error', text: 'Erro ao carregar dados' });
+      setMessage({ type: 'error', text: 'Não foi possível carregar suas informações. Tente recarregar a página.' });
     } finally {
       setLoading(false);
     }
   };
 
+  const formatCPF = (value) => {
+    // Remove tudo que não é dígito e limita a 11 caracteres
+    const cleaned = value.replace(/\D/g, '').slice(0, 11);
+    // Aplica a máscara 000.000.000-00
+    return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  };
+
+  const formatPhone = (value) => {
+    // Remove tudo que não é dígito e limita a 11 caracteres
+    const cleaned = value.replace(/\D/g, '').slice(0, 11);
+    // Aplica a máscara (00) 00000 0000
+    return cleaned.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2 $3');
+  };
+
   const handleSaveProfile = async (e) => {
     e.preventDefault();
+    
+    // Validações básicas
+    if (!formData.name || formData.name.trim() === '') {
+      setMessage({ type: 'error', text: 'O nome completo é obrigatório.' });
+      return;
+    }
+
+    if (formData.name.trim().length < 3) {
+      setMessage({ type: 'error', text: 'O nome deve ter no mínimo 3 caracteres.' });
+      return;
+    }
+
     try {
       setSaving(true);
       setMessage({ type: '', text: '' });
@@ -70,18 +96,26 @@ export const DashboardUsuarioMinhaConta = () => {
       // Remove email do formData antes de enviar, pois o backend não permite atualizar email
       const { email, ...profileData } = formData;
       
+      // Remove formatação de CPF e telefone antes de enviar
+      if (profileData.cpf) {
+        profileData.cpf = profileData.cpf.replace(/\D/g, '');
+      }
+      if (profileData.phone) {
+        profileData.phone = profileData.phone.replace(/\D/g, '');
+      }
+      
       const response = await api.put('/auth/profile', profileData);
       if (response.data.success) {
         updateUser(response.data.data);
-        setMessage({ type: 'success', text: 'Perfil atualizado com sucesso!' });
+        setMessage({ type: 'success', text: 'Perfil atualizado com sucesso! ✓' });
       } else {
-        setMessage({ type: 'error', text: response.data.message || 'Erro ao atualizar perfil' });
+        setMessage({ type: 'error', text: response.data.message || 'Não foi possível atualizar seu perfil. Verifique os dados e tente novamente.' });
       }
     } catch (error) {
       console.error('Erro ao salvar perfil:', error);
       setMessage({ 
         type: 'error', 
-        text: error.response?.data?.message || 'Erro ao atualizar perfil. Tente novamente.' 
+        text: error.response?.data?.message || 'Não foi possível salvar as alterações do perfil. Tente novamente mais tarde.' 
       });
     } finally {
       setSaving(false);
@@ -91,13 +125,34 @@ export const DashboardUsuarioMinhaConta = () => {
   const handleChangePassword = async (e) => {
     e.preventDefault();
     
+    // Validações básicas
+    if (!passwordData.currentPassword || passwordData.currentPassword === '') {
+      setMessage({ type: 'error', text: 'A senha atual é obrigatória.' });
+      return;
+    }
+
+    if (!passwordData.newPassword || passwordData.newPassword === '') {
+      setMessage({ type: 'error', text: 'A nova senha é obrigatória.' });
+      return;
+    }
+
+    if (!passwordData.confirmPassword || passwordData.confirmPassword === '') {
+      setMessage({ type: 'error', text: 'A confirmação da senha é obrigatória.' });
+      return;
+    }
+    
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setMessage({ type: 'error', text: 'As senhas não coincidem' });
+      setMessage({ type: 'error', text: 'As senhas não correspondem. Verifique os valores digitados.' });
       return;
     }
 
     if (passwordData.newPassword.length < 8) {
-      setMessage({ type: 'error', text: 'A senha deve ter pelo menos 8 caracteres' });
+      setMessage({ type: 'error', text: 'A nova senha deve ter no mínimo 8 caracteres.' });
+      return;
+    }
+
+    if (passwordData.currentPassword === passwordData.newPassword) {
+      setMessage({ type: 'error', text: 'A nova senha não pode ser igual à senha atual.' });
       return;
     }
 
@@ -112,20 +167,20 @@ export const DashboardUsuarioMinhaConta = () => {
       });
       
       if (response.data.success) {
-        setMessage({ type: 'success', text: 'Senha alterada com sucesso!' });
+        setMessage({ type: 'success', text: 'Senha alterada com sucesso! ✓' });
         setPasswordData({
           currentPassword: '',
           newPassword: '',
           confirmPassword: ''
         });
       } else {
-        setMessage({ type: 'error', text: response.data.message || 'Erro ao alterar senha' });
+        setMessage({ type: 'error', text: response.data.message || 'Não foi possível alterar a senha. Verifique os dados e tente novamente.' });
       }
     } catch (error) {
       console.error('Erro ao alterar senha:', error);
       setMessage({ 
         type: 'error', 
-        text: error.response?.data?.message || 'Erro ao alterar senha. Verifique a senha atual.' 
+        text: error.response?.data?.message || 'Não foi possível alterar a senha. Verifique a senha atual e tente novamente.' 
       });
     } finally {
       setSavingPassword(false);
@@ -236,7 +291,7 @@ export const DashboardUsuarioMinhaConta = () => {
               <input 
                 type="tel" 
                 value={formData.phone}
-                onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                onChange={(e) => setFormData({...formData, phone: formatPhone(e.target.value)})}
               />
             </div>
           </div>
@@ -292,7 +347,7 @@ export const DashboardUsuarioMinhaConta = () => {
               <input 
                 type="text" 
                 value={formData.cpf}
-                disabled
+                onChange={(e) => setFormData({...formData, cpf: formatCPF(e.target.value)})}
               />
             </div>
           </div>

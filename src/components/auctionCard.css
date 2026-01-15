@@ -1,6 +1,6 @@
 .card {
-  background: linear-gradient(180deg, rgba(13,21,41,0.9), rgba(8,13,25,0.95));
-  border: 1px solid rgba(88,78,255,0.06);
+  background: var(--color-card-bg, #0D1529);
+  border: 1px solid var(--color-card-border, rgba(255, 255, 255, 0.1));
   border-radius: 16px;
   overflow: hidden;
   transition: all 0.3s ease;
@@ -11,8 +11,8 @@
 
 .card:hover {
   transform: translateY(-8px);
-  border-color: rgba(88, 78, 255, 0.22);
-  box-shadow: 0 18px 40px rgba(8,12,20,0.6);
+  border-color: rgba(88, 78, 255, 0.5);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
 }
 
 .card-media {
@@ -40,7 +40,6 @@
   right: 12px;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
   z-index: 2;
   gap: 8px;
 }
@@ -48,41 +47,46 @@
 .top-badges-left {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   align-items: flex-start;
 }
 
 .top-badges-right {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
 }
 
 .badge-item {
-  padding: 5px 10px;
-  border-radius: 8px;
-  font-size: 11px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
   font-weight: 700;
   display: flex;
   align-items: center;
   gap: 4px;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
+  text-transform: uppercase;
 }
 
 .badge-item.hot {
-  background: linear-gradient(90deg, #FFB86B, #F59E0B);
-  color: #0b0b0b;
-  box-shadow: 0 6px 14px rgba(245,158,11,0.12);
-  text-transform: uppercase;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #FFA500, #FF8C00);
+  color: #fff;
+  border: 1px solid rgba(255, 165, 0, 0.5);
 }
 
 .badge-item.discount {
-  background: linear-gradient(90deg, #4A9FD8, #2EB0E6);
-  color: #052231;
-  box-shadow: 0 6px 14px rgba(74,159,216,0.08);
+  background: linear-gradient(135deg, #8B5CF6, #6D28D9);
+  color: #fff;
+  border: 1px solid rgba(139, 92, 246, 0.5);
+}
+
+.badge-item.cashback {
+  background: linear-gradient(135deg, #10B981, #34D399);
+  color: #fff;
+  border: 1px solid rgba(16, 185, 129, 0.5);
 }
 
 .bottom-overlay {
@@ -91,70 +95,71 @@
   left: 0;
   right: 0;
   padding: 12px;
-  background: linear-gradient(to top, rgba(8,13,25,0.95), transparent 70%);
+  background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.4), transparent);
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
   z-index: 2;
 }
 
-.badge-item.cashback {
-  background: rgba(16, 185, 129, 0.9);
-  color: #fff;
-}
-
 .timer-pills {
-  display: inline-flex;
+  display: flex;
+  gap: 6px;
   align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  color: rgba(255, 255, 255, 0.95);
-  font-weight: 800;
-  font-size: 12px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 8px 12px;
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 165, 0, 0.3);
 }
 
 .timer-pill {
-  width: 26px;
-  height: 26px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.12);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
-  font-variant-numeric: tabular-nums;
+  color: #FFA500;
+  font-size: 14px;
+  font-weight: 700;
+  min-width: 20px;
+  text-align: center;
 }
 
 .timer-sep {
-  opacity: 0.75;
+  color: #FFA500;
   font-weight: 700;
+}
+
+.timer {
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0,0,0,0.5);
+  padding: 5px 10px;
+  border-radius: 8px;
+  backdrop-filter: blur(4px);
 }
 
 .card-content {
   padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   flex: 1;
 }
 
 .product-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
-  color: #fff;
-  margin: 0 0 12px 0;
+  color: var(--color-card-title, #fff);
+  margin: 0;
   line-height: 1.4;
-  height: auto;
-  min-height: 50px;
+  height: 45px; /* 2 linhas de texto */
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  font-family: var(--font-primary, 'Inter', sans-serif);
+  font-family: var(--font-secondary, 'Orbitron', sans-serif);
 }
 
 .product-title a {
@@ -162,45 +167,87 @@
   color: inherit;
 }
 
-
-.price-row {
+.star-rating {
   display: flex;
-  align-items: baseline;
-  gap: 12px;
+  gap: 2px;
+  color: #f59e0b;
+  margin-top: 8px;
+}
+
+.star-rating svg {
+  width: 16px;
+  height: 16px;
+}
+
+.price-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
   margin-top: 4px;
 }
 
-.current-price {
-  font-size: 26px;
-  font-weight: 900;
-  line-height: 1;
+.price-group .price-label {
+  font-size: 11px;
+  color: #8da4bf;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.price-group .current-price {
+  font-size: 24px;
+  font-weight: 800;
   color: #4A9FD8;
-  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.price-group.market-price-group {
+  text-align: right;
+}
+
+.price-group .market-price {
+  font-size: 14px;
+  color: #7a90a6;
+  text-decoration: line-through;
+  line-height: 1;
+}
+
+.price-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.current-price {
+  font-size: 24px;
+  font-weight: 800;
+  color: #4A9FD8;
+  line-height: 1;
 }
 
 .market-price {
-  font-size: 13px;
+  font-size: 14px;
   color: #7a90a6;
   text-decoration: line-through;
-  font-variant-numeric: tabular-nums;
+  line-height: 1;
 }
 
 .meta-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 16px;
+  padding-top: 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  margin-top: auto;
+  margin-top: 12px;
 }
 
 .bids-count {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
-  color: #9fb0c8;
-  font-weight: 500;
+  font-size: 13px;
+  color: #8da4bf;
 }
 
 .btn-view {
@@ -213,7 +260,6 @@
   text-align: center;
   font-size: 14px;
   font-weight: 700;
-  font-family: var(--font-primary, 'Inter', sans-serif);
   transition: all 0.3s;
   border: none;
 }
@@ -221,5 +267,4 @@
 .btn-view:hover {
   filter: brightness(1.15);
   box-shadow: 0 4px 15px rgba(88, 78, 255, 0.4);
-  transform: translateY(-1px);
 }

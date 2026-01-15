@@ -21,6 +21,33 @@
   --header-scrolled-height: 60px; /* 16px padding top + 16px padding bottom + 28px adjusted logo height */
 }
 
+/* Aplicar fonte primária em todos os botões */
+button,
+[type="button"],
+[type="submit"],
+[type="reset"],
+[role="button"],
+.btn,
+.btn-submit,
+.btn-primary,
+.btn-secondary,
+.btn-login,
+.btn-register,
+.btn-see-all,
+.btn-cta-primary,
+.btn-cta-secondary,
+.btn-retry,
+.btn-icon,
+.btn-icon-danger,
+.btn-buy-credits,
+.btn-ver-todos,
+.btn-ver-leilao,
+.btn-change-avatar,
+.btn-logout,
+[class*="btn-"] {
+  font-family: var(--font-primary, 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif) !important;
+}
+
 .App {
   min-height: 100vh;
   background: #080c16;

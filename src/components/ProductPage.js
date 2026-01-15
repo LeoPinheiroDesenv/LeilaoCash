@@ -22,6 +22,7 @@ const ProductPage = () => {
   const [bidMessage, setBidMessage] = useState({ type: '', text: '' });
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [bids, setBids] = useState([]);
   
   const prevBidRef = useRef(0);
 
@@ -57,6 +58,11 @@ const ProductPage = () => {
         
         prevBidRef.current = newCurrentBid;
         setProduct(newProductData);
+        
+        // Carregar bids se existirem
+        if (newAuction?.bids && Array.isArray(newAuction.bids)) {
+          setBids(newAuction.bids);
+        }
         
         const minBid = newCurrentBid + 0.5;
         if (!bidAmount || parseFloat(bidAmount) < minBid) {
@@ -331,11 +337,7 @@ const ProductPage = () => {
             <div className="product-gallery">
               <div className="main-image">
                 <img src={currentImage} alt={product.name} />
-                {auction.status === 'active' && (
-                  <div className="product-badge hot-badge">
-                    <span>{getText('text_hot_deal', 'Hot Deal')}</span>
-                  </div>
-                )}
+                
                 {auction.cashback_percentage && (
                   <div className="product-badge discount-badge">
                     {auction.cashback_percentage}% {getText('text_cashback', 'Cashback')}
@@ -380,7 +382,37 @@ const ProductPage = () => {
               )}
             </div>
 
-            <div className="product-info">
+            {settings?.show_bid_history === 'true' && (
+              <div className="bid-history-section">
+                <h3>{getText('text_bid_history', 'Histórico de Lances')}</h3>
+                <div className="bid-history-list">
+                  {bids && bids.length > 0 ? (
+                    bids.map((bid, index) => (
+                      <div key={index} className="bid-history-item">
+                        <div className="bid-user">
+                          <div className="bid-avatar">
+                            {bid.user?.name?.charAt(0)?.toUpperCase() || '?'}
+                          </div>
+                          <div className="bid-user-info">
+                            <p className="bid-user-name">{bid.user?.name || 'Usuário Anônimo'}</p>
+                            <p className="bid-timestamp">
+                              {new Date(bid.created_at).toLocaleDateString('pt-BR')} {new Date(bid.created_at).toLocaleTimeString('pt-BR')}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="bid-amount">
+                          {formatPrice(bid.amount)}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="no-bids">{getText('text_no_bids_yet', 'Nenhum lance realizado ainda.')}</p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div className="product-info" style ={{ marginTop: '-900px' }}>
               <div className="product-header">
                 {auction.cashback_percentage && (
                   <div className="cashback-tag">
@@ -649,14 +681,7 @@ const ProductPage = () => {
             </div>
           </div>
 
-          {settings?.show_bid_history === 'true' && (
-            <div className="bid-history-section">
-                <h3>{getText('text_bid_history', 'Histórico de Lances')}</h3>
-                <div className="bid-history-list">
-                <p className="no-bids">{getText('text_bid_history_soon', 'Histórico de lances será implementado em breve.')}</p>
-                </div>
-            </div>
-          )}
+         
           </div>
         </section>
       </main>
