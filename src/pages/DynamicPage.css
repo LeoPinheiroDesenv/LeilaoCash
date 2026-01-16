@@ -16,7 +16,7 @@
   font-weight: 700;
   margin-bottom: 1.5rem;
   color: var(--color-text, #e6eef8);
-  font-family: var(--font-secondary, 'Orbitron', sans-serif);
+  font-family: var(--font-secondary, 'Roboto', sans-serif);
 }
 
 .dynamic-content h2 {
@@ -24,7 +24,7 @@
   font-weight: 600;
   margin: 2rem 0 1rem;
   color: var(--color-text, #e6eef8);
-  font-family: var(--font-secondary, 'Orbitron', sans-serif);
+  font-family: var(--font-secondary, 'Roboto', sans-serif);
 }
 
 .dynamic-content h3 {

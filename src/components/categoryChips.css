@@ -20,7 +20,7 @@
   font-weight: 500;
   transition: all 0.2s;
   white-space: nowrap;
-  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
+  font-family: var(--font-primary, 'Roboto', system-ui, sans-serif);
   cursor: pointer;
 }
 

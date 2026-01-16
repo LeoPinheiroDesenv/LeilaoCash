@@ -155,9 +155,7 @@ export const DashboardAdminLances = () => {
   return (
     <AdminLayout pageTitle="Lances" pageSubtitle="Visualize e gerencie todos os lances realizados">
       <div className="content-header">
-        <div>
-          <h1 className="page-title">Histórico de Lances</h1>
-        </div>
+        
       </div>
       
       {loading ? (
@@ -273,7 +271,7 @@ export const DashboardAdminCashback = () => {
     <AdminLayout pageTitle="Cashback" pageSubtitle="Gerencie o sistema de cashback e pagamentos">
       <div className="content-header">
         <div>
-          <h1 className="page-title">Gestão de Cashback</h1>
+         
         </div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <input
@@ -427,7 +425,7 @@ export const DashboardAdminTransacoes = () => {
     <AdminLayout pageTitle="Transações" pageSubtitle="Visualize todas as transações financeiras">
       <div className="content-header">
         <div>
-          <h1 className="page-title">Transações</h1>
+          
         </div>
         <div style={{ display: 'flex', gap: '1rem' }}>
           <select
@@ -570,7 +568,7 @@ export const DashboardAdminRelatorios = () => {
     <AdminLayout pageTitle="Relatórios" pageSubtitle="Acesse relatórios e análises da plataforma">
       <div className="content-header">
         <div>
-          <h1 className="page-title">Relatórios</h1>
+          
         </div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -680,6 +678,406 @@ export const DashboardAdminRelatorios = () => {
                 <p className="report-metric-label">Cashback Hoje</p>
                 <p className="report-metric-value">{formatPrice(todayMetrics?.cashback_today)}</p>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </AdminLayout>
+  );
+};
+
+// ✅ DashboardAdminContatos - Gerenciamento de mensagens de contato
+export const DashboardAdminContatos = () => {
+  const [contacts, setContacts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState(null);
+  const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, per_page: 15, total: 0 });
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [selectedContact, setSelectedContact] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  const [newStatus, setNewStatus] = useState('');
+
+  useEffect(() => {
+    loadContacts();
+    loadStats();
+  }, [pagination.current_page, search, statusFilter]);
+
+  const loadContacts = async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams({
+        page: pagination.current_page,
+        per_page: pagination.per_page,
+      });
+      if (search) params.append('email', search);
+      if (statusFilter) params.append('status', statusFilter);
+      
+      const response = await api.get(`/contacts?${params.toString()}`);
+      if (response.data.success) {
+        setContacts(response.data.data.data || response.data.data);
+        if (response.data.data.pagination) {
+          setPagination({
+            current_page: response.data.data.pagination.current_page,
+            last_page: response.data.data.pagination.last_page,
+            per_page: response.data.data.pagination.per_page,
+            total: response.data.data.pagination.total
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao carregar contatos:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadStats = async () => {
+    try {
+      const response = await api.get('/contacts/stats');
+      if (response.data.success) {
+        setStats(response.data.data);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar estatísticas:', error);
+    }
+  };
+
+  const handleViewDetails = (contact) => {
+    setSelectedContact(contact);
+    setNewStatus(contact.status);
+    setModalOpen(true);
+  };
+
+  const handleUpdateStatus = async () => {
+    if (!selectedContact) return;
+    try {
+      setUpdating(true);
+      const response = await api.put(`/contacts/${selectedContact.id}`, {
+        status: newStatus
+      });
+      if (response.data.success) {
+        alert('Status atualizado com sucesso!');
+        setModalOpen(false);
+        loadContacts();
+        loadStats();
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar status:', error);
+      alert('Erro ao atualizar status');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Tem certeza que deseja deletar este contato?')) return;
+    try {
+      const response = await api.delete(`/contacts/${id}`);
+      if (response.data.success) {
+        alert('Contato deletado com sucesso!');
+        loadContacts();
+        loadStats();
+      }
+    } catch (error) {
+      console.error('Erro ao deletar contato:', error);
+      alert('Erro ao deletar contato');
+    }
+  };
+
+  const getStatusColor = (status) => {
+    const colors = {
+      'novo': '#FFB800',
+      'respondido': '#10B981',
+      'arquivado': '#6B7280'
+    };
+    return colors[status] || '#9CA3AF';
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleString('pt-BR');
+  };
+
+  return (
+    <AdminLayout pageTitle="Mensagens de Contato" pageSubtitle="Visualize e gerencie todas as mensagens recebidas">
+      <div className="content-header">
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <input 
+            type="text" 
+            placeholder="Buscar por e-mail..." 
+            value={search} 
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPagination(prev => ({ ...prev, current_page: 1 }));
+            }}
+            className="search-input"
+            style={{ minWidth: '250px' }}
+          />
+          <select 
+            value={statusFilter} 
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setPagination(prev => ({ ...prev, current_page: 1 }));
+            }}
+            className="form-select"
+            style={{ minWidth: '180px' }}
+          >
+            <option value="">Todos os status</option>
+            <option value="novo">Novo</option>
+            <option value="respondido">Respondido</option>
+            <option value="arquivado">Arquivado</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Estatísticas */}
+      {stats && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '32px' }}>
+          <div style={{ background: '#1d283a', padding: '20px', borderRadius: '8px', borderLeft: '4px solid #4A9FD8' }}>
+            <p style={{ fontSize: '12px', color: '#9fb0c8', marginBottom: '8px' }}>Total</p>
+            <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#f8fafc' }}>{stats.total}</p>
+          </div>
+          <div style={{ background: '#1d283a', padding: '20px', borderRadius: '8px', borderLeft: '4px solid #FFB800' }}>
+            <p style={{ fontSize: '12px', color: '#9fb0c8', marginBottom: '8px' }}>Novos</p>
+            <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#FFB800' }}>{stats.novo}</p>
+          </div>
+          <div style={{ background: '#1d283a', padding: '20px', borderRadius: '8px', borderLeft: '4px solid #10B981' }}>
+            <p style={{ fontSize: '12px', color: '#9fb0c8', marginBottom: '8px' }}>Respondidos</p>
+            <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#10B981' }}>{stats.respondido}</p>
+          </div>
+          <div style={{ background: '#1d283a', padding: '20px', borderRadius: '8px', borderLeft: '4px solid #6B7280' }}>
+            <p style={{ fontSize: '12px', color: '#9fb0c8', marginBottom: '8px' }}>Arquivados</p>
+            <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#6B7280' }}>{stats.arquivado}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Tabela de Contatos */}
+      <div className="table-container">
+        {loading ? (
+          <p style={{ textAlign: 'center', padding: '40px', color: '#9fb0c8' }}>Carregando...</p>
+        ) : contacts.length === 0 ? (
+          <p style={{ textAlign: 'center', padding: '40px', color: '#9fb0c8' }}>Nenhuma mensagem encontrada</p>
+        ) : (
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>Assunto</th>
+                <th>Status</th>
+                <th>Data</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {contacts.map(contact => (
+                <tr key={contact.id}>
+                  <td>{contact.name}</td>
+                  <td>{contact.email}</td>
+                  <td style={{ maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{contact.subject}</td>
+                  <td>
+                    <span style={{
+                      display: 'inline-block',
+                      padding: '4px 12px',
+                      borderRadius: '4px',
+                      fontSize: '12px',
+                      fontWeight: 'bold',
+                      backgroundColor: `${getStatusColor(contact.status)}20`,
+                      color: getStatusColor(contact.status)
+                    }}>
+                      {contact.status.charAt(0).toUpperCase() + contact.status.slice(1)}
+                    </span>
+                  </td>
+                  <td>{formatDate(contact.created_at)}</td>
+                  <td>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button
+                        onClick={() => handleViewDetails(contact)}
+                        style={{
+                          padding: '4px 12px',
+                          background: '#4A9FD8',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '12px',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        Ver
+                      </button>
+                      <button
+                        onClick={() => handleDelete(contact.id)}
+                        style={{
+                          padding: '4px 12px',
+                          background: '#EF4444',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '12px',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        Deletar
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* Paginação */}
+      {pagination.last_page > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '24px' }}>
+          <button
+            onClick={() => setPagination(prev => ({ ...prev, current_page: Math.max(1, prev.current_page - 1) }))}
+            disabled={pagination.current_page === 1}
+            style={{
+              padding: '8px 16px',
+              background: pagination.current_page === 1 ? '#6B7280' : '#4A9FD8',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: pagination.current_page === 1 ? 'not-allowed' : 'pointer'
+            }}
+          >
+            Anterior
+          </button>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#9fb0c8' }}>
+            Página {pagination.current_page} de {pagination.last_page}
+          </span>
+          <button
+            onClick={() => setPagination(prev => ({ ...prev, current_page: Math.min(prev.last_page, prev.current_page + 1) }))}
+            disabled={pagination.current_page === pagination.last_page}
+            style={{
+              padding: '8px 16px',
+              background: pagination.current_page === pagination.last_page ? '#6B7280' : '#4A9FD8',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: pagination.current_page === pagination.last_page ? 'not-allowed' : 'pointer'
+            }}
+          >
+            Próxima
+          </button>
+        </div>
+      )}
+
+      {/* Modal de Detalhes */}
+      {modalOpen && selectedContact && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 100
+        }}>
+          <div style={{
+            background: '#1d283a',
+            borderRadius: '8px',
+            padding: '32px',
+            maxWidth: '600px',
+            width: '90%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            color: '#f8fafc'
+          }}>
+            <h2 style={{ marginTop: 0, marginBottom: '20px', fontSize: '20px', fontWeight: 'bold' }}>Detalhes da Mensagem</h2>
+            
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '12px', color: '#9fb0c8', marginBottom: '4px' }}>Nome</label>
+              <p style={{ margin: 0, fontSize: '14px' }}>{selectedContact.name}</p>
+            </div>
+
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '12px', color: '#9fb0c8', marginBottom: '4px' }}>E-mail</label>
+              <p style={{ margin: 0, fontSize: '14px' }}>{selectedContact.email}</p>
+            </div>
+
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '12px', color: '#9fb0c8', marginBottom: '4px' }}>Assunto</label>
+              <p style={{ margin: 0, fontSize: '14px' }}>{selectedContact.subject}</p>
+            </div>
+
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '12px', color: '#9fb0c8', marginBottom: '4px' }}>Mensagem</label>
+              <p style={{ margin: 0, fontSize: '14px', whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>{selectedContact.message}</p>
+            </div>
+
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '12px', color: '#9fb0c8', marginBottom: '4px' }}>IP Address</label>
+              <p style={{ margin: 0, fontSize: '12px', fontFamily: 'monospace', color: '#9fb0c8' }}>{selectedContact.ip_address}</p>
+            </div>
+
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '12px', color: '#9fb0c8', marginBottom: '4px' }}>Data</label>
+              <p style={{ margin: 0, fontSize: '14px' }}>{formatDate(selectedContact.created_at)}</p>
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{ display: 'block', fontSize: '12px', color: '#9fb0c8', marginBottom: '8px' }}>Status</label>
+              <select
+                value={newStatus}
+                onChange={(e) => setNewStatus(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: '4px',
+                  border: '1px solid #334155',
+                  background: '#0b111e',
+                  color: '#f8fafc',
+                  fontSize: '14px',
+                  cursor: 'pointer'
+                }}
+              >
+                <option value="novo">Novo</option>
+                <option value="respondido">Respondido</option>
+                <option value="arquivado">Arquivado</option>
+              </select>
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setModalOpen(false)}
+                style={{
+                  padding: '8px 20px',
+                  background: '#6B7280',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold'
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleUpdateStatus}
+                disabled={updating}
+                style={{
+                  padding: '8px 20px',
+                  background: '#4A9FD8',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: updating ? 'not-allowed' : 'pointer',
+                  fontWeight: 'bold',
+                  opacity: updating ? 0.7 : 1
+                }}
+              >
+                {updating ? 'Atualizando...' : 'Atualizar Status'}
+              </button>
             </div>
           </div>
         </div>

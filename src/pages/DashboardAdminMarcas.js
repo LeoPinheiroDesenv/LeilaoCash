@@ -89,7 +89,7 @@ const DashboardAdminMarcas = () => {
   return (
     <AdminLayout pageTitle="Marcas" pageSubtitle="Gerencie as marcas dos produtos">
       <div className="content-header">
-        <div><h1 className="page-title">Marcas</h1></div>
+        
         <div style={{ display: 'flex', gap: '1rem' }}>
           <input 
             type="text" 

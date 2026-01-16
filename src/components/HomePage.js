@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import Hero from './Hero';
 import WhyChooseUs from './WhyChooseUs';
@@ -36,6 +36,7 @@ const HomePage = ({ searchTerm, onSearch }) => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [error, setError] = useState(null);
+  const resultsRef = useRef(null);
 
   const loadCategories = async () => {
     try {
@@ -158,6 +159,26 @@ const HomePage = ({ searchTerm, onSearch }) => {
     }
   }, [filter, auctions]);
 
+  // Quando houver um filtro via query string, rola a página até o início da visualização dos resultados.
+  useEffect(() => {
+    if (!filter) return;
+
+    // Aguarda a renderização dos produtos filtrados e então realiza o scroll.
+    const id = setTimeout(() => {
+      const el = resultsRef.current;
+      if (!el) return;
+
+      // Compensa a altura do cabeçalho sticky
+      const header = document.querySelector('.site-header');
+      const headerHeight = header ? header.getBoundingClientRect().height : 0;
+      const top = el.getBoundingClientRect().top + window.scrollY - headerHeight - 8; // pequeno espaçamento
+
+      window.scrollTo({ top, behavior: 'smooth' });
+    }, 80);
+
+    return () => clearTimeout(id);
+  }, [filter, filteredProducts]);
+
   const handleSelectCategory = (categoryId) => {
     setSelectedCategory(categoryId);
   };
@@ -212,7 +233,7 @@ const HomePage = ({ searchTerm, onSearch }) => {
       />
       <main>
         {filter && filteredProducts.length > 0 ? (
-          <div className="container" style={{ padding: '2rem' }}>
+          <div ref={resultsRef} className="container" style={{ padding: '2rem' }}>
             <div style={{ marginBottom: '2rem' }}>
               <Link to="/" style={{ color: '#4A9FD8', textDecoration: 'none', fontSize: '0.9rem' }}>
                 ← Voltar
@@ -242,7 +263,7 @@ const HomePage = ({ searchTerm, onSearch }) => {
             </div>
           </div>
         ) : filter && filteredProducts.length === 0 ? (
-          <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
+          <div ref={resultsRef} className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
             <Link to="/" style={{ color: '#4A9FD8', textDecoration: 'none', fontSize: '0.9rem' }}>
               ← Voltar
             </Link>

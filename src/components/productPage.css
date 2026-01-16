@@ -95,7 +95,7 @@
   transform: translateY(-50%);
   width: 40px;
   height: 40px;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   border: none;
   border-radius: 50%;
   color: #fff;
@@ -107,16 +107,16 @@
   z-index: 2;
 }
 
-.gallery-nav.prev {
-  left: 12px;
-}
+@media (max-width: 640px) {
+  .gallery-nav {
+    width: 32px;
+    height: 32px;
+  }
 
-.gallery-nav.next {
-  right: 12px;
-}
-
-.gallery-nav:hover {
-  background: rgba(0, 0, 0, 0.7);
+  .gallery-nav svg {
+    width: 18px;
+    height: 18px;
+  }
 }
 
 .thumbnail-list {
@@ -150,7 +150,6 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  /*margin-top: -900px;*/
 }
 
 .product-header {
@@ -185,7 +184,7 @@
   font-weight: 700;
   color: var(--color-text);
   margin: 0;
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
 }
 
 .timer-section {
@@ -196,6 +195,14 @@
   background: rgba(255, 107, 53, 0.1);
   border: 1px solid rgba(255, 107, 53, 0.2);
   border-radius: 12px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .timer-section {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
 }
 
 .timer-label {
@@ -205,6 +212,13 @@
   color: #ff6b35;
   font-weight: 600;
   font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .timer-label {
+    font-size: 0.8rem;
+  }
 }
 
 .timer-display {
@@ -212,6 +226,12 @@
   font-weight: 700;
   font-size: 1.25rem;
   font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 640px) {
+  .timer-display {
+    font-size: 1rem;
+  }
 }
 
 .countdown-display {
@@ -277,6 +297,19 @@
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 12px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .leader-section {
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
+
+  .bids-count {
+    width: 100%;
+    justify-content: flex-start;
+  }
 }
 
 .leader-avatar {
@@ -328,13 +361,22 @@
 }
 
 .bid-input-group {
-    display: flex;
+  display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 1rem;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .bid-input-group {
+    flex-wrap: nowrap;
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
 }
 
 .currency {
@@ -350,6 +392,14 @@
   font-size: 1.25rem;
   font-weight: 700;
   outline: none;
+  min-width: 80px;
+}
+
+@media (max-width: 640px) {
+  .bid-input {
+    font-size: 1rem;
+    min-width: 60px;
+  }
 }
 
 .bid-input::placeholder {
@@ -360,12 +410,20 @@
   padding: 12px 24px;
   background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
   color: #fff;
-    border: none;
+  border: none;
   border-radius: 10px;
   font-weight: 600;
   font-size: 1rem;
-    cursor: pointer;
+  cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .btn-bid {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
 }
 
 .btn-bid:hover {
@@ -377,6 +435,12 @@
   color: #9fb0c8;
   font-size: 0.875rem;
   margin: 0;
+}
+
+@media (max-width: 640px) {
+  .bid-info {
+    font-size: 0.75rem;
+  }
 }
 
 .action-buttons {
@@ -595,9 +659,13 @@
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .product-detail .container {
     padding: 0 1rem;
+  }
+
+  .product-info h1 {
+    font-size: 1.75rem;
   }
 
   .features-grid {
@@ -606,6 +674,175 @@
 
   .price-section {
     grid-template-columns: 1fr;
+  }
+
+  .meta-row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .product-info-section,
+  .get-section {
+    padding: 1rem;
+  }
+
+  .info-grid,
+  .get-info-grid {
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .product-detail {
+    padding: 1rem 0;
+  }
+
+  .product-detail .container {
+    padding: 0 0.75rem;
+  }
+
+  .breadcrumb {
+    margin-bottom: 1rem;
+    font-size: 0.8rem;
+  }
+
+  .main-image {
+    aspect-ratio: 16/9;
+    border-radius: 12px;
+    min-height: 200px;
+  }
+
+  .thumbnail-list {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .thumbnail {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+  }
+
+  .product-info h1 {
+    font-size: 1.25rem;
+    line-height: 1.3;
+  }
+
+  .product-header {
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .cashback-tag {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+  }
+
+  .product-status {
+    padding: 3px 8px;
+    font-size: 0.7rem;
+  }
+
+  .price-section {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .price-value {
+    font-size: 1.5rem;
+  }
+
+  .price-old {
+    font-size: 1rem;
+  }
+
+  .action-buttons {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .action-btn {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+
+  .action-btn.favorite,
+  .action-btn.share {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+  }
+
+  .action-btn.credits {
+    flex: 1 1 100%;
+    min-width: 0;
+    padding: 10px 16px;
+  }
+
+  .features-grid {
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .feature-item {
+    gap: 0.35rem;
+  }
+
+  .feature-item svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .feature-item p {
+    font-size: 0.8rem;
+  }
+
+  .product-description-section,
+  .product-specs-section {
+    padding-top: 1.5rem;
+  }
+
+  .product-description-section h3,
+  .product-specs-section h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .product-description-section p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .spec-item {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .bid-history-item {
+    padding: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .bid-user-name {
+    font-size: 0.85rem;
+  }
+
+  .bid-timestamp {
+    font-size: 0.75rem;
+  }
+
+  .bid-amount {
+    font-size: 0.95rem;
+    width: 100%;
+    margin-top: 0.5rem;
+    text-align: right;
+  }
+
+  .alert {
+    font-size: 0.85rem !important;
+    padding: 0.6rem !important;
   }
 }
 
@@ -661,7 +898,7 @@
   font-weight: 700;
   color: var(--color-text);
   margin: 0 0 1rem 0;
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -719,7 +956,7 @@
   font-weight: 700;
   color: var(--color-text);
   margin: 0 0 1rem 0;
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
 }
 
 .get-info-grid {

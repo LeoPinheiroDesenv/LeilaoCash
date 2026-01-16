@@ -102,7 +102,7 @@ const DashboardAdminModelos = () => {
   return (
     <AdminLayout pageTitle="Modelos" pageSubtitle="Gerencie os modelos dos produtos">
       <div className="content-header">
-        <div><h1 className="page-title">Modelos</h1></div>
+        
         <div style={{ display: 'flex', gap: '1rem' }}>
           <input 
             type="text" 

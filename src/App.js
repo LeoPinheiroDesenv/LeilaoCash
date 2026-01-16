@@ -10,6 +10,7 @@ import ProductPage from './components/ProductPage';
 import Login from './pages/Login';
 import Cadastro from './pages/Cadastro';
 import ComoFunciona from './pages/ComoFunciona';
+import Contato from './pages/Contato';
 import FAQ from './pages/FAQ';
 import Termos from './pages/Termos';
 import Privacidade from './pages/Privacidade';
@@ -30,7 +31,8 @@ import {
   DashboardAdminLances,
   DashboardAdminCashback,
   DashboardAdminTransacoes,
-  DashboardAdminRelatorios
+  DashboardAdminRelatorios,
+  DashboardAdminContatos
 } from './pages/DashboardAdminPages';
 import {
   DashboardUsuarioMinhaConta,
@@ -115,6 +117,11 @@ function App() {
                 <DashboardAdminRelatorios />
               </ProtectedRoute>
             } />
+            <Route path="/dashboard/contatos" element={
+              <ProtectedRoute adminOnly={true}>
+                <DashboardAdminContatos />
+              </ProtectedRoute>
+            } />
             
             {/* Rotas de Configurações */}
             <Route path="/dashboard/configuracoes" element={<Navigate to="/dashboard/configuracoes/layout" replace />} />
@@ -157,6 +164,7 @@ function App() {
             <Route path="/produto/:id" element={<Layout><ProductPage /></Layout>} />
             <Route path="/suba-de-nivel" element={<Layout><SubaDeNivel /></Layout>} />
             <Route path="/como-funciona" element={<Layout><ComoFunciona /></Layout>} />
+            <Route path="/contato" element={<Layout><Contato /></Layout>} />
             <Route path="/faq" element={<Layout><FAQ /></Layout>} />
             <Route path="/termos" element={<Layout><Termos /></Layout>} />
             <Route path="/privacidade" element={<Layout><Privacidade /></Layout>} />

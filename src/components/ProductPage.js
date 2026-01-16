@@ -412,7 +412,7 @@ const ProductPage = () => {
               </div>
             )}
 
-            <div className="product-info" style ={{ marginTop: '-900px' }}>
+            <div className="product-info ajuste_prod">
               <div className="product-header">
                 {auction.cashback_percentage && (
                   <div className="cashback-tag">

@@ -2,7 +2,7 @@
   min-height: 100vh;
   background: var(--color-background);
   color: var(--color-text);
-  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
+  font-family: var(--font-primary, 'Roboto', system-ui, sans-serif);
 }
 
 .dashboard-header {
@@ -50,7 +50,7 @@
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--color-text);
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
 }
 
 .header-nav {
@@ -65,7 +65,7 @@
   font-weight: 400;
   font-size: 16px;
   transition: color 0.2s;
-  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
+  font-family: var(--font-primary, 'Roboto', system-ui, sans-serif);
 }
 
 .header-nav a:hover {
@@ -221,7 +221,7 @@
   font-size: 32px;
   font-weight: 700;
   color: var(--color-text);
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
 }
 
 .welcome-text p {
@@ -243,7 +243,7 @@
   font-size: 16px;
   text-decoration: none;
   transition: transform 0.2s, box-shadow 0.2s;
-  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
+  font-family: var(--font-primary, 'Roboto', system-ui, sans-serif);
 }
 
 .btn-buy-credits:hover {
@@ -295,7 +295,7 @@
   font-size: 32px;
   font-weight: 700;
   color: var(--color-text);
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
 }
 
 .stat-description {
@@ -338,7 +338,7 @@
   font-size: 24px;
   font-weight: 700;
   color: var(--color-text);
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
 }
 
 .actions-grid {
@@ -394,7 +394,7 @@
   font-size: 24px;
   font-weight: 700;
   color: var(--color-text);
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
 }
 
 .btn-ver-todos {
@@ -406,7 +406,7 @@
   font-weight: 500;
   font-size: 14px;
   transition: color 0.2s;
-  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
+  font-family: var(--font-primary, 'Roboto', system-ui, sans-serif);
 }
 
 .btn-ver-todos:hover {
@@ -504,7 +504,7 @@
   font-weight: 700;
   font-size: 12px;
   font-variant-numeric: tabular-nums;
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
   z-index: 2;
 }
 
@@ -517,7 +517,7 @@
   font-size: 18px;
   font-weight: 600;
   color: var(--color-text);
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
 }
 
 .price-row {
@@ -568,7 +568,7 @@
   text-decoration: none;
   transition: all 0.2s;
   font-size: 14px;
-  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
+  font-family: var(--font-primary, 'Roboto', system-ui, sans-serif);
 }
 
 .btn-ver-leilao:hover {
@@ -637,7 +637,7 @@
   font-size: 24px;
   font-weight: 700;
   color: var(--color-text);
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
 }
 
 .profile-info p {
@@ -666,7 +666,7 @@
   font-size: 20px;
   font-weight: 700;
   color: var(--color-text);
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
 }
 
 .section-header-form svg {
@@ -690,7 +690,7 @@
   font-size: 14px;
   font-weight: 500;
   color: #9fb0c8;
-  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
+  font-family: var(--font-primary, 'Roboto', system-ui, sans-serif);
 }
 
 .form-group input {
@@ -700,7 +700,7 @@
   border-radius: 8px;
   color: var(--color-text);
   font-size: 14px;
-  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
+  font-family: var(--font-primary, 'Roboto', system-ui, sans-serif);
   transition: all 0.2s;
 }
 
@@ -746,7 +746,7 @@
   font-size: 14px;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
-  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
+  font-family: var(--font-primary, 'Roboto', system-ui, sans-serif);
 }
 
 .btn-save:hover {
@@ -774,7 +774,7 @@
   font-size: 32px;
   font-weight: 700;
   color: var(--color-text);
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
 }
 
 .stat-label {
@@ -792,7 +792,7 @@
   font-size: 24px;
   font-weight: 700;
   color: var(--color-text);
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
 }
 
 .bids-list {
@@ -848,7 +848,7 @@
   font-size: 18px;
   font-weight: 600;
   color: var(--color-text);
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
 }
 
 .bid-date {
@@ -894,7 +894,7 @@
   font-size: 18px;
   font-weight: 700;
   color: var(--color-text);
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
 }
 
 .bid-timer {
@@ -908,7 +908,7 @@
   font-weight: 700;
   font-size: 14px;
   font-variant-numeric: tabular-nums;
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
 }
 
 .btn-ver-leilao-bid {
@@ -926,7 +926,7 @@
   font-weight: 500;
   font-size: 14px;
   transition: all 0.2s;
-  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
+  font-family: var(--font-primary, 'Roboto', system-ui, sans-serif);
 }
 
 .btn-ver-leilao-bid:hover {
@@ -960,7 +960,7 @@
   font-size: 48px;
   font-weight: 700;
   color: var(--color-text);
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
 }
 
 .balance-cards-secondary {
@@ -998,7 +998,7 @@
   font-size: 20px;
   font-weight: 700;
   color: var(--color-text);
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
 }
 
 .withdraw-section {
@@ -1018,7 +1018,7 @@
   font-size: 14px;
   font-weight: 500;
   color: #9fb0c8;
-  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
+  font-family: var(--font-primary, 'Roboto', system-ui, sans-serif);
 }
 
 .input-with-prefix {
@@ -1046,7 +1046,7 @@
   color: var(--color-text);
   font-size: 16px;
   font-weight: 600;
-  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
+  font-family: var(--font-primary, 'Roboto', system-ui, sans-serif);
 }
 
 .input-with-prefix input:focus {
@@ -1068,7 +1068,7 @@
   font-size: 16px;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
-  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
+  font-family: var(--font-primary, 'Roboto', system-ui, sans-serif);
 }
 
 .btn-withdraw:hover {
@@ -1098,7 +1098,7 @@
   font-size: 18px;
   font-weight: 700;
   color: var(--color-text);
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
 }
 
 .info-card p {
@@ -1165,7 +1165,7 @@
 .history-amount {
   font-size: 16px;
   font-weight: 700;
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
 }
 
 .history-amount.credit {
@@ -1237,7 +1237,7 @@
 .credit-card-form h3, .pix-payment h3 {
   margin: 0 0 24px 0;
   color: var(--color-text);
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
 }
 
 .form-row {

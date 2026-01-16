@@ -99,8 +99,8 @@ export const ThemeProvider = ({ children }) => {
       loadGoogleFont(themeSettings.font_primary);
       root.style.setProperty('--font-primary', `'${themeSettings.font_primary}', system-ui, sans-serif`);
     } else {
-      // Se não tiver font_primary, usar o padrão
-      root.style.setProperty('--font-primary', "'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif");
+      // Se não tiver font_primary, usar o padrão: Roboto
+      root.style.setProperty('--font-primary', "'Roboto', system-ui, sans-serif");
     }
     
     if (themeSettings.font_secondary) {
@@ -108,7 +108,7 @@ export const ThemeProvider = ({ children }) => {
       root.style.setProperty('--font-secondary', `'${themeSettings.font_secondary}', system-ui, sans-serif`);
     } else {
       // Se não tiver font_secondary, usar o padrão
-      root.style.setProperty('--font-secondary', "'Orbitron', system-ui, sans-serif");
+      root.style.setProperty('--font-secondary', "'Roboto', system-ui, sans-serif");
     }
 
     if (themeSettings.background_image) {

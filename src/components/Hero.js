@@ -1,26 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './hero.css';
 import CategoryChips from './CategoryChips';
+import SearchAutocomplete from './SearchAutocomplete';
 import { useTheme } from '../contexts/ThemeContext';
 
 const Hero = ({ categories, selectedCategory, onSelectCategory, onSearch }) => {
   const { getText, settings } = useTheme();
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-    if (onSearch) {
-      onSearch(value);
-    }
-  };
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    if (onSearch) {
-      onSearch(searchTerm);
-    }
-  };
   
   return (
     <section className="hero">
@@ -38,17 +23,13 @@ const Hero = ({ categories, selectedCategory, onSelectCategory, onSearch }) => {
           {getText('text_hero_subtitle', 'Participe dos melhores leilões de eletrônicos e ganhe cashback em cada lance. Economize até 90% em produtos premium!')}
         </p>
 
-        <form className="hero-search" onSubmit={handleSearchSubmit}>
-          <svg className="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M15.5 14.5L19 18M17 9C17 13.4183 13.4183 17 9 17C4.58172 17 1 13.4183 1 9C1 4.58172 4.58172 1 9 1C13.4183 1 17 4.58172 17 9Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <input 
-            type="text" 
-            placeholder={getText('text_hero_search_placeholder', 'Buscar produtos em leilão...')} 
-            value={searchTerm}
-            onChange={handleSearchChange}
+        <div className="hero-search">
+          <SearchAutocomplete
+            placeholder={getText('text_hero_search_placeholder', 'Buscar produtos em leilão...')}
+            onSearch={onSearch}
+            minChars={3}
           />
-        </form>
+        </div>
 
         <div className="hero-stats">
           <div className="stat-item">

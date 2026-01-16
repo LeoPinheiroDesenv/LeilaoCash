@@ -37,6 +37,7 @@ const AdminLayout = ({ children, pageTitle, pageSubtitle }) => {
     { path: '/dashboard/cashback', label: 'Cashback', icon: 'cashback' },
     { path: '/dashboard/transacoes', label: 'Transações', icon: 'transactions' },
     { path: '/dashboard/relatorios', label: 'Relatórios', icon: 'reports' },
+    { path: '/dashboard/contatos', label: 'Mensagens', icon: 'messages' },
     { 
       label: 'Configurações', 
       icon: 'settings',
@@ -111,6 +112,11 @@ const AdminLayout = ({ children, pageTitle, pageSubtitle }) => {
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M3 3v18h18"></path>
           <path d="m19 9-5 5-4-4-3 3"></path>
+        </svg>
+      ),
+      messages: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
         </svg>
       ),
       settings: (

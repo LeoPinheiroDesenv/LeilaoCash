@@ -38,6 +38,9 @@ const Header = ({ onSearch, showSearch = true }) => {
             <Link to="/" className="nav-link">{getText('text_header_home', 'Início')}</Link>
             <Link to="/?filter=featured" className="nav-link">{getText('text_header_highlights', 'Destaques')}</Link>
             <Link to="/?filter=ending" className="nav-link">{getText('text_header_ending_soon', 'Encerrando')}</Link>
+            <Link to="/leiloes" className="nav-link">{getText('text_header_auctions', 'Leilões')}</Link>
+            <Link to="/como-funciona" className="nav-link">{getText('text_header_how_it_works', 'Como Funciona')}</Link>
+            <Link to="/contato" className="nav-link">{getText('text_header_contact', 'Fale Conosco')}</Link>
           </nav>
           
 
@@ -75,6 +78,8 @@ const Header = ({ onSearch, showSearch = true }) => {
         <div className="mobile-menu-overlay">
           <nav className="mobile-nav">
             <Link to="/leiloes" className="nav-link" onClick={() => setIsMenuOpen(false)}>{getText('text_header_auctions', 'Leilões')}</Link>
+            <Link to="/como-funciona" className="nav-link" onClick={() => setIsMenuOpen(false)}>{getText('text_header_how_it_works', 'Como Funciona')}</Link>
+            <Link to="/contato" className="nav-link" onClick={() => setIsMenuOpen(false)}>{getText('text_header_contact', 'Fale Conosco')}</Link>
           </nav>
         </div>
       )}

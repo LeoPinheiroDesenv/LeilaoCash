@@ -51,6 +51,9 @@ Route::get('/auctions/home', [\App\Http\Controllers\Api\AuctionController::class
 Route::get('/auctions/public/{id}', [\App\Http\Controllers\Api\AuctionController::class, 'show']);
 Route::get('/settings/public', [\App\Http\Controllers\Api\SettingsController::class, 'getPublic']);
 
+// Public routes - Contact (form submission)
+Route::post('/contacts', [\App\Http\Controllers\Api\ContactController::class, 'store']);
+
 
 // Protected routes
 Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
@@ -231,6 +234,15 @@ Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
         Route::prefix('logs')->group(function () {
             Route::get('/', [\App\Http\Controllers\Api\LogController::class, 'index']);
             Route::delete('/', [\App\Http\Controllers\Api\LogController::class, 'clear']);
+        });
+
+        // Contact management (Admin only)
+        Route::prefix('contacts')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Api\ContactController::class, 'index']);
+            Route::get('/stats', [\App\Http\Controllers\Api\ContactController::class, 'stats']);
+            Route::get('/{id}', [\App\Http\Controllers\Api\ContactController::class, 'show']);
+            Route::put('/{id}', [\App\Http\Controllers\Api\ContactController::class, 'update']);
+            Route::delete('/{id}', [\App\Http\Controllers\Api\ContactController::class, 'destroy']);
         });
 
         // Mercado Pago Validation (Admin only)

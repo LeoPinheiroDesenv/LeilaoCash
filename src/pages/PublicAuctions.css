@@ -20,7 +20,7 @@
   font-size: 2.5rem;
   font-weight: 700;
   margin: 0 0 1rem 0;
-  font-family: var(--font-secondary, 'Orbitron', system-ui, sans-serif);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
   color: var(--color-text);
 }
 
@@ -44,7 +44,7 @@
   border-radius: 12px;
   color: #e6eef8;
   font-size: 1rem;
-  font-family: var(--font-primary, 'Inter', system-ui, sans-serif);
+  font-family: var(--font-primary, 'Roboto', system-ui, sans-serif);
   min-width: 250px;
 }
 

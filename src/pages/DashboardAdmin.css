@@ -3,7 +3,7 @@
   min-height: 100vh;
   background: #0b111e;
   color: #f8fafc;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Roboto', system-ui, sans-serif;
 }
 
 .admin-sidebar {
@@ -52,7 +52,7 @@
   font-weight: 700;
   font-size: 20px;
   color: #ffffff;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: 'Roboto', system-ui, sans-serif;
 }
 
 .sidebar-nav {
@@ -193,7 +193,7 @@
   font-size: 24px;
   font-weight: 700;
   color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: 'Roboto', system-ui, sans-serif;
 }
 
 .dashboard-content {
@@ -209,7 +209,7 @@
   font-size: 32px;
   font-weight: 700;
   color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: 'Roboto', system-ui, sans-serif;
 }
 
 .page-subtitle {
@@ -257,7 +257,7 @@
   font-size: 32px;
   font-weight: 700;
   color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: 'Roboto', system-ui, sans-serif;
 }
 
 .stat-change {
@@ -309,7 +309,7 @@
   font-size: 20px;
   font-weight: 700;
   color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: 'Roboto', system-ui, sans-serif;
 }
 
 .auctions-list {
@@ -349,7 +349,7 @@
   font-size: 18px;
   font-weight: 700;
   color: #4A9FD8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: 'Roboto', system-ui, sans-serif;
 }
 
 .metrics-grid {
@@ -371,7 +371,7 @@
   font-size: 28px;
   font-weight: 700;
   color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: 'Roboto', system-ui, sans-serif;
 }
 
 .metric-label {
@@ -400,7 +400,7 @@
   font-size: 14px;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Roboto', system-ui, sans-serif;
 }
 
 .btn-export:hover, .btn-new-product:hover {
@@ -431,7 +431,7 @@
   font-weight: 600;
   font-size: 14px;
   color: #9fb0c8;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Roboto', system-ui, sans-serif;
 }
 
 .admin-table td {
@@ -548,7 +548,7 @@
   font-size: 18px;
   font-weight: 600;
   color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: 'Roboto', system-ui, sans-serif;
 }
 
 .product-meta {
@@ -572,7 +572,7 @@
   font-size: 18px;
   font-weight: 700;
   color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: 'Roboto', system-ui, sans-serif;
 }
 
 .product-actions {
@@ -595,7 +595,7 @@
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Roboto', system-ui, sans-serif;
 }
 
 .btn-edit:hover {
@@ -641,7 +641,7 @@
   font-weight: 700;
   font-size: 14px;
   font-variant-numeric: tabular-nums;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: 'Roboto', system-ui, sans-serif;
 }
 
 .bids-list-admin {
@@ -688,7 +688,7 @@
   font-size: 18px;
   font-weight: 700;
   color: #4A9FD8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: 'Roboto', system-ui, sans-serif;
 }
 
 .cashback-users-grid {
@@ -723,7 +723,7 @@
   font-size: 18px;
   font-weight: 600;
   color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: 'Roboto', system-ui, sans-serif;
 }
 
 .cashback-amount-display {
@@ -745,7 +745,7 @@
   font-size: 20px;
   font-weight: 700;
   color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: 'Roboto', system-ui, sans-serif;
 }
 
 .text-success {
@@ -786,7 +786,7 @@
   font-size: 20px;
   font-weight: 700;
   color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: 'Roboto', system-ui, sans-serif;
 }
 
 .report-card p {
@@ -848,7 +848,7 @@
   font-size: 18px;
   font-weight: 700;
   color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: 'Roboto', system-ui, sans-serif;
 }
 
 .reports-sections {
@@ -882,7 +882,7 @@
   font-size: 20px;
   font-weight: 700;
   color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: 'Roboto', system-ui, sans-serif;
 }
 
 .report-metrics {
@@ -911,6 +911,39 @@
   font-size: 24px;
   font-weight: 700;
   color: #e6eef8;
-  font-family: 'Orbitron', system-ui, sans-serif;
+  font-family: 'Roboto', system-ui, sans-serif;
+}
+
+/* Input e Select padronizados para Admin */
+.search-input,
+.form-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #e6eef8;
+  font-size: 14px;
+  font-family: 'Roboto', system-ui, sans-serif;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.search-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: #4A9FD8;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(74, 159, 216, 0.1);
+}
+
+.search-input::placeholder {
+  color: #9fb0c8;
+}
+
+.form-select option {
+  background-color: #0b111e;
+  color: #e6eef8;
+  padding: 8px;
 }
 

@@ -150,14 +150,13 @@ const ConfiguracoesTextos = ({ settings, onInputChange }) => {
         settings: allTextSettings.filter(s => s.key === 'page_regras')
       },
       contato: {
-        name: 'Contato',
+        name: 'Fale Conosco',
         icon: (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-            <polyline points="22,6 12,13 2,6"></polyline>
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
         ),
-        settings: allTextSettings.filter(s => s.key === 'page_contato')
+        settings: allTextSettings.filter(s => s.key === 'page_contact_text' || s.key.startsWith('text_contact_') || s.key.startsWith('text_header_contact'))
       },
       suba_de_nivel: {
         name: 'Suba de Nível',
@@ -366,7 +365,10 @@ const ConfiguracoesTextos = ({ settings, onInputChange }) => {
           'text_header_cadastro': '📍 Botão "Cadastrar" no canto superior direito',
           'text_header_search_placeholder': '📍 Placeholder do campo de busca no header (quando não está na home)',
           'text_header_como_funciona': '📍 Link "Como Funciona" no botão CTA',
-          'text_header_auctions': '📍 Link "Leilões" no menu mobile',
+          'text_header_how_it_works': '📍 Link "Como Funciona" no menu superior',
+          'text_header_auctions': '📍 Link "Leilões" no menu superior e mobile',
+          'text_header_contact': '📍 Link "Fale Conosco" no menu superior',
+          'text_header_contact_subtitle': '📍 Subtítulo na página de contato ("Estamos aqui para ajudar")',
           
           // Cards de Produtos
           'text_ver_leilao': '📍 Botão nos cards de produtos na página inicial',
@@ -409,6 +411,33 @@ const ConfiguracoesTextos = ({ settings, onInputChange }) => {
           'text_loading': '📍 Mensagem "Carregando..." em várias páginas',
           'text_loading_product': '📍 Mensagem "Carregando produto..." na página do produto',
           'text_try_again': '📍 Botão "Tentar Novamente" em caso de erro',
+          
+          // Página de Contato
+          'page_contact_text': '📍 Texto customizável na página de contato (acima do formulário)',
+          'text_contact_form_title': '📍 Título do formulário na página de contato',
+          'text_contact_name': '📍 Label do campo "Nome" no formulário de contato',
+          'text_contact_name_placeholder': '📍 Placeholder do campo "Nome"',
+          'text_contact_email': '📍 Label do campo "E-mail" no formulário de contato',
+          'text_contact_email_placeholder': '📍 Placeholder do campo "E-mail"',
+          'text_contact_subject': '📍 Label do campo "Assunto" no formulário de contato',
+          'text_contact_subject_placeholder': '📍 Placeholder do campo "Assunto"',
+          'text_contact_message': '📍 Label do campo "Mensagem" no formulário de contato',
+          'text_contact_message_placeholder': '📍 Placeholder do campo "Mensagem"',
+          'text_contact_send': '📍 Texto do botão "Enviar Mensagem" no formulário',
+          'text_contact_sending': '📍 Texto do botão enquanto envia ("Enviando...")',
+          'text_contact_success': '📍 Mensagem de sucesso ao enviar formulário',
+          'text_contact_error_name': '📍 Mensagem de erro: campo nome vazio',
+          'text_contact_error_email': '📍 Mensagem de erro: e-mail inválido',
+          'text_contact_error_subject': '📍 Mensagem de erro: campo assunto vazio',
+          'text_contact_error_message': '📍 Mensagem de erro: campo mensagem vazio',
+          'text_contact_error_generic': '📍 Mensagem de erro genérico ao enviar',
+          'text_contact_info_title': '📍 Título "Outras Formas de Contato" na página de contato',
+          'text_contact_email_label': '📍 Label "E-mail" na seção de contato',
+          'text_contact_email_value': '📍 Endereço de e-mail na seção de contato',
+          'text_contact_phone_label': '📍 Label "Telefone" na seção de contato',
+          'text_contact_phone_value': '📍 Número de telefone na seção de contato',
+          'text_contact_address_label': '📍 Label "Endereço" na seção de contato',
+          'text_contact_address_value': '📍 Endereço físico na seção de contato',
         };
         return locations[key] || null;
       };
