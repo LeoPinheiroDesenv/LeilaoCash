@@ -75,11 +75,37 @@ const Header = ({ onSearch, showSearch = true }) => {
         </div>
       </div>
       {isMenuOpen && (
-        <div className="mobile-menu-overlay">
+        <div className="mobile-menu-overlay" role="dialog" aria-modal="true" onKeyDown={(e) => { if (e.key === 'Escape') setIsMenuOpen(false); }} tabIndex={-1}>
+          <div className="mobile-overlay-top">
+            <Link to="/" className="logo" onClick={() => setIsMenuOpen(false)}>
+              <img src={logoSrc} alt="Logo" className="logo-full" />
+            </Link>
+            <button className="menu-close" onClick={() => setIsMenuOpen(false)} aria-label="Fechar menu">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+
           <nav className="mobile-nav">
+            <Link to="/" className="nav-link" onClick={() => setIsMenuOpen(false)}>{getText('text_header_home', 'Início')}</Link>
+            <Link to="/?filter=featured" className="nav-link" onClick={() => setIsMenuOpen(false)}>{getText('text_header_highlights', 'Destaques')}</Link>
+            <Link to="/?filter=ending" className="nav-link" onClick={() => setIsMenuOpen(false)}>{getText('text_header_ending_soon', 'Encerrando')}</Link>
             <Link to="/leiloes" className="nav-link" onClick={() => setIsMenuOpen(false)}>{getText('text_header_auctions', 'Leilões')}</Link>
             <Link to="/como-funciona" className="nav-link" onClick={() => setIsMenuOpen(false)}>{getText('text_header_how_it_works', 'Como Funciona')}</Link>
             <Link to="/contato" className="nav-link" onClick={() => setIsMenuOpen(false)}>{getText('text_header_contact', 'Fale Conosco')}</Link>
+
+            <div className="mobile-auth">
+              {isAuthenticated ? (
+                <Link to="/dashboard" className="nav-link nav-cta" onClick={() => setIsMenuOpen(false)}>{getText('text_header_my_dashboard', 'Meu Painel')}</Link>
+              ) : (
+                <>
+                  <Link to="/login" className="nav-link" onClick={() => setIsMenuOpen(false)}>{getText('text_header_login', 'Entrar')}</Link>
+                  <Link to="/cadastro" className="nav-link nav-cta" onClick={() => setIsMenuOpen(false)}>{getText('text_header_cadastro', 'Cadastre-se')}</Link>
+                </>
+              )}
+            </div>
           </nav>
         </div>
       )}
