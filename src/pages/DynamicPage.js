@@ -6,8 +6,9 @@ import './DynamicPage.css';
  * Componente reutilizável para páginas com conteúdo dinâmico
  * @param {string} contentKey - Chave da configuração (ex: 'page_como_funciona')
  * @param {string} defaultTitle - Título padrão caso não haja conteúdo
+ * @param {React.ReactNode} children - Conteúdo adicional a ser renderizado após o conteúdo dinâmico
  */
-const DynamicPage = ({ contentKey, defaultTitle = 'Página' }) => {
+const DynamicPage = ({ contentKey, defaultTitle = 'Página', children }) => {
   const { settings, loading } = useTheme();
 
   if (loading) {
@@ -33,6 +34,7 @@ const DynamicPage = ({ contentKey, defaultTitle = 'Página' }) => {
           className="dynamic-content" 
           dangerouslySetInnerHTML={{ __html: content }}
         />
+        {children}
       </div>
     </main>
   );

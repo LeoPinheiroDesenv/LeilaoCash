@@ -438,6 +438,9 @@ const ConfiguracoesTextos = ({ settings, onInputChange }) => {
           'text_contact_phone_value': '📍 Número de telefone na seção de contato',
           'text_contact_address_label': '📍 Label "Endereço" na seção de contato',
           'text_contact_address_value': '📍 Endereço físico na seção de contato',
+          
+          // Página Como Funciona
+          'page_como_funciona': '📍 Conteúdo principal da página "Como Funciona"',
         };
         return locations[key] || null;
       };

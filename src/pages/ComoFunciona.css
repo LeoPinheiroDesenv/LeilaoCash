@@ -23,3 +23,103 @@
   font-size: 1.1rem;
   line-height: 1.6;
 }
+
+/* Estilos da Tabela Comparativa */
+.tabela-comparativa-container {
+  margin-top: 4rem;
+  padding: 2rem 0;
+}
+
+.tabela-titulo {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  text-align: center;
+  color: var(--color-text);
+}
+
+.tabela-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  background: #1e293b; /* Cor de fundo escura para combinar com o tema */
+}
+
+.tabela-comparativa {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.tabela-comparativa th,
+.tabela-comparativa td {
+  padding: 1.5rem;
+  text-align: center;
+  border-bottom: 1px solid #334155;
+}
+
+.tabela-comparativa th {
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tabela-comparativa td {
+  font-size: 1rem;
+  color: #cbd5e1;
+}
+
+/* Coluna de Features */
+.tabela-comparativa .feature-cell {
+  text-align: left;
+  font-weight: 600;
+  color: #e2e8f0;
+  background-color: #0f172a;
+  width: 25%;
+}
+
+/* Coluna LeilãoCash (Destaque) */
+.coluna-leilaocash {
+  background-color: #3b82f6; /* Azul destaque */
+  color: white;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.logo-header {
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.tabela-comparativa .highlight-cell {
+  background-color: rgba(59, 130, 246, 0.1); /* Azul bem claro/transparente */
+  color: #60a5fa; /* Azul mais claro para texto */
+  font-weight: 700;
+  border-left: 2px solid #3b82f6;
+  border-right: 2px solid #3b82f6;
+}
+
+/* Colunas Outros e Varejo */
+.coluna-outros,
+.coluna-varejo {
+  background-color: #1e293b;
+  color: #94a3b8;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .tabela-comparativa th,
+  .tabela-comparativa td {
+    padding: 1rem 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .tabela-comparativa .feature-cell {
+    width: 30%;
+  }
+
+  .logo-header {
+    font-size: 1rem;
+  }
+}
