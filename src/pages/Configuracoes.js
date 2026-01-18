@@ -25,7 +25,8 @@ const Configuracoes = () => {
     general: [],
     content: [],
     social: [],
-    payment: []
+    payment: [],
+    text: []
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -60,9 +61,225 @@ const Configuracoes = () => {
       const response = await api.get('/settings');
       
       if (response.data.success) {
+        const data = response.data.data;
+        
+        // Garantir que as chaves de páginas dinâmicas existam, mesmo que vazias
+        const ensureSettingExists = (group, key, description, defaultValue = '', type = 'html') => {
+          if (!data[group]) data[group] = [];
+          if (!data[group].some(s => s.key === key)) {
+            data[group].push({
+              key,
+              value: defaultValue,
+              description,
+              type,
+              group
+            });
+          }
+        };
+
+        // HTML padrão da tabela para a página Como Funciona
+        const defaultComoFunciona = `
+<div class="tabela-comparativa-container">
+  <h2 class="tabela-titulo">Comparativo de Vantagens</h2>
+  <div class="tabela-wrapper">
+    <table class="tabela-comparativa">
+      <thead>
+        <tr>
+          <th></th>
+          <th class="coluna-leilaocash">
+            <div class="logo-header">LeilãoCash</div>
+          </th>
+          <th class="coluna-outros">Outros Sites de Leilão</th>
+          <th class="coluna-varejo">Varejo Tradicional</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="feature-cell">Preço dos Produtos</td>
+          <td class="highlight-cell">Até 90% OFF</td>
+          <td>Até 90% OFF</td>
+          <td>Preço Cheio</td>
+        </tr>
+        <tr>
+          <td class="feature-cell">Cashback em Lances</td>
+          <td class="highlight-cell">SIM (Até 10%)</td>
+          <td>NÃO</td>
+          <td>NÃO</td>
+        </tr>
+        <tr>
+          <td class="feature-cell">Garantia de Entrega</td>
+          <td class="highlight-cell">SIM</td>
+          <td>Variável</td>
+          <td>SIM</td>
+        </tr>
+        <tr>
+          <td class="feature-cell">Produtos Novos</td>
+          <td class="highlight-cell">SIM</td>
+          <td>Variável</td>
+          <td>SIM</td>
+        </tr>
+        <tr>
+          <td class="feature-cell">Frete Grátis</td>
+          <td class="highlight-cell">Em Promoções</td>
+          <td>Raro</td>
+          <td>Depende do Valor</td>
+        </tr>
+        <tr>
+          <td class="feature-cell">Suporte 24h</td>
+          <td class="highlight-cell">SIM</td>
+          <td>NÃO</td>
+          <td>Horário Comercial</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>`;
+
+        // HTML padrão para a página Suba de Nível
+        const defaultSubaDeNivel = `
+<div class="nivel-hero">
+  <div class="container">
+    <div class="nivel-hero-content">
+      <div class="nivel-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+      </div>
+      <h1 class="nivel-title">Suba de Nível com <span class="text-gradient">Suas Vibes!</span></h1>
+      <p class="nivel-subtitle">Transforme sua experiência de compra em uma verdadeira disputa de Vibe.</p>
+    </div>
+  </div>
+</div>
+
+<div class="nivel-content-section">
+  <div class="container">
+    <div class="nivel-intro">
+      <h2>Como Funciona</h2>
+      <p class="intro-text">
+        No VibeGet, você não apenas adquire produtos, mas participa de uma verdadeira disputa. 
+        Você começa como inscrito e, conforme participa e vence Vibes, sobe de nível. 
+        Quanto mais vitórias, mais oportunidades você tem para aproveitar a plataforma.
+      </p>
+    </div>
+
+    <div class="niveis-grid">
+      <!-- Inscrito -->
+      <div class="nivel-card">
+        <div class="nivel-card-badge">Nível Inicial</div>
+        <div class="nivel-card-header">
+          <span class="nivel-emoji">📝</span>
+          <h3>Inscrito</h3>
+          <span class="nivel-range">Cadastro no site</span>
+        </div>
+        <div class="nivel-card-body">
+          <p class="nivel-text">
+            Todos que se cadastraram no site começam como inscritos. Ao se cadastrar, você tem acesso a todas as Vibes abertas e começa a ganhar Cash Back, podendo ganhar prêmios e começar sua jornada.
+          </p>
+        </div>
+      </div>
+
+      <!-- Bronze -->
+      <div class="nivel-card">
+        <div class="nivel-card-badge" style="background: linear-gradient(90deg, #cd7f32, #e6a86a);">Nível 1</div>
+        <div class="nivel-card-header">
+          <span class="nivel-emoji">🥉</span>
+          <h3>Viber Bronze</h3>
+          <span class="nivel-range">1 Vitória</span>
+        </div>
+        <div class="nivel-card-body">
+          <p class="nivel-text">
+            Ao ganhar 1 Vibe, você se torna um Viber Nível Bronze e começa a participar ativamente das Vibes. Neste nível, você já tem a chance de sugerir novos produtos para as Vibes.
+          </p>
+        </div>
+      </div>
+
+      <!-- Prata -->
+      <div class="nivel-card">
+        <div class="nivel-card-badge" style="background: linear-gradient(90deg, #c0c0c0, #e0e0e0);">Nível 2</div>
+        <div class="nivel-card-header">
+          <span class="nivel-emoji">🥈</span>
+          <h3>Viber Prata</h3>
+          <span class="nivel-range">5 Vitórias</span>
+        </div>
+        <div class="nivel-card-body">
+          <p class="nivel-text">
+            Ao conquistar 5 Vibes, você sobe para o Nível Prata. Agora, você tem mais oportunidades e seu Cash Back aumenta para 45%. Você também começa a concorrer a prêmios e a participar de benefícios exclusivos.
+          </p>
+        </div>
+      </div>
+
+      <!-- Ouro -->
+      <div class="nivel-card">
+        <div class="nivel-card-badge" style="background: linear-gradient(90deg, #ffd700, #ffec8b);">Nível 3</div>
+        <div class="nivel-card-header">
+          <span class="nivel-emoji">🥇</span>
+          <h3>Viber Ouro</h3>
+          <span class="nivel-range">+4 Vitórias</span>
+        </div>
+        <div class="nivel-card-body">
+          <p class="nivel-text">
+            Ao vencer mais 4 Vibes, você alcança o Nível Ouro. Neste nível, você pode comercializar seu Cash Back. Além disso, ganha mais visibilidade na plataforma e tem prioridade nas sugestões para melhorias.
+          </p>
+        </div>
+      </div>
+
+      <!-- Diamante -->
+      <div class="nivel-card">
+        <div class="nivel-card-badge" style="background: linear-gradient(90deg, #b9f2ff, #e0ffff);">Nível 4</div>
+        <div class="nivel-card-header">
+          <span class="nivel-emoji">💎</span>
+          <h3>Viber Diamante</h3>
+          <span class="nivel-range">+3 Vitórias</span>
+        </div>
+        <div class="nivel-card-body">
+          <p class="nivel-text">
+            Com 3 vitórias adicionais, você atinge o Nível Diamante. Agora, você fica mais visível e seu Cash Back aumenta para 50%.
+          </p>
+        </div>
+      </div>
+
+      <!-- Platina -->
+      <div class="nivel-card">
+        <div class="nivel-card-badge" style="background: linear-gradient(90deg, #e5e4e2, #ffffff);">Nível Máximo</div>
+        <div class="nivel-card-header">
+          <span class="nivel-emoji">👑</span>
+          <h3>Viber Platina</h3>
+          <span class="nivel-range">+2 Vitórias</span>
+        </div>
+        <div class="nivel-card-body">
+          <p class="nivel-text">
+            Ao alcançar 2 vitórias adicionais, você chega ao Nível Platina, o nível mais alto. Neste estágio, seu Cash Back aumenta para 60% e você tem acesso a benefícios exclusivos. Além disso, você recebe suporte prioritário e tem voz ativa nas decisões sobre novos produtos na plataforma.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-final-section">
+      <h2>Pronto para começar sua jornada?</h2>
+      <p>Cadastre-se agora e comece a subir de nível!</p>
+      <div class="cta-buttons">
+        <a href="/cadastro" class="btn-cta-primary">
+          Criar Conta Grátis
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </a>
+        <a href="/leiloes" class="btn-cta-secondary">Ver Leilões Ativos</a>
+      </div>
+    </div>
+  </div>
+</div>`;
+
+        // Injetar configurações padrão para páginas dinâmicas se não existirem
+        ensureSettingExists('content', 'page_como_funciona', 'Conteúdo da página Como Funciona', defaultComoFunciona);
+        ensureSettingExists('content', 'page_suba_de_nivel', 'Conteúdo da página Suba de Nível', defaultSubaDeNivel);
+        ensureSettingExists('content', 'page_contato', 'Conteúdo da página Contato');
+        ensureSettingExists('content', 'page_termos', 'Conteúdo da página Termos de Uso');
+        ensureSettingExists('content', 'page_privacidade', 'Conteúdo da página Privacidade');
+        ensureSettingExists('content', 'page_regras', 'Conteúdo da página Regras');
+        ensureSettingExists('content', 'page_faq', 'Conteúdo da página FAQ');
+
         setSettings(prev => ({
           ...prev,
-          ...response.data.data
+          ...data
         }));
       }
     } catch (error) {

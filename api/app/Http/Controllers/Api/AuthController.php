@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Mail\PasswordResetMail;
 use Illuminate\Support\Facades\Mail;
+use Carbon\Carbon;
 
 class AuthController extends Controller
 {
@@ -53,6 +54,7 @@ class AuthController extends Controller
                 'cashback_balance' => 0,
                 'is_admin' => false,
                 'is_active' => true,
+                'auctions_won' => 0, // Inicializa com 0 vitórias
             ]);
 
             $token = $user->createToken('auth_token')->plainTextToken;

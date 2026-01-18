@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Auction;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
@@ -324,8 +325,25 @@ class AuctionController extends Controller
                 }
             }
 
+            // Verificar se o status mudou para 'finished'
+            $oldStatus = $auction->status;
+            $newStatus = $request->status;
+
             // Atualizar outros campos
             $auction->update($request->except('product_ids'));
+
+            // Se o leilão foi finalizado e tem um vencedor, incrementar vitórias do usuário
+            if ($oldStatus !== 'finished' && $newStatus === 'finished' && $auction->winner_id) {
+                $winner = User::find($auction->winner_id);
+                if ($winner) {
+                    $winner->increment('auctions_won');
+                    Log::info('[AuctionController] Incrementado vitórias do usuário', [
+                        'user_id' => $winner->id,
+                        'auction_id' => $auction->id,
+                        'new_total' => $winner->auctions_won
+                    ]);
+                }
+            }
 
             Log::info('[AuctionController] Leilão atualizado', [
                 'auction_id' => $auction->id,

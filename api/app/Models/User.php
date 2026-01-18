@@ -33,6 +33,7 @@ class User extends Authenticatable
         'is_active',
         'user_type',
         'permissions',
+        'auctions_won', // Adicionado campo para contagem de vitórias
     ];
 
     /**
@@ -61,6 +62,7 @@ class User extends Authenticatable
             'is_admin' => 'boolean',
             'is_active' => 'boolean',
             'permissions' => 'array',
+            'auctions_won' => 'integer', // Cast para inteiro
         ];
     }
 
