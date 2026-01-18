@@ -40,6 +40,7 @@ const Header = ({ onSearch, showSearch = true }) => {
             <Link to="/?filter=ending" className="nav-link">{getText('text_header_ending_soon', 'Encerrando')}</Link>
             <Link to="/leiloes" className="nav-link">{getText('text_header_auctions', 'Leilões')}</Link>
             <Link to="/como-funciona" className="nav-link">{getText('text_header_how_it_works', 'Como Funciona')}</Link>
+            <Link to="/suba-de-nivel" className="nav-link">{getText('text_header_upgrade_level', 'Suba de Nível')}</Link>
             <Link to="/contato" className="nav-link">{getText('text_header_contact', 'Fale Conosco')}</Link>
           </nav>
           
@@ -94,6 +95,7 @@ const Header = ({ onSearch, showSearch = true }) => {
             <Link to="/?filter=ending" className="nav-link" onClick={() => setIsMenuOpen(false)}>{getText('text_header_ending_soon', 'Encerrando')}</Link>
             <Link to="/leiloes" className="nav-link" onClick={() => setIsMenuOpen(false)}>{getText('text_header_auctions', 'Leilões')}</Link>
             <Link to="/como-funciona" className="nav-link" onClick={() => setIsMenuOpen(false)}>{getText('text_header_how_it_works', 'Como Funciona')}</Link>
+            <Link to="/suba-de-nivel" className="nav-link" onClick={() => setIsMenuOpen(false)}>{getText('text_header_upgrade_level', 'Suba de Níve1l')}</Link>
             <Link to="/contato" className="nav-link" onClick={() => setIsMenuOpen(false)}>{getText('text_header_contact', 'Fale Conosco')}</Link>
 
             <div className="mobile-auth">

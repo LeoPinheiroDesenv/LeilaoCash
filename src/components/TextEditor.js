@@ -17,7 +17,7 @@ const TextEditor = ({ value, onChange, placeholder = 'Digite seu conteúdo aqui.
         [{ 'header': '1' }, { 'header': '2' }, 'blockquote', 'code-block'],
         [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
         [{ 'direction': 'rtl' }, { 'align': [] }],
-        ['link', 'image', 'video'],
+        ['link', 'image', 'video', 'table'],
         ['clean']
       ]
     }
@@ -26,7 +26,8 @@ const TextEditor = ({ value, onChange, placeholder = 'Digite seu conteúdo aqui.
   const formats = [
     'font', 'size', 'bold', 'italic', 'underline', 'strike', 'color', 'background',
     'script', 'header', 'blockquote', 'code-block', 'list', 'indent',
-    'direction', 'align', 'link', 'image', 'video'
+    'direction', 'align', 'link', 'image', 'video',
+    'table', 'table-row', 'table-cell', 'table-col'
   ];
 
   return (
