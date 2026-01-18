@@ -164,7 +164,7 @@
 }
 
 .sidebar-nav {
-  display: flex;
+  display:contents;
   flex-direction: column;
   gap: 4px;
   padding: 0 16px;
@@ -1073,7 +1073,7 @@
 
 .btn-withdraw:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 8px 24px (16, 185, 129, 0.4);
 }
 
 .info-card {
@@ -1387,5 +1387,103 @@
   .bid-values {
     flex-direction: column;
     align-items: flex-start;
+  }
+  /* NEW rules for 1024px and smaller screens */
+  .user-main {
+    padding: 24px; /* Slightly reduced padding */
+  }
+  .header-content {
+    padding: 0 1rem; /* Reduced horizontal padding */
+    gap: 1rem; /* Reduced gap */
+  }
+  .header-actions {
+    gap: 8px; /* Reduced gap */
+  }
+  .cashback-display {
+    padding: 6px 10px;
+  }
+  .user-menu {
+    padding: 6px 10px;
+  }
+  .dashboard-header .btn-logout {
+    width: 36px;
+    height: 36px;
+  }
+  .welcome-text h1 {
+    font-size: 28px;
+  }
+  .welcome-text p {
+    font-size: 14px;
+  }
+  .btn-buy-credits {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .user-main {
+    padding: 16px; /* Further reduced padding for smaller mobiles */
+  }
+  .header-content {
+    flex-wrap: wrap; /* Allow items to wrap */
+    justify-content: center; /* Center items when wrapped */
+    padding: 0 0.5rem; /* Even smaller horizontal padding */
+    gap: 0.5rem;
+  }
+  .header-logo {
+    flex-basis: 100%; /* Force logo to its own line */
+    justify-content: center;
+    margin-bottom: 0.5rem;
+  }
+  .header-actions {
+    flex-wrap: wrap; /* Allow action items to wrap */
+    justify-content: center;
+    width: 100%; /* Take full width to center items */
+  }
+  .cashback-display,
+  .user-menu,
+  .dashboard-header .btn-logout {
+    flex-grow: 1; /* Allow these items to grow and fill space */
+    justify-content: center;
+  }
+  .cashback-display span,
+  .user-menu span {
+    white-space: nowrap; /* Prevent text wrapping inside buttons/displays */
+  }
+  /* For the welcome-section, make it stack more neatly */
+  .welcome-section {
+    align-items: center; /* Center items */
+    text-align: center;
+  }
+  .welcome-text h1 {
+    font-size: 24px;
+  }
+  .btn-buy-credits {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* Modal adjustments for smaller screens */
+  .payment-options {
+    grid-template-columns: 1fr; /* Stack payment options vertically */
+  }
+  .form-row {
+    grid-template-columns: 1fr; /* Stack form fields vertically */
+  }
+  .input-with-button {
+    flex-direction: column; /* Stack input and button vertically */
+  }
+  .btn-generate-pix {
+    width: 100%;
+    padding: 12px 20px;
+  }
+  .copy-paste-input {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .copy-paste-input button {
+    width: 100%;
+    padding: 12px;
   }
 }

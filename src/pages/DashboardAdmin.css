@@ -947,3 +947,105 @@
   padding: 8px;
 }
 
+/* Mobile adjustments */
+.sidebar-overlay {
+  display: none;
+}
+
+.mobile-header {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .admin-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .admin-sidebar.open {
+    transform: translateX(0);
+    box-shadow: 0 0 40px rgba(0,0,0,0.5);
+  }
+
+  .admin-main {
+    margin-left: 0;
+    transition: margin-left 0.3s ease-in-out;
+  }
+
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 49;
+  }
+
+  .mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    padding: 0 16px;
+    background: #0b111e;
+    border-bottom: 1px solid #1d283a;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
+  
+  .mobile-logo-container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  .hamburger-btn {
+    background: none;
+    border: none;
+    color: #e6eef8;
+    padding: 8px;
+    cursor: pointer;
+    position: absolute;
+    left: 16px;
+  }
+  
+  .dashboard-content {
+    padding: 16px;
+  }
+  
+  .page-title {
+    font-size: 24px;
+  }
+  
+  .page-subtitle {
+    font-size: 14px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .stat-card {
+    padding: 16px;
+  }
+  
+  .stat-value {
+    font-size: 28px;
+  }
+  
+  .dashboard-sections {
+    gap: 16px;
+  }
+  
+  .section-card {
+    padding: 16px;
+  }
+  
+  .section-card h3 {
+    font-size: 18px;
+  }
+}

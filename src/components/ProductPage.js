@@ -16,6 +16,8 @@ const ProductPage = () => {
   const [error, setError] = useState(null);
   const [bidAmount, setBidAmount] = useState('');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isImageFading, setIsImageFading] = useState(false);
+  const [isImageLoading, setIsImageLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isCheckingFavorite, setIsCheckingFavorite] = useState(false);
   const [bidding, setBidding] = useState(false);
@@ -25,6 +27,25 @@ const ProductPage = () => {
   const [bids, setBids] = useState([]);
   
   const prevBidRef = useRef(0);
+  const preloadedImagesRef = useRef({});
+
+  const preloadImage = (url) => {
+    return new Promise((resolve) => {
+      if (!url) return resolve();
+      if (preloadedImagesRef.current[url]) return resolve();
+      const img = new Image();
+      img.src = url;
+      img.onload = () => {
+        preloadedImagesRef.current[url] = true;
+        resolve();
+      };
+      img.onerror = () => {
+        // mark as attempted to avoid retry loops
+        preloadedImagesRef.current[url] = true;
+        resolve();
+      };
+    });
+  };
 
   const parsePrice = (priceString) => {
     if (!priceString) return 0;
@@ -138,16 +159,51 @@ const ProductPage = () => {
   const allImages = [productImage, ...additionalImages].filter(Boolean);
   const currentImage = allImages[currentImageIndex] || allImages[0] || productImage;
 
+  // Preload all images for smooth transitions and hide loader when done
+  useEffect(() => {
+    if (allImages.length === 0) return;
+    let mounted = true;
+    const promises = allImages.map(url => preloadImage(url));
+    Promise.all(promises).then(() => {
+      if (mounted) setIsImageLoading(false);
+    });
+    return () => { mounted = false; };
+  }, [product?.id, allImages.length]);
+
+  const changeImageIndex = (newIndex) => {
+    // Start fade out and show loading spinner
+    setIsImageFading(true);
+    setIsImageLoading(true);
+
+    const newUrl = allImages[newIndex];
+
+    // Preload the next image, then change index and fade in (avoids flicker)
+    preloadImage(newUrl).then(() => {
+      // Wait for fade out animation to finish
+      setTimeout(() => {
+        setCurrentImageIndex(newIndex);
+        // small delay to let browser set new src, then hide loader and fade in
+        setTimeout(() => {
+          setIsImageLoading(false);
+          setIsImageFading(false);
+        }, 60);
+      }, 200); // matches CSS transition duration
+    });
+  };
+
   const handlePrevImage = () => {
-    setCurrentImageIndex((prev) => (prev > 0 ? prev - 1 : allImages.length - 1));
+    const newIndex = currentImageIndex > 0 ? currentImageIndex - 1 : allImages.length - 1;
+    changeImageIndex(newIndex);
   };
 
   const handleNextImage = () => {
-    setCurrentImageIndex((prev) => (prev < allImages.length - 1 ? prev + 1 : 0));
+    const newIndex = currentImageIndex < allImages.length - 1 ? currentImageIndex + 1 : 0;
+    changeImageIndex(newIndex);
   };
 
   const handleThumbnailClick = (index) => {
-    setCurrentImageIndex(index);
+    if (index === currentImageIndex) return;
+    changeImageIndex(index);
   };
 
   const currentBid = parsePrice(auction.current_bid || auction.starting_bid || product?.price);
@@ -334,85 +390,93 @@ const ProductPage = () => {
           </div>
 
           <div className="product-layout">
-            <div className="product-gallery">
-              <div className="main-image">
-                <img src={currentImage} alt={product.name} />
-                
-                {auction.cashback_percentage && (
-                  <div className="product-badge discount-badge">
-                    {auction.cashback_percentage}% {getText('text_cashback', 'Cashback')}
+            <div className="product-gallery-and-history">
+              <div className="product-gallery">
+                <div className="main-image">
+                  <img src={currentImage} alt={product.name} className={isImageFading ? 'fading' : ''} />
+
+                  {isImageLoading && (
+                    <div className="image-loader-overlay" aria-hidden>
+                      <div className="spinner"></div>
+                    </div>
+                  )}
+
+                  {auction.cashback_percentage && (
+                    <div className="product-badge discount-badge">
+                      {auction.cashback_percentage}% {getText('text_cashback', 'Cashback')}
+                    </div>
+                  )}
+                  {allImages.length > 1 && (
+                    <>
+                      <button 
+                        className="gallery-nav prev" 
+                        aria-label={getText('text_previous_image', 'Imagem anterior')}
+                        onClick={handlePrevImage}
+                      >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <polyline points="15 18 9 12 15 6"/>
+                        </svg>
+                      </button>
+                      <button 
+                        className="gallery-nav next" 
+                        aria-label={getText('text_next_image', 'Próxima imagem')}
+                        onClick={handleNextImage}
+                      >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                      </button>
+                    </>
+                  )}
+                </div>
+                {allImages.length > 1 && (
+                  <div className="thumbnail-list">
+                    {allImages.map((img, index) => (
+                      <button 
+                        key={index} 
+                        className={`thumbnail ${index === currentImageIndex ? 'active' : ''}`}
+                        aria-label={`${getText('text_image', 'Imagem')} ${index + 1}`}
+                        onClick={() => handleThumbnailClick(index)}
+                      >
+                        <img src={img} alt={`Thumbnail ${index + 1}`} />
+                      </button>
+                    ))}
                   </div>
                 )}
-                {allImages.length > 1 && (
-                  <>
-                    <button 
-                      className="gallery-nav prev" 
-                      aria-label={getText('text_previous_image', 'Imagem anterior')}
-                      onClick={handlePrevImage}
-                    >
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <polyline points="15 18 9 12 15 6"/>
-                      </svg>
-                    </button>
-                    <button 
-                      className="gallery-nav next" 
-                      aria-label={getText('text_next_image', 'Próxima imagem')}
-                      onClick={handleNextImage}
-                    >
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <polyline points="9 18 15 12 9 6"/>
-                      </svg>
-                    </button>
-                  </>
-                )}
               </div>
-              {allImages.length > 1 && (
-                <div className="thumbnail-list">
-                  {allImages.map((img, index) => (
-                    <button 
-                      key={index} 
-                      className={`thumbnail ${index === currentImageIndex ? 'active' : ''}`}
-                      aria-label={`${getText('text_image', 'Imagem')} ${index + 1}`}
-                      onClick={() => handleThumbnailClick(index)}
-                    >
-                      <img src={img} alt={`Thumbnail ${index + 1}`} />
-                    </button>
-                  ))}
+
+              {settings?.show_bid_history === 'true' && (
+                <div className="bid-history-section">
+                  <h3>{getText('text_bid_history', 'Histórico de Lances')}</h3>
+                  <div className="bid-history-list">
+                    {bids && bids.length > 0 ? (
+                      bids.map((bid, index) => (
+                        <div key={index} className="bid-history-item">
+                          <div className="bid-user">
+                            <div className="bid-avatar">
+                              {bid.user?.name?.charAt(0)?.toUpperCase() || '?'}
+                            </div>
+                            <div className="bid-user-info">
+                              <p className="bid-user-name">{bid.user?.name || 'Usuário Anônimo'}</p>
+                              <p className="bid-timestamp">
+                                {new Date(bid.created_at).toLocaleDateString('pt-BR')} {new Date(bid.created_at).toLocaleTimeString('pt-BR')}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="bid-amount">
+                            {formatPrice(bid.amount)}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="no-bids">{getText('text_no_bids_yet', 'Nenhum lance realizado ainda.')}</p>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
 
-            {settings?.show_bid_history === 'true' && (
-              <div className="bid-history-section">
-                <h3>{getText('text_bid_history', 'Histórico de Lances')}</h3>
-                <div className="bid-history-list">
-                  {bids && bids.length > 0 ? (
-                    bids.map((bid, index) => (
-                      <div key={index} className="bid-history-item">
-                        <div className="bid-user">
-                          <div className="bid-avatar">
-                            {bid.user?.name?.charAt(0)?.toUpperCase() || '?'}
-                          </div>
-                          <div className="bid-user-info">
-                            <p className="bid-user-name">{bid.user?.name || 'Usuário Anônimo'}</p>
-                            <p className="bid-timestamp">
-                              {new Date(bid.created_at).toLocaleDateString('pt-BR')} {new Date(bid.created_at).toLocaleTimeString('pt-BR')}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="bid-amount">
-                          {formatPrice(bid.amount)}
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="no-bids">{getText('text_no_bids_yet', 'Nenhum lance realizado ainda.')}</p>
-                  )}
-                </div>
-              </div>
-            )}
-
-            <div className="product-info ajuste_prod">
+            <div className="product-info">
               <div className="product-header">
                 {auction.cashback_percentage && (
                   <div className="cashback-tag">
