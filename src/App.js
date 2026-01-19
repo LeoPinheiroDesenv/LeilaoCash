@@ -9,6 +9,7 @@ import HomePage from './components/HomePage';
 import ProductPage from './components/ProductPage';
 import Login from './pages/Login';
 import Cadastro from './pages/Cadastro';
+import PorqueNosEscolher from './pages/PorqueNosEscolher';
 import ComoFunciona from './pages/ComoFunciona';
 import Contato from './pages/Contato';
 import FAQ from './pages/FAQ';
@@ -164,6 +165,7 @@ function App() {
             <Route path="/produto/:id" element={<Layout><ProductPage /></Layout>} />
             <Route path="/suba-de-nivel" element={<Layout><SubaDeNivel /></Layout>} />
             <Route path="/como-funciona" element={<Layout><ComoFunciona /></Layout>} />
+            <Route path="/porque-nos-escolher" element={<Layout><PorqueNosEscolher /></Layout>} />
             <Route path="/contato" element={<Layout><Contato /></Layout>} />
             <Route path="/faq" element={<Layout><FAQ /></Layout>} />
             <Route path="/termos" element={<Layout><Termos /></Layout>} />

@@ -36,6 +36,7 @@ const Footer = () => {
               <ul>
                 <li><Link to="/leiloes">Leilões</Link></li>
                 <li><Link to="/como-funciona">Como Funciona</Link></li>
+                <li><Link to="/porque-nos-escolher">Porque Nos Escolher</Link></li>
                 <li><Link to="/faq">FAQ</Link></li>
               </ul>
             </div>

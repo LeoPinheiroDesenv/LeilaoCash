@@ -15,7 +15,7 @@ const API_BASE_URL = (process.env.REACT_APP_API_URL || 'http://localhost:8000/ap
 
 const Configuracoes = () => {
   const { isAuthenticated, isAdmin } = useAuth();
-  const { refreshTheme } = useTheme();
+  const { refreshTheme, updateLiveCssVariable } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   
@@ -276,6 +276,7 @@ const Configuracoes = () => {
         ensureSettingExists('content', 'page_privacidade', 'Conteúdo da página Privacidade');
         ensureSettingExists('content', 'page_regras', 'Conteúdo da página Regras');
         ensureSettingExists('content', 'page_faq', 'Conteúdo da página FAQ');
+        ensureSettingExists('content', 'page_porque_nos_escolher', 'Conteúdo da página Porque Nos Escolher');
 
         setSettings(prev => ({
           ...prev,
@@ -309,7 +310,7 @@ const Configuracoes = () => {
     }
   }, [isAuthenticated, isAdmin, loadSettings]);
 
-  const handleInputChange = (key, value) => {
+  const handleInputChange = (key, value, groupName) => {
     setSettings(prevSettings => {
       const newSettings = { ...prevSettings };
       let found = false;
@@ -325,20 +326,21 @@ const Configuracoes = () => {
       });
 
       if (!found) {
-        const groupName = key.startsWith('mercadopago_') ? 'payment' : 'general';
-        const groupKey = groupName;
-
-        if (newSettings[groupKey]) {
-            if (!newSettings[groupKey].some(s => s.key === key)) {
-                 newSettings[groupKey].push({ key, value, group: groupKey });
-            }
-        } else {
-             newSettings[groupKey] = [{ key, value, group: groupKey }];
+        // Usa o groupName passado, ou adivinha se não for fornecido.
+        const effectiveGroupName = groupName || (key.startsWith('mercadopago_') ? 'payment' : 'general');
+        
+        if (!newSettings[effectiveGroupName]) {
+          newSettings[effectiveGroupName] = [];
         }
+        
+        newSettings[effectiveGroupName].push({ key, value, group: effectiveGroupName });
       }
       
       return newSettings;
     });
+    
+    // Aplica a mudança visualmente em tempo real
+    updateLiveCssVariable(key, value);
   };
 
   const handleSave = async () => {

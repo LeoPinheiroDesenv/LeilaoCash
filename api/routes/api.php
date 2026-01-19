@@ -50,6 +50,7 @@ Route::get('/auctions/public', [\App\Http\Controllers\Api\AuctionController::cla
 Route::get('/auctions/home', [\App\Http\Controllers\Api\AuctionController::class, 'home']); // Nova rota
 Route::get('/auctions/public/{id}', [\App\Http\Controllers\Api\AuctionController::class, 'show']);
 Route::get('/settings/public', [\App\Http\Controllers\Api\SettingsController::class, 'getPublic']);
+Route::get('/settings/public/{key}', [\App\Http\Controllers\Api\SettingsController::class, 'getPublicByKey']);
 
 // Public routes - Contact (form submission)
 Route::post('/contacts', [\App\Http\Controllers\Api\ContactController::class, 'store']);

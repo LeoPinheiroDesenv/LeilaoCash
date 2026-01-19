@@ -1,0 +1,9 @@
+I have already addressed this request in the previous turn.
+
+I have modified the file `src/components/TextEditor.js` to enable table functionality in the text editor.
+
+Specifically, I have:
+1.  Added `'table'` to the `toolbar.container` configuration within the `modules` object. This makes the table button visible in the editor's toolbar.
+2.  Added `'table'`, `'table-row'`, `'table-cell'`, and `'table-col'` to the `formats` array. This allows the editor to recognize and correctly handle these table-related HTML elements.
+
+With these changes, you should now be able to insert and edit tables using the text editor in the admin panel's `dashboard/configuracoes/textos` section.

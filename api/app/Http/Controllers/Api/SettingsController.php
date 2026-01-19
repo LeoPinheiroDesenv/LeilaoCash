@@ -106,6 +106,39 @@ class SettingsController extends Controller
     }
 
     /**
+     * Get a public setting by key.
+     */
+    public function getPublicByKey($key)
+    {
+        try {
+            $setting = Setting::where('key', $key)->first();
+
+            if (!$setting) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Conteúdo não encontrado'
+                ], 404);
+            }
+
+            $data = [
+                'title' => $setting->description,
+                'content_html' => $setting->value
+            ];
+
+            return response()->json([
+                'success' => true,
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ocorreu um erro ao carregar o conteúdo. Tente novamente mais tarde.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Update a setting
      */
     public function update(Request $request, $key)

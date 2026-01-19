@@ -196,8 +196,8 @@ const HomePage = ({ searchTerm, onSearch }) => {
             <div className="spinner" style={{ width: '48px', height: '48px', margin: '0 auto', border: '4px solid rgba(255, 255, 255, 0.1)', borderTopColor: '#4A9FD8', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
             <p style={{ marginTop: '1rem', color: '#8da4bf' }}>{getText('text_loading', 'Carregando...')}</p>
           </div>
+
         </main>
-        <WhyChooseUs />
       </>
     );
   }
@@ -218,7 +218,6 @@ const HomePage = ({ searchTerm, onSearch }) => {
             </button>
           </div>
         </main>
-        <WhyChooseUs />
       </>
     );
   }

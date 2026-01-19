@@ -48,13 +48,13 @@ const ConfiguracoesLayout = ({ settings, onInputChange }) => {
           <input
             type="color"
             value={setting.value || '#000000'}
-            onChange={(e) => onInputChange(setting.key, e.target.value)}
+            onChange={(e) => onInputChange(setting.key, e.target.value, setting.group)}
             className="color-input"
           />
           <input
             type="text"
             value={setting.value || ''}
-            onChange={(e) => onInputChange(setting.key, e.target.value)}
+            onChange={(e) => onInputChange(setting.key, e.target.value, setting.group)}
             className="color-text-input"
             placeholder="#000000"
           />
@@ -72,7 +72,7 @@ const ConfiguracoesLayout = ({ settings, onInputChange }) => {
         <input
           type="text"
           value={setting.value || ''}
-          onChange={(e) => onInputChange(setting.key, e.target.value)}
+          onChange={(e) => onInputChange(setting.key, e.target.value, setting.group)}
           className="text-input"
           placeholder={setting.description}
         />
@@ -87,7 +87,7 @@ const ConfiguracoesLayout = ({ settings, onInputChange }) => {
       <>
         <FontSelector
           value={setting.value || ''}
-          onChange={(value) => onInputChange(setting.key, value)}
+          onChange={(value) => onInputChange(setting.key, value, setting.group)}
           placeholder={setting.description || 'Selecione uma fonte'}
         />
         {info.description && <p className="setting-help-text">{info.description}</p>}
@@ -95,15 +95,22 @@ const ConfiguracoesLayout = ({ settings, onInputChange }) => {
     );
   };
 
-  // Combinar configurações do tema e do grupo 'theme' (cores novas)
-  const themeSettings = [
-      ...(settings.theme || []),
-      ...(settings.theme_colors || []) // Assumindo que as novas cores virão aqui ou misturadas em 'theme'
-  ];
-  
-  // Se as novas cores estiverem no grupo 'theme' junto com as antigas, o array acima já resolve.
-  // Mas o seeder salvou no grupo 'theme'. O endpoint /settings agrupa por 'group'.
-  // Então settings.theme deve conter tudo.
+  const themeSettings = settings.theme || [];
+  const displayableThemeSettings = [...themeSettings];
+
+  // Garante que a cor de fundo sempre possa ser editada
+  const hasBackgroundColor = displayableThemeSettings.some(s => s.key === 'background_color');
+  if (!hasBackgroundColor) {
+    // Tenta pegar o valor atual da variável CSS, senão usa um fallback
+    const currentBgColor = getComputedStyle(document.documentElement).getPropertyValue('--color-background').trim();
+    displayableThemeSettings.push({
+      key: 'background_color',
+      value: currentBgColor || '#0a1628',
+      description: 'Fundo principal do site.',
+      type: 'color',
+      group: 'theme',
+    });
+  }
 
   // Agrupar configurações para exibição
   const groups = {
@@ -116,7 +123,7 @@ const ConfiguracoesLayout = ({ settings, onInputChange }) => {
       other: { title: 'Outros', items: [] }
   };
 
-  (settings.theme || []).forEach(setting => {
+  displayableThemeSettings.forEach(setting => {
       if (['primary_color', 'secondary_color', 'background_color', 'text_color'].includes(setting.key)) {
           groups.base.items.push(setting);
       } else if (setting.key.startsWith('color_header_')) {
