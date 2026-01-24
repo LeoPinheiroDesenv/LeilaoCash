@@ -34,7 +34,7 @@ const DashboardUsuario = () => {
   const activeAuctions = [
     {
       id: 1,
-      title: 'iPhone 15 Pro Max 256GBssssssssssss',
+      title: 'iPhone 15 Pro Max 256GB',
       price: 'R$ 4.523,00',
       oldPrice: 'R$ 9.999',
       cashbackPercent: '5',
@@ -212,19 +212,6 @@ const DashboardUsuario = () => {
     }
   };
 
-  // Função para calcular o nível do usuário
-  const getUserLevel = (wins) => {
-    if (!wins) return { name: 'Inscrito', icon: '📝', nextLevel: 1, color: '#9fb0c8' };
-    if (wins >= 15) return { name: 'Viber Platina', icon: '👑', nextLevel: null, color: '#e5e4e2' };
-    if (wins >= 13) return { name: 'Viber Diamante', icon: '💎', nextLevel: 15, color: '#b9f2ff' };
-    if (wins >= 10) return { name: 'Viber Ouro', icon: '🥇', nextLevel: 13, color: '#ffd700' };
-    if (wins >= 5) return { name: 'Viber Prata', icon: '🥈', nextLevel: 10, color: '#c0c0c0' };
-    if (wins >= 1) return { name: 'Viber Bronze', icon: '🥉', nextLevel: 5, color: '#cd7f32' };
-    return { name: 'Inscrito', icon: '📝', nextLevel: 1, color: '#9fb0c8' };
-  };
-
-  const userLevel = getUserLevel(user?.auctions_won || 0);
-
   return (
     <UserLayout>
             <div className="welcome-section">
@@ -241,24 +228,6 @@ const DashboardUsuario = () => {
               </a>
             </div>
             <div className="stats-grid">
-              <div className="stat-card level-card" style={{ borderColor: userLevel.color }}>
-                <div className="stat-content">
-                  <p className="stat-label">Seu Nível</p>
-                  <p className="stat-value" style={{ color: userLevel.color }}>
-                    {userLevel.icon} {userLevel.name}
-                  </p>
-                  <p className="stat-description">
-                    {userLevel.nextLevel 
-                      ? `${userLevel.nextLevel - (user?.auctions_won || 0)} vitórias para o próximo nível`
-                      : 'Você atingiu o nível máximo!'}
-                  </p>
-                </div>
-                <div className="stat-icon" style={{ color: userLevel.color }}>
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                  </svg>
-                </div>
-              </div>
               <div className="stat-card cashback-card">
                 <div className="stat-content">
                   <p className="stat-label">Cashback Disponível</p>

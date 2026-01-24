@@ -1,301 +1,109 @@
-/* ==========================================
-   TEXT EDITOR (REACT QUILL) - VIBEGET
-   ========================================== */
+/* Variáveis para o tema escuro do CKEditor */
+:root {
+    --ck-color-base-foreground: #0a1628;
+    --ck-color-base-background: #0a1628;
+    --ck-color-text: #e6eef8;
+    --ck-color-shadow-drop: rgba(0, 0, 0, 0.2);
+    --ck-color-shadow-inner: rgba(0, 0, 0, 0.1);
+
+    /* Botões */
+    --ck-color-button-default-background: transparent;
+    --ck-color-button-default-hover-background: #1e293b;
+    --ck-color-button-default-active-background: #334155;
+    --ck-color-button-default-active-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+    --ck-color-button-default-disabled-background: transparent;
+
+    /* Botões ON (ativos) */
+    --ck-color-button-on-background: #3b82f6;
+    --ck-color-button-on-hover-background: #2563eb;
+    --ck-color-button-on-active-background: #1d4ed8;
+    --ck-color-button-on-active-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+    --ck-color-button-on-color: #ffffff;
+
+    /* Toolbar */
+    --ck-color-toolbar-background: #0f172a;
+    --ck-color-toolbar-border: #1e293b;
+
+    /* Dropdown */
+    --ck-color-dropdown-panel-background: #1e293b;
+    --ck-color-dropdown-panel-border: #334155;
+
+    /* Input */
+    --ck-color-input-background: #0f172a;
+    --ck-color-input-border: #334155;
+    --ck-color-input-text: #e6eef8;
+
+    /* Listas */
+    --ck-color-list-background: #1e293b;
+    --ck-color-list-button-hover-background: #334155;
+    --ck-color-list-button-on-background: #3b82f6;
+    --ck-color-list-button-on-text: #ffffff;
+
+    /* Painéis e Balões */
+    --ck-color-panel-background: #1e293b;
+    --ck-color-panel-border: #334155;
+
+    /* Editor (área de edição) */
+    --ck-color-editor-base-text: #e6eef8;
+    --ck-color-link-default: #60a5fa;
+    --ck-color-link-selected: #2563eb;
+}
 
 .text-editor-wrapper {
-  background: #1a1a2e;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid #2d2d44;
+    margin-top: 0.5rem;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #334155;
 }
 
-/* ==========================================
-   TOOLBAR STYLING
-   ========================================== */
-
-.text-editor-wrapper .ql-toolbar {
-  background: #16213e;
-  border: none;
-  border-bottom: 1px solid #2d2d44;
-  padding: 16px;
+/* Ajustes específicos para a área de edição */
+.ck-editor__editable {
+    min-height: 300px;
+    max-height: 600px;
+    background-color: #0a1628 !important;
+    color: #e6eef8 !important;
+    padding: 1rem 2rem !important;
 }
 
-.text-editor-wrapper .ql-toolbar .ql-stroke {
-  stroke: #9ca3af !important;
+/* Ajustes para tabelas dentro do editor */
+.ck-content table {
+    border-collapse: collapse;
+    width: 100%;
 }
 
-.text-editor-wrapper .ql-toolbar .ql-fill {
-  fill: #9ca3af !important;
+.ck-content table td,
+.ck-content table th {
+    border: 1px solid #334155;
+    padding: 0.5rem;
 }
 
-.text-editor-wrapper .ql-toolbar .ql-picker-label {
-  color: #9ca3af !important;
+.ck-content blockquote {
+    border-left: 4px solid #3b82f6;
+    padding-left: 1rem;
+    margin-left: 0;
+    color: #94a3b8;
+    font-style: italic;
 }
 
-.text-editor-wrapper .ql-toolbar button:hover,
-.text-editor-wrapper .ql-toolbar button:focus,
-.text-editor-wrapper .ql-toolbar button.ql-active {
-  background: #0f3460;
+/* Ajustes para o modo Source Editing */
+.ck-source-editing-area textarea {
+    background-color: #0f172a !important;
+    color: #e6eef8 !important;
+    font-family: monospace;
 }
 
-.text-editor-wrapper .ql-toolbar button:hover .ql-stroke,
-.text-editor-wrapper .ql-toolbar button.ql-active .ql-stroke {
-  stroke: #7c3aed !important;
+/* Ajustes para placeholders */
+.ck.ck-editor__editable > .ck-placeholder::before {
+    color: #64748b !important;
 }
 
-.text-editor-wrapper .ql-toolbar button:hover .ql-fill,
-.text-editor-wrapper .ql-toolbar button.ql-active .ql-fill {
-  fill: #7c3aed !important;
+/* Ajustes de foco */
+.ck.ck-editor__editable:not(.ck-editor__nested-editable).ck-focused {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
 }
 
-/* ==========================================
-   EDITOR CONTENT AREA
-   ========================================== */
-
-.text-editor-wrapper .ql-container {
-  background: #1a1a2e;
-  border: none;
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 15px;
-  min-height: 300px;
-}
-
-.text-editor-wrapper .ql-editor {
-  color: #e5e7eb;
-  min-height: 300px;
-  padding: 24px;
-  line-height: 1.8;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-.text-editor-wrapper .ql-editor.ql-blank::before {
-  color: #6b7280;
-  font-style: normal;
-  left: 24px;
-}
-
-/* ==========================================
-   TEXT FORMATTING
-   ========================================== */
-
-.text-editor-wrapper .ql-editor h1 {
-  color: #f3f4f6;
-  font-size: 2em;
-  font-weight: 700;
-  margin-bottom: 0.5em;
-}
-
-.text-editor-wrapper .ql-editor h2 {
-  color: #f3f4f6;
-  font-size: 1.5em;
-  font-weight: 600;
-  margin-bottom: 0.5em;
-}
-
-.text-editor-wrapper .ql-editor h3 {
-  color: #f3f4f6;
-  font-size: 1.25em;
-  font-weight: 600;
-  margin-bottom: 0.5em;
-}
-
-.text-editor-wrapper .ql-editor p {
-  margin-bottom: 1em;
-}
-
-.text-editor-wrapper .ql-editor strong {
-  color: #f3f4f6;
-  font-weight: 600;
-}
-
-.text-editor-wrapper .ql-editor em {
-  color: #d1d5db;
-}
-
-.text-editor-wrapper .ql-editor blockquote {
-  border-left: 4px solid #7c3aed;
-  padding-left: 16px;
-  margin-left: 0;
-  margin-right: 0;
-  color: #d1d5db;
-  font-style: italic;
-}
-
-.text-editor-wrapper .ql-editor code,
-.text-editor-wrapper .ql-editor .ql-code-block-container {
-  background: #0f3460;
-  color: #fbbf24;
-  border-radius: 6px;
-  padding: 2px 6px;
-  font-family: 'Courier New', monospace;
-}
-
-.text-editor-wrapper .ql-editor pre {
-  background: #0f3460;
-  color: #e5e7eb;
-  border-radius: 8px;
-  padding: 16px;
-  overflow-x: auto;
-}
-
-/* ==========================================
-   LISTS
-   ========================================== */
-
-.text-editor-wrapper .ql-editor ul,
-.text-editor-wrapper .ql-editor ol {
-  padding-left: 1.5em;
-  margin-bottom: 1em;
-}
-
-.text-editor-wrapper .ql-editor li {
-  color: #e5e7eb;
-  margin-bottom: 0.5em;
-}
-
-.text-editor-wrapper .ql-editor li::marker {
-  color: #7c3aed;
-}
-
-/* ==========================================
-   LINKS AND MEDIA
-   ========================================== */
-
-.text-editor-wrapper .ql-editor a {
-  color: #7c3aed;
-  text-decoration: underline;
-  transition: color 0.2s;
-}
-
-.text-editor-wrapper .ql-editor a:hover {
-  color: #9333ea;
-}
-
-.text-editor-wrapper .ql-editor img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-  margin: 1em 0;
-}
-
-.text-editor-wrapper .ql-editor video {
-  max-width: 100%;
-  border-radius: 8px;
-  margin: 1em 0;
-}
-
-/* ==========================================
-   PICKER DROPDOWNS
-   ========================================== */
-
-.text-editor-wrapper .ql-toolbar .ql-picker-options {
-  background: #16213e;
-  border: 1px solid #2d2d44;
-  border-radius: 6px;
-  padding: 8px;
-}
-
-.text-editor-wrapper .ql-toolbar .ql-picker-item {
-  color: #e5e7eb;
-}
-
-.text-editor-wrapper .ql-toolbar .ql-picker-item:hover {
-  background: #0f3460;
-  color: #7c3aed;
-}
-
-/* ==========================================
-   COLOR PICKER
-   ========================================== */
-
-.text-editor-wrapper .ql-toolbar .ql-color-picker .ql-picker-options,
-.text-editor-wrapper .ql-toolbar .ql-background .ql-picker-options {
-  width: 200px;
-}
-
-/* ==========================================
-   TOOLTIP
-   ========================================== */
-
-.text-editor-wrapper .ql-toolbar button .ql-tooltip {
-  background: #16213e;
-  border: 1px solid #2d2d44;
-  color: #e5e7eb;
-  border-radius: 6px;
-  padding: 8px 12px;
-}
-
-.text-editor-wrapper .ql-snow .ql-tooltip {
-  background: #16213e;
-  border: 1px solid #2d2d44;
-  color: #e5e7eb;
-  border-radius: 8px;
-  padding: 12px;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3);
-}
-
-.text-editor-wrapper .ql-snow .ql-tooltip input[type=text] {
-  background: #1a1a2e;
-  border: 1px solid #2d2d44;
-  color: #e5e7eb;
-  border-radius: 6px;
-  padding: 8px;
-}
-
-.text-editor-wrapper .ql-snow .ql-tooltip a {
-  color: #7c3aed;
-}
-
-/* ==========================================
-   RESPONSIVE
-   ========================================== */
-
-@media (max-width: 768px) {
-  .text-editor-wrapper .ql-toolbar {
-    padding: 12px;
-  }
-
-  .text-editor-wrapper .ql-editor {
-    padding: 16px;
-    min-height: 250px;
-  }
-
-  .text-editor-wrapper .ql-toolbar .ql-formats {
-    margin-right: 8px;
-  }
-}
-
-@media (max-width: 480px) {
-  .text-editor-wrapper .ql-toolbar {
-    padding: 8px;
-  }
-
-  .text-editor-wrapper .ql-editor {
-    padding: 12px;
-    min-height: 200px;
-    font-size: 14px;
-  }
-}
-
-/* ==========================================
-   SCROLLBAR (EDITOR CONTENT)
-   ========================================== */
-
-.text-editor-wrapper .ql-editor::-webkit-scrollbar {
-  width: 8px;
-}
-
-.text-editor-wrapper .ql-editor::-webkit-scrollbar-track {
-  background: #16213e;
-  border-radius: 4px;
-}
-
-.text-editor-wrapper .ql-editor::-webkit-scrollbar-thumb {
-  background: #2d2d44;
-  border-radius: 4px;
-}
-
-.text-editor-wrapper .ql-editor::-webkit-scrollbar-thumb:hover {
-  background: #3d3d5c;
+.ck.ck-editor__main > .ck-editor__editable:not(.ck-focused) {
+    border-color: transparent !important;
 }

@@ -128,35 +128,6 @@ export const ThemeProvider = ({ children }) => {
     }
   };
 
-  const updateLiveCssVariable = (key, value) => {
-    const root = document.documentElement;
-    let cssVar = '';
-
-    // Mapeamento especial para cores base
-    const baseColorMapping = {
-      'primary_color': '--color-primary',
-      'secondary_color': '--color-secondary',
-      'background_color': '--color-background',
-      'text_color': '--color-text',
-    };
-
-    if (baseColorMapping[key]) {
-      cssVar = baseColorMapping[key];
-    } else if (key.startsWith('color_')) {
-      cssVar = '--' + key.replace(/_/g, '-');
-    } else if (key.startsWith('font_')) {
-      cssVar = '--' + key.replace(/_/g, '-');
-      // Para fontes, o valor precisa das aspas
-      root.style.setProperty(cssVar, `'${value}', system-ui, sans-serif`);
-      loadGoogleFont(value);
-      return; // Retorno antecipado para fontes
-    }
-
-    if (cssVar) {
-      root.style.setProperty(cssVar, value);
-    }
-  };
-
   const refreshTheme = async () => {
     try {
       console.log('[Theme] Recarregando configurações...');
@@ -194,7 +165,6 @@ export const ThemeProvider = ({ children }) => {
     getLogoUrl,
     getText,
     applyTheme,
-    updateLiveCssVariable,
   };
 
   return (

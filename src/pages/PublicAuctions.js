@@ -108,7 +108,8 @@ const PublicAuctions = ({ searchTerm }) => {
       <div className="container">
         <div className="page-header">
           <h1>{getText('text_auctions_title', 'Todos os Leilões')}</h1>
-          <p>{getText('text_auctions_subtitle', 'Confira os leilões ativos e dê o seu lance!')}</p>
+
+          <p className="corrije_sub">{getText('text_auctions_subtitle', '')}</p>
         </div>
 
         <div className="filters-bar">

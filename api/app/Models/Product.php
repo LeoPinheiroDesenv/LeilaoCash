@@ -25,6 +25,7 @@ class Product extends Model
         'specifications',
         'is_active',
         'auction_id',
+
     ];
 
     protected function casts(): array
@@ -84,4 +85,20 @@ class Product extends Model
     {
         return $this->is_active && $this->auction_id === null;
     }
+
+    // Relacionamento com Categoria
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+
+
+    // Relacionamento com Marca
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class, 'brand_id');
+    }
+
+
+
 }

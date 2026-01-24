@@ -115,30 +115,58 @@ const Contato = () => {
               {error && <div className="alert alert-error">{error}</div>}
 
               <form className="contact-form" onSubmit={handleSubmit}>
-                <div className="form-row">
-                  <div className="form-group">
+                {/* AQUI: Usamos 'row' para ativar o grid system */}
+                <div className="row">
+
+                  {/* 'col-12' garante 100% de largura no mobile */}
+                  {/* 'col-md-6' faz ficar lado a lado a partir de telas médias */}
+                  <div className="col-12 col-md-6 form-group mb-3">
                     <label>{labelName}</label>
-                    <input type="text" placeholder={phName} value={name} onChange={(e) => setName(e.target.value)} />
+                    <input
+                        type="text"
+                        className="form-control" /* Classe padrão do Bootstrap para inputs */
+                        placeholder={phName}
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                    />
                   </div>
 
-                  <div className="form-group">
+                  <div className="col-12 col-md-6 form-group mb-3">
                     <label>{labelEmail}</label>
-                    <input type="email" placeholder={phEmail} value={email} onChange={(e) => setEmail(e.target.value)} />
+                    <input
+                        type="email"
+                        className="form-control"
+                        placeholder={phEmail}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
                   </div>
                 </div>
 
-                <div className="form-group">
+                <div className="form-group mb-3">
                   <label>{labelSubject}</label>
-                  <input type="text" placeholder={phSubject} value={subject} onChange={(e) => setSubject(e.target.value)} />
+                  <input
+                      type="text"
+                      className="form-control"
+                      placeholder={phSubject}
+                      value={subject}
+                      onChange={(e) => setSubject(e.target.value)}
+                  />
                 </div>
 
-                <div className="form-group">
+                <div className="form-group mb-3">
                   <label>{labelMessage}</label>
-                  <textarea rows="6" placeholder={phMessage} value={message} onChange={(e) => setMessage(e.target.value)} />
+                  <textarea
+                      className="form-control"
+                      rows="6"
+                      placeholder={phMessage}
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                  />
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                  <button type="submit" className="btn-submit" disabled={submitting}>
+                  <button type="submit" className="btn btn-primary btn-submit" disabled={submitting}>
                     {submitting ? btnSending : btnSend}
                   </button>
                 </div>

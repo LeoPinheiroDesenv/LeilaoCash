@@ -136,22 +136,34 @@
 }
 
 .password-toggle {
-  position: absolute;
-  right: 16px;
-  background: none;
+  /* 1. Remove o estilo padrão de botão (borda cinza, fundo, etc) */
+  background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.4);
+  padding: 0;
   cursor: pointer;
-  padding: 4px;
+
+  /* 2. Centraliza o SVG perfeitamente dentro da área do clique */
   display: flex;
   align-items: center;
-  transition: color 0.2s;
+  justify-content: center;
+
+  /* 3. (Opcional) Define um tamanho fixo para a área de clique */
+  width: 40px;
+  height: 40px;
+
+  /* 4. Posicionamento sobre o Input (Padrão de UI) */
+  /* Isso exige que o pai (wrapper) tenha position: relative */
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10; /* Garante que fique acima do input */
+  color: #6c757d; /* Cor do ícone (cinza bootstrap) */
 }
 
 .password-toggle:hover {
-  color: rgba(255, 255, 255, 0.6);
+  color: #212529; /* Escurece ao passar o mouse */
 }
-
 .btn-submit {
   width: 100%;
   padding: 14px 24px;

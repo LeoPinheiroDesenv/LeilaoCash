@@ -15,7 +15,7 @@ const API_BASE_URL = (process.env.REACT_APP_API_URL || 'http://localhost:8000/ap
 
 const Configuracoes = () => {
   const { isAuthenticated, isAdmin } = useAuth();
-  const { refreshTheme, updateLiveCssVariable } = useTheme();
+  const { refreshTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   
@@ -135,148 +135,14 @@ const Configuracoes = () => {
   </div>
 </div>`;
 
-        // HTML padrão para a página Suba de Nível
-        const defaultSubaDeNivel = `
-<div class="nivel-hero">
-  <div class="container">
-    <div class="nivel-hero-content">
-      <div class="nivel-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="18 15 12 9 6 15"></polyline>
-        </svg>
-      </div>
-      <h1 class="nivel-title">Suba de Nível com <span class="text-gradient">Suas Vibes!</span></h1>
-      <p class="nivel-subtitle">Transforme sua experiência de compra em uma verdadeira disputa de Vibe.</p>
-    </div>
-  </div>
-</div>
-
-<div class="nivel-content-section">
-  <div class="container">
-    <div class="nivel-intro">
-      <h2>Como Funciona</h2>
-      <p class="intro-text">
-        No VibeGet, você não apenas adquire produtos, mas participa de uma verdadeira disputa. 
-        Você começa como inscrito e, conforme participa e vence Vibes, sobe de nível. 
-        Quanto mais vitórias, mais oportunidades você tem para aproveitar a plataforma.
-      </p>
-    </div>
-
-    <div class="niveis-grid">
-      <!-- Inscrito -->
-      <div class="nivel-card">
-        <div class="nivel-card-badge">Nível Inicial</div>
-        <div class="nivel-card-header">
-          <span class="nivel-emoji">📝</span>
-          <h3>Inscrito</h3>
-          <span class="nivel-range">Cadastro no site</span>
-        </div>
-        <div class="nivel-card-body">
-          <p class="nivel-text">
-            Todos que se cadastraram no site começam como inscritos. Ao se cadastrar, você tem acesso a todas as Vibes abertas e começa a ganhar Cash Back, podendo ganhar prêmios e começar sua jornada.
-          </p>
-        </div>
-      </div>
-
-      <!-- Bronze -->
-      <div class="nivel-card">
-        <div class="nivel-card-badge" style="background: linear-gradient(90deg, #cd7f32, #e6a86a);">Nível 1</div>
-        <div class="nivel-card-header">
-          <span class="nivel-emoji">🥉</span>
-          <h3>Viber Bronze</h3>
-          <span class="nivel-range">1 Vitória</span>
-        </div>
-        <div class="nivel-card-body">
-          <p class="nivel-text">
-            Ao ganhar 1 Vibe, você se torna um Viber Nível Bronze e começa a participar ativamente das Vibes. Neste nível, você já tem a chance de sugerir novos produtos para as Vibes.
-          </p>
-        </div>
-      </div>
-
-      <!-- Prata -->
-      <div class="nivel-card">
-        <div class="nivel-card-badge" style="background: linear-gradient(90deg, #c0c0c0, #e0e0e0);">Nível 2</div>
-        <div class="nivel-card-header">
-          <span class="nivel-emoji">🥈</span>
-          <h3>Viber Prata</h3>
-          <span class="nivel-range">5 Vitórias</span>
-        </div>
-        <div class="nivel-card-body">
-          <p class="nivel-text">
-            Ao conquistar 5 Vibes, você sobe para o Nível Prata. Agora, você tem mais oportunidades e seu Cash Back aumenta para 45%. Você também começa a concorrer a prêmios e a participar de benefícios exclusivos.
-          </p>
-        </div>
-      </div>
-
-      <!-- Ouro -->
-      <div class="nivel-card">
-        <div class="nivel-card-badge" style="background: linear-gradient(90deg, #ffd700, #ffec8b);">Nível 3</div>
-        <div class="nivel-card-header">
-          <span class="nivel-emoji">🥇</span>
-          <h3>Viber Ouro</h3>
-          <span class="nivel-range">+4 Vitórias</span>
-        </div>
-        <div class="nivel-card-body">
-          <p class="nivel-text">
-            Ao vencer mais 4 Vibes, você alcança o Nível Ouro. Neste nível, você pode comercializar seu Cash Back. Além disso, ganha mais visibilidade na plataforma e tem prioridade nas sugestões para melhorias.
-          </p>
-        </div>
-      </div>
-
-      <!-- Diamante -->
-      <div class="nivel-card">
-        <div class="nivel-card-badge" style="background: linear-gradient(90deg, #b9f2ff, #e0ffff);">Nível 4</div>
-        <div class="nivel-card-header">
-          <span class="nivel-emoji">💎</span>
-          <h3>Viber Diamante</h3>
-          <span class="nivel-range">+3 Vitórias</span>
-        </div>
-        <div class="nivel-card-body">
-          <p class="nivel-text">
-            Com 3 vitórias adicionais, você atinge o Nível Diamante. Agora, você fica mais visível e seu Cash Back aumenta para 50%.
-          </p>
-        </div>
-      </div>
-
-      <!-- Platina -->
-      <div class="nivel-card">
-        <div class="nivel-card-badge" style="background: linear-gradient(90deg, #e5e4e2, #ffffff);">Nível Máximo</div>
-        <div class="nivel-card-header">
-          <span class="nivel-emoji">👑</span>
-          <h3>Viber Platina</h3>
-          <span class="nivel-range">+2 Vitórias</span>
-        </div>
-        <div class="nivel-card-body">
-          <p class="nivel-text">
-            Ao alcançar 2 vitórias adicionais, você chega ao Nível Platina, o nível mais alto. Neste estágio, seu Cash Back aumenta para 60% e você tem acesso a benefícios exclusivos. Além disso, você recebe suporte prioritário e tem voz ativa nas decisões sobre novos produtos na plataforma.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div class="cta-final-section">
-      <h2>Pronto para começar sua jornada?</h2>
-      <p>Cadastre-se agora e comece a subir de nível!</p>
-      <div class="cta-buttons">
-        <a href="/cadastro" class="btn-cta-primary">
-          Criar Conta Grátis
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-        </a>
-        <a href="/leiloes" class="btn-cta-secondary">Ver Leilões Ativos</a>
-      </div>
-    </div>
-  </div>
-</div>`;
-
         // Injetar configurações padrão para páginas dinâmicas se não existirem
         ensureSettingExists('content', 'page_como_funciona', 'Conteúdo da página Como Funciona', defaultComoFunciona);
-        ensureSettingExists('content', 'page_suba_de_nivel', 'Conteúdo da página Suba de Nível', defaultSubaDeNivel);
         ensureSettingExists('content', 'page_contato', 'Conteúdo da página Contato');
         ensureSettingExists('content', 'page_termos', 'Conteúdo da página Termos de Uso');
         ensureSettingExists('content', 'page_privacidade', 'Conteúdo da página Privacidade');
         ensureSettingExists('content', 'page_regras', 'Conteúdo da página Regras');
         ensureSettingExists('content', 'page_faq', 'Conteúdo da página FAQ');
-        ensureSettingExists('content', 'page_porque_nos_escolher', 'Conteúdo da página Porque Nos Escolher');
+        ensureSettingExists('content', 'page_suba_de_nivel', 'Conteúdo da página Suba de Nível');
 
         setSettings(prev => ({
           ...prev,
@@ -310,7 +176,7 @@ const Configuracoes = () => {
     }
   }, [isAuthenticated, isAdmin, loadSettings]);
 
-  const handleInputChange = (key, value, groupName) => {
+  const handleInputChange = (key, value) => {
     setSettings(prevSettings => {
       const newSettings = { ...prevSettings };
       let found = false;
@@ -326,21 +192,20 @@ const Configuracoes = () => {
       });
 
       if (!found) {
-        // Usa o groupName passado, ou adivinha se não for fornecido.
-        const effectiveGroupName = groupName || (key.startsWith('mercadopago_') ? 'payment' : 'general');
-        
-        if (!newSettings[effectiveGroupName]) {
-          newSettings[effectiveGroupName] = [];
+        const groupName = key.startsWith('mercadopago_') ? 'payment' : 'general';
+        const groupKey = groupName;
+
+        if (newSettings[groupKey]) {
+            if (!newSettings[groupKey].some(s => s.key === key)) {
+                 newSettings[groupKey].push({ key, value, group: groupKey });
+            }
+        } else {
+             newSettings[groupKey] = [{ key, value, group: groupKey }];
         }
-        
-        newSettings[effectiveGroupName].push({ key, value, group: effectiveGroupName });
       }
       
       return newSettings;
     });
-    
-    // Aplica a mudança visualmente em tempo real
-    updateLiveCssVariable(key, value);
   };
 
   const handleSave = async () => {
@@ -639,44 +504,6 @@ const Configuracoes = () => {
             {message.text}
           </div>
         )}
-
-        <div className="settings-tabs">
-          <button
-            className={`tab-button ${activeTab === 'layout' ? 'active' : ''}`}
-            onClick={() => navigate('/dashboard/configuracoes/layout')}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="3" y1="9" x2="21" y2="9"></line>
-              <line x1="9" y1="21" x2="9" y2="9"></line>
-            </svg>
-            Layout
-          </button>
-          <button
-            className={`tab-button ${activeTab === 'textos' ? 'active' : ''}`}
-            onClick={() => navigate('/dashboard/configuracoes/textos')}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-              <polyline points="10 9 9 9 8 9"></polyline>
-            </svg>
-            Textos
-          </button>
-          <button
-            className={`tab-button ${activeTab === 'sistema' ? 'active' : ''}`}
-            onClick={() => navigate('/dashboard/configuracoes/sistema')}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="3"></circle>
-              <path d="M12 1v6m0 6v6m-9-9h6m6 0h6"></path>
-            </svg>
-            Sistema
-          </button>
-        </div>
-
         <div className="settings-content">
           {activeTab === 'layout' && (
             <>

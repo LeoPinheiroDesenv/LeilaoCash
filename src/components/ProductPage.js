@@ -101,6 +101,7 @@ const ProductPage = () => {
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (id) {
       setLoading(true);
       loadProduct();
@@ -140,6 +141,7 @@ const ProductPage = () => {
 
     checkFavorite();
   }, [product?.id, isAuthenticated]);
+
 
   const auction = product?.auction || {};
   const productImage = product?.image_url 
@@ -640,7 +642,7 @@ const ProductPage = () => {
                   />
                   <button 
                     type="submit" 
-                    className="btn-bid"
+                    className="btn-bid ajuste_btn_prod"
                     disabled={bidding || auction.status !== 'active'}
                   >
                     {bidding ? getText('text_bidding', 'Enviando...') : getText('text_place_bid', 'Dar Lance')}

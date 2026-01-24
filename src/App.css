@@ -394,7 +394,7 @@ body {
 }
 
 .site-main {
-  padding-top: 66px;
+  padding-top:2px;
   transition: padding-top 0.3s ease;
   background: #080c16;
 }

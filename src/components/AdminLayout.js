@@ -148,7 +148,7 @@ const AdminLayout = ({ children, pageTitle, pageSubtitle }) => {
       {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)}></div>}
       <aside className={`admin-sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
-          <Link to="/" className="sidebar-logo">
+          <Link to="/" className="sidebar-logo" target="_blank">
             <img src={logoSrc} alt={settings.site_name || "VibeGet"} style={{height: '45px', width: 'auto', objectFit: 'contain'}} />
           </Link>
         </div>

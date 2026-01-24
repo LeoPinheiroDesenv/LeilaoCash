@@ -326,6 +326,10 @@
   flex-direction: column;
   gap: 0.75rem;
 }
+
+.ajuste_btn_prod{
+  margin-left: -38px
+}
 .bid-input-group {
   display: flex;
   align-items: center;

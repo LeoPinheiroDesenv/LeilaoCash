@@ -90,16 +90,6 @@ const ConfiguracoesTextos = ({ settings, onInputChange }) => {
         ),
         settings: allTextSettings.filter(s => s.key === 'page_como_funciona')
       },
-      porque_nos_escolher: {
-        name: 'Porque Nos Escolher',
-        icon: (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-            <polyline points="22 4 12 14.01 9 11.01"></polyline>
-          </svg>
-        ),
-        settings: allTextSettings.filter(s => s.key === 'page_porque_nos_escolher')
-      },
       categorias: {
         name: 'Categorias',
         icon: (
@@ -448,12 +438,8 @@ const ConfiguracoesTextos = ({ settings, onInputChange }) => {
           'text_contact_phone_value': '📍 Número de telefone na seção de contato',
           'text_contact_address_label': '📍 Label "Endereço" na seção de contato',
           'text_contact_address_value': '📍 Endereço físico na seção de contato',
-          
-          // Página Como Funciona
+                  // Página Como Funciona
           'page_como_funciona': '📍 Conteúdo principal da página "Como Funciona"',
-          
-          // Página Porque Nos Escolher
-          'page_porque_nos_escolher': '📍 Conteúdo principal da página "Porque Nos Escolher"',
         };
         return locations[key] || null;
       };

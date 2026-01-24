@@ -127,6 +127,7 @@
     cursor: pointer;
     padding: 0.5rem;
     z-index: 1001;
+    margin: -50px 0 0 250px;
 }
 
 .mobile-menu-overlay {
@@ -203,6 +204,12 @@
     color: #fff;
 }
 
+@media (max-width: 768px) {
+    .main-nav { display: none; }
+    .menu-toggle { display: block; }
+}
+
+
 @media (max-width: 1200px) {
     .main-nav {
         gap: 1rem;
@@ -214,22 +221,19 @@
 }
 
 @media (max-width: 768px) {
-    .main-nav,
-    .auth-buttons {
+    .main-nav {
         display: none;
     }
 
     .header-content {
         gap: 1rem;
-        width: 100%;
-        display: flex;
-        flex-direction: row !important;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: nowrap !important;
     }
 
     .menu-toggle {
         display: block;
+    }
+
+    .auth-buttons .btn-login, .auth-buttons .btn-register {
+        display: none; /* Opcional: esconder botões de login/cadastro no mobile */
     }
 }

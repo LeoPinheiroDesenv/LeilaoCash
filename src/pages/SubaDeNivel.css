@@ -72,9 +72,6 @@
   color: #9fb0c8;
   margin: 0;
   line-height: 1.6;
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .text-gradient {
@@ -93,7 +90,7 @@
 
 .nivel-intro {
   text-align: center;
-  max-width: 900px;
+  max-width: 800px;
   margin: 0 auto 80px;
 }
 
@@ -109,13 +106,13 @@
   font-size: 18px;
   color: #9fb0c8;
   line-height: 1.8;
-  margin: 0 0 24px 0;
+  margin: 0;
 }
 
 /* Níveis Grid */
 .niveis-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 32px;
   margin-bottom: 80px;
 }
@@ -128,8 +125,6 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
 }
 
 .nivel-card::before {
@@ -191,28 +186,19 @@
   font-size: 14px;
   color: #9fb0c8;
   font-weight: 500;
-  display: block;
 }
 
 .nivel-card-body {
-  margin-top: auto;
-}
-
-.nivel-text {
-  color: #9fb0c8;
-  font-size: 16px;
-  line-height: 1.6;
-  margin: 0;
-  text-align: center;
+  margin-top: 24px;
 }
 
 .beneficios-list {
   list-style: none;
   padding: 0;
-  margin: 16px 0 0 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .beneficios-list li {
@@ -227,6 +213,79 @@
 .beneficios-list svg {
   flex-shrink: 0;
   color: var(--color-secondary);
+}
+
+/* Como Subir Section */
+.como-subir-section {
+  margin-bottom: 80px;
+}
+
+.como-subir-section h2 {
+  font-size: 40px;
+  font-weight: 700;
+  margin: 0 0 48px 0;
+  color: var(--color-text);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
+  text-align: center;
+}
+
+.acoes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+}
+
+.acao-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.acao-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(229, 95, 82, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.acao-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, rgba(229, 95, 82, 0.2), rgba(74, 159, 216, 0.2));
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  color: var(--color-secondary);
+}
+
+.acao-card h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  color: var(--color-text);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
+}
+
+.acao-card p {
+  font-size: 15px;
+  color: #9fb0c8;
+  line-height: 1.6;
+  margin: 0 0 16px 0;
+}
+
+.pontos {
+  display: inline-block;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
 }
 
 /* CTA Final Section */
@@ -324,7 +383,8 @@
     height: 48px;
   }
 
-  .nivel-intro h2 {
+  .nivel-intro h2,
+  .como-subir-section h2 {
     font-size: 28px;
   }
 
@@ -332,7 +392,8 @@
     font-size: 16px;
   }
 
-  .niveis-grid {
+  .niveis-grid,
+  .acoes-grid {
     grid-template-columns: 1fr;
   }
 

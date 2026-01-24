@@ -85,7 +85,7 @@
 
 .input-wrapper svg:first-child {
   position: absolute;
-  left: 16px;
+
   color: #9fb0c8;
   opacity: 0.7;
   pointer-events: none;

@@ -18,55 +18,64 @@ class ProductController extends Controller
         try {
             $query = Product::query();
 
-            // Filtros
-            if ($request->has('search')) {
-                $search = $request->search;
-                $query->where(function($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('description', 'like', "%{$search}%")
-                      ->orWhere('category', 'like', "%{$search}%")
-                      ->orWhere('brand', 'like', "%{$search}%")
-                      ->orWhere('model', 'like', "%{$search}%")
-                      ->orWhereHas('brandModel', function($q) use ($search) {
-                          $q->where('name', 'like', "%{$search}%");
-                      })
-                      ->orWhereHas('productModel', function($q) use ($search) {
-                          $q->where('name', 'like', "%{$search}%");
-                      })
-                      ->orWhereHas('categoryModel', function($q) use ($search) {
-                          $q->where('name', 'like', "%{$search}%");
-                      });
+            // Lógica de Pesquisa Avançada (Keywords)
+            if ($request->has('search') && !empty(trim($request->search))) {
+                // Divide a pesquisa em palavras (ex: "iPhone 15" -> ["iPhone", "15"])
+                $terms = explode(' ', trim($request->search));
+
+                $query->where(function($q) use ($terms) {
+                    foreach ($terms as $term) {
+                        // Ignora termos vazios
+                        if (empty($term)) continue;
+
+                        $q->where(function($subQ) use ($term) {
+                            $termLike = "%{$term}%";
+
+                            // 1. Busca nos campos diretos do Produto
+                            $subQ->where('name', 'like', $termLike)
+                                ->orWhere('description', 'like', $termLike)
+
+                                // Campos legados (texto direto)
+                                ->orWhere('category', 'like', $termLike)
+                                ->orWhere('brand', 'like', $termLike)
+                                ->orWhere('model', 'like', $termLike)
+
+                                // 2. Busca nos Relacionamentos (Tabelas: categories, brands, product_models)
+                                // Requer que os métodos categoryModel, brandModel, productModel existam no Model Product
+                                ->orWhereHas('categoryModel', function($relQ) use ($termLike) {
+                                    $relQ->where('name', 'like', $termLike);
+                                })
+                                ->orWhereHas('brandModel', function($relQ) use ($termLike) {
+                                    $relQ->where('name', 'like', $termLike);
+                                })
+                                ->orWhereHas('productModel', function($relQ) use ($termLike) {
+                                    $relQ->where('name', 'like', $termLike);
+                                });
+                        });
+                    }
                 });
             }
 
-            if ($request->has('category')) {
-                $query->where('category', $request->category);
-            }
-
-            if ($request->has('category_id')) {
-                $query->where('category_id', $request->category_id);
-            }
-
+            // Filtros adicionais
             if ($request->has('is_active')) {
-                $query->where('is_active', $request->is_active === 'true');
+                $query->where('is_active', filter_var($request->is_active, FILTER_VALIDATE_BOOLEAN));
             }
 
-            // Produtos disponíveis (sem leilão)
-            if ($request->has('available') && $request->available === 'true') {
-                $query->whereNull('auction_id');
-            }
+            // Carrega os relacionamentos para otimizar o retorno JSON
+            $query->with(['categoryModel', 'brandModel', 'productModel']);
 
-            // Incluir relacionamentos
-            $query->with(['auction:id,title,status', 'categoryModel:id,name,slug']);
+            // Ordenação
+            $query->orderBy('created_at', 'desc');
 
             // Paginação
-            $perPage = $request->get('per_page', 15);
-            $products = $query->orderBy('created_at', 'desc')->paginate($perPage);
+            $perPage = $request->input('per_page', 20);
+            $products = $query->paginate($perPage);
 
             return response()->json([
                 'success' => true,
                 'data' => $products
             ]);
+
         } catch (\Exception $e) {
             Log::error('[ProductController] Erro ao listar produtos', [
                 'error' => $e->getMessage(),
@@ -111,6 +120,9 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+
+        $baseUrl = config('app.url');
+
         try {
             $rules = [
                 'name' => 'required|string|max:255',
@@ -149,7 +161,7 @@ class ProductController extends Controller
                 $image = $request->file('image');
                 $imageName = 'product_' . time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
                 $image->move(public_path('uploads/products'), $imageName);
-                $data['image_url'] = 'https://api.vibeget.net/uploads/products/' . $imageName;
+                $data['image_url'] = $baseUrl.'/uploads/products/' . $imageName;
             }
 
             $uploadedImages = [];
@@ -163,7 +175,7 @@ class ProductController extends Controller
                     if ($img && $img->isValid()) {
                         $imageName = 'product_' . time() . '_' . uniqid() . '_' . $index . '.' . $img->getClientOriginalExtension();
                         $img->move(public_path('uploads/products'), $imageName);
-                        $uploadedImages[] = 'https://api.vibeget.net/uploads/products/' . $imageName;
+                        $uploadedImages[] = $baseUrl.'/uploads/products/' . $imageName;
                     }
                 }
             }
@@ -210,6 +222,9 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
+
+        $baseUrl = config('app.url');
+
         try {
             $product = Product::findOrFail($id);
 
@@ -254,7 +269,7 @@ class ProductController extends Controller
                 $image = $request->file('image');
                 $imageName = 'product_' . time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
                 $image->move(public_path('uploads/products'), $imageName);
-                $data['image_url'] = 'https://api.vibeget.net/uploads/products/' . $imageName;
+                $data['image_url'] = $baseUrl.'/uploads/products/' . $imageName;
             }
 
             $uploadedImages = [];
@@ -268,7 +283,7 @@ class ProductController extends Controller
                     if ($img && $img->isValid()) {
                         $imageName = 'product_' . time() . '_' . uniqid() . '_' . $index . '.' . $img->getClientOriginalExtension();
                         $img->move(public_path('uploads/products'), $imageName);
-                        $uploadedImages[] = 'https://api.vibeget.net/uploads/products/' . $imageName;
+                        $uploadedImages[] = $baseUrl.'/uploads/products/' . $imageName;
                     }
                 }
             }

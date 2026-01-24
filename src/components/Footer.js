@@ -6,6 +6,10 @@ import './footer.css';
 const Footer = () => {
   const { getLogoUrl, getText } = useTheme();
   const logoSrc = getLogoUrl();
+  const phoneLabel = getText('text_contact_phone_label', 'Telefone');
+  const phoneValue = getText('text_contact_phone_value', '+55 (11) 3000-0000');
+  const addressLabel = getText('text_contact_address_label', 'Endereço');
+  const addressValue = getText('text_contact_address_value', 'São Paulo, SP - Brasil');
 
   return (
     <>
@@ -36,7 +40,6 @@ const Footer = () => {
               <ul>
                 <li><Link to="/leiloes">Leilões</Link></li>
                 <li><Link to="/como-funciona">Como Funciona</Link></li>
-                <li><Link to="/porque-nos-escolher">Porque Nos Escolher</Link></li>
                 <li><Link to="/faq">FAQ</Link></li>
               </ul>
             </div>
@@ -53,6 +56,20 @@ const Footer = () => {
               <ul>
                 <li><a href={`mailto:${getText('contact_email', 'contato@leilaocash.com')}`}>{getText('contact_email', 'contato@leilaocash.com')}</a></li>
               </ul>
+              <ul>
+                <li>
+                  <div className="footer-col">{phoneValue}</div>
+                </li>
+              </ul>
+
+              <ul>
+                <li>
+                  <div className="footer-col">{addressValue}</div>
+                </li>
+              </ul>
+
+
+
             </div>
           </div>
           <div className="footer-copyright">

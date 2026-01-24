@@ -155,7 +155,6 @@
 .password-toggle {
   position: absolute;
   right: 16px;
-  background: none;
   border: none;
   color: rgba(255, 255, 255, 0.4);
   cursor: pointer;
