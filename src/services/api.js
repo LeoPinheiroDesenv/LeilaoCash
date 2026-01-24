@@ -78,7 +78,8 @@ api.interceptors.response.use(
       const isAuthMeRequest = url.includes('/auth/me');
       const isLoginRequest = url.includes('/auth/login');
       const isRegisterRequest = url.includes('/auth/register');
-      const isPublicRoute = url.includes('/public') || url.includes('/categories') || url.includes('/health');
+      // Adicionando /products à lista de rotas públicas que não devem forçar logout
+      const isPublicRoute = url.includes('/public') || url.includes('/categories') || url.includes('/health') || url.includes('/products');
       
       // Não fazer logout em requisições de validação, autenticação ou rotas públicas
       if (isAuthMeRequest || isLoginRequest || isRegisterRequest || isPublicRoute) {

@@ -44,10 +44,11 @@ class PasswordResetMail extends Mailable
      */
     public function content()
     {
+        // Usando a view HTML simples que já existe e funciona sem dependências de componentes Markdown
         return new Content(
-            markdown: 'emails.password.reset',
+            view: 'emails.password_reset',
             with: [
-                'url' => $this->resetUrl,
+                'resetUrl' => $this->resetUrl,
             ],
         );
     }

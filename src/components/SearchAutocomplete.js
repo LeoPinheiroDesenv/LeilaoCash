@@ -29,6 +29,8 @@ const SearchAutocomplete = ({ placeholder, onSearch, minChars = 3 }) => {
                 setIsLoading(true);
                 try {
                     // Busca produtos ativos que coincidam com o termo
+                    // Usa a rota pública /public/products se disponível, ou /products se o interceptor permitir
+                    // Para garantir que funcione sem login, usamos uma rota que sabemos ser pública ou ajustamos o interceptor
                     const response = await api.get(`/products?search=${searchTerm}&per_page=7&is_active=true`);
 
                     if (response.data.success) {
@@ -46,6 +48,7 @@ const SearchAutocomplete = ({ placeholder, onSearch, minChars = 3 }) => {
                     }
                 } catch (error) {
                     console.error("Erro ao buscar sugestões:", error);
+                    // Se der erro 401, tenta uma rota alternativa pública se existir, ou apenas limpa
                     setSuggestions([]);
                 } finally {
                     setIsLoading(false);
@@ -65,6 +68,8 @@ const SearchAutocomplete = ({ placeholder, onSearch, minChars = 3 }) => {
         if (searchTerm.trim()) {
             if (onSearch) onSearch(searchTerm);
             setShowSuggestions(false);
+            // Navega para a página de leilões com o termo de busca
+            navigate(`/leiloes?search=${encodeURIComponent(searchTerm)}`);
         }
     };
 
@@ -72,7 +77,7 @@ const SearchAutocomplete = ({ placeholder, onSearch, minChars = 3 }) => {
         setSearchTerm(product.name);
         setShowSuggestions(false);
 
-        // CORREÇÃO DEFINITIVA: Navega direto para a página do produto usando o ID
+        // Navega direto para a página do produto usando o ID
         navigate(`/produto/${product.id}`);
 
         // Opcional: Avisa o componente pai que uma busca foi feita

@@ -52,6 +52,10 @@ Route::get('/auctions/public/{id}', [\App\Http\Controllers\Api\AuctionController
 Route::get('/settings/public', [\App\Http\Controllers\Api\SettingsController::class, 'getPublic']);
 Route::get('/settings/public/{key}', [\App\Http\Controllers\Api\SettingsController::class, 'getPublicByKey']);
 
+// Rota pública para busca de produtos (usada no autocomplete)
+// Esta rota deve ficar FORA do grupo de middleware 'auth:sanctum'
+Route::get('/products', [\App\Http\Controllers\Api\ProductController::class, 'index']);
+
 // Public routes - Contact (form submission)
 Route::post('/contacts', [\App\Http\Controllers\Api\ContactController::class, 'store']);
 
@@ -194,8 +198,10 @@ Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
         });
 
         // Product management
+        // REMOVIDO DAQUI: Route::get('/', [\App\Http\Controllers\Api\ProductController::class, 'index']);
+        // A rota GET /products foi movida para fora do middleware de autenticação
         Route::prefix('products')->group(function () {
-            Route::get('/', [\App\Http\Controllers\Api\ProductController::class, 'index']);
+            // Route::get('/', [\App\Http\Controllers\Api\ProductController::class, 'index']); // Já definida como pública
             Route::get('/available', [\App\Http\Controllers\Api\ProductController::class, 'available']);
             Route::post('/', [\App\Http\Controllers\Api\ProductController::class, 'store']);
             Route::get('/{id}', [\App\Http\Controllers\Api\ProductController::class, 'show']);
