@@ -122,6 +122,26 @@
     box-shadow: 0 8px 24px rgba(229, 95, 82, 0.4);
 }
 
+.btn-favorites {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    color: #9fb0c8;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s;
+}
+
+.btn-favorites:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+}
+
 .menu-toggle {
     display: none;
     background: none;

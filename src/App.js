@@ -37,7 +37,8 @@ import {
 import {
   DashboardUsuarioMinhaConta,
   DashboardUsuarioMeusLances,
-  DashboardUsuarioMeuCashback
+  DashboardUsuarioMeuCashback,
+  DashboardUsuarioMeusFavoritos
 } from './pages/DashboardUsuarioPages';
 
 function App() {
@@ -155,6 +156,11 @@ function App() {
             <Route path="/dashboard/meu-cashback" element={
               <ProtectedRoute>
                 <DashboardUsuarioMeuCashback />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/meus-favoritos" element={
+              <ProtectedRoute>
+                <DashboardUsuarioMeusFavoritos />
               </ProtectedRoute>
             } />
             

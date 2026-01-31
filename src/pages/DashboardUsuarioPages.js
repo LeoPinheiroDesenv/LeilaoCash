@@ -935,3 +935,142 @@ export const DashboardUsuarioMeuCashback = () => {
     </UserLayout>
   );
 };
+
+export const DashboardUsuarioMeusFavoritos = () => {
+  const { user } = useAuth();
+  const [favorites, setFavorites] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, per_page: 15, total: 0 });
+
+  const loadFavorites = useCallback(async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams({
+        page: pagination.current_page,
+        per_page: pagination.per_page
+      });
+
+      const response = await api.get(`/favorites?${params.toString()}`);
+      
+      if (response.data.success) {
+        const favoritesData = response.data.data.data || response.data.data || [];
+        setFavorites(favoritesData);
+        setPagination({
+          current_page: response.data.data.current_page || 1,
+          last_page: response.data.data.last_page || 1,
+          per_page: response.data.data.per_page || 15,
+          total: response.data.data.total || 0
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao carregar favoritos:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [pagination.current_page, pagination.per_page]);
+
+  useEffect(() => {
+    if (user) {
+      loadFavorites();
+    }
+  }, [user, loadFavorites]);
+
+  const getProductImage = (favorite) => {
+    if (favorite.product?.image_url) {
+      const img = favorite.product.image_url;
+      return img.startsWith('http') 
+        ? img 
+        : `${process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:8000'}${img}`;
+    }
+    return 'https://via.placeholder.com/400x300?text=Sem+Imagem';
+  };
+
+  const getProductName = (favorite) => {
+    return favorite.product?.name || 'Produto sem nome';
+  };
+
+  const getProductId = (favorite) => {
+    return favorite.product?.id;
+  };
+
+  const formatPrice = (price) => {
+    return `R$ ${parseFloat(price || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
+
+  if (loading) {
+    return (
+      <UserLayout>
+        <div style={{ padding: '4rem 2rem', textAlign: 'center' }}>
+          <p style={{ color: '#8da4bf' }}>Carregando seus favoritos...</p>
+        </div>
+      </UserLayout>
+    );
+  }
+
+  return (
+    <UserLayout>
+      <div className="welcome-section">
+        <div className="welcome-text">
+          <h1>Meus Favoritos</h1>
+          <p>Produtos que você está de olho</p>
+        </div>
+      </div>
+      
+      <div className="bids-history-section">
+        {favorites.length === 0 ? (
+          <div style={{ padding: '2rem', textAlign: 'center', color: '#8da4bf' }}>
+            <p>Você ainda não favoritou nenhum produto.</p>
+            <Link to="/" style={{ color: '#4A9FD8', textDecoration: 'none', marginTop: '1rem', display: 'inline-block' }}>
+              Ver leilões disponíveis →
+            </Link>
+          </div>
+        ) : (
+          <>
+            <div className="bids-list">
+              {favorites.map(favorite => (
+                <div key={favorite.id} className="bid-history-card">
+                  <div className="bid-card-content">
+                    <div className="bid-image">
+                      <img src={getProductImage(favorite)} alt={getProductName(favorite)} />
+                      <div className="bid-info-main">
+                        <div className="bid-title-section">
+                          <h4>{getProductName(favorite)}</h4>
+                          <p className="bid-date">Preço: {formatPrice(favorite.product?.price)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {getProductId(favorite) && (
+                    <Link to={`/produto/${getProductId(favorite)}`} className="btn-ver-leilao-bid">Ver Produto</Link>
+                  )}
+                </div>
+              ))}
+            </div>
+            
+            {pagination.last_page > 1 && (
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '2rem' }}>
+                <button 
+                  onClick={() => setPagination({...pagination, current_page: pagination.current_page - 1})}
+                  disabled={pagination.current_page === 1}
+                  style={{ padding: '0.5rem 1rem', background: '#1a2942', border: '1px solid #2a3a52', color: '#e6eef8', borderRadius: '8px', cursor: pagination.current_page === 1 ? 'not-allowed' : 'pointer' }}
+                >
+                  Anterior
+                </button>
+                <span style={{ padding: '0.5rem 1rem', color: '#8da4bf' }}>
+                  Página {pagination.current_page} de {pagination.last_page}
+                </span>
+                <button 
+                  onClick={() => setPagination({...pagination, current_page: pagination.current_page + 1})}
+                  disabled={pagination.current_page === pagination.last_page}
+                  style={{ padding: '0.5rem 1rem', background: '#1a2942', border: '1px solid #2a3a52', color: '#e6eef8', borderRadius: '8px', cursor: pagination.current_page === pagination.last_page ? 'not-allowed' : 'pointer' }}
+                >
+                  Próxima
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </UserLayout>
+  );
+};
