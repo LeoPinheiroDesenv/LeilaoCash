@@ -856,43 +856,9 @@ export const DashboardUsuarioMeuCashback = () => {
               <p className="balance-secondary-amount">{formatPrice(totalReceived)}</p>
             </div>
           </div>
-          <div className="balance-card-secondary">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="17 8 12 3 7 8"></polyline>
-              <line x1="12" y1="3" x2="12" y2="15"></line>
-            </svg>
-            <div>
-              <p className="balance-secondary-label">Total Sacado</p>
-              <p className="balance-secondary-amount">{formatPrice(totalWithdrawn)}</p>
-            </div>
-          </div>
+
         </div>
-        <form onSubmit={handleWithdraw} className="withdraw-section">
-          <div className="withdraw-form">
-            <label>Valor do saque</label>
-            <div className="input-with-prefix">
-              <span className="input-prefix">R$</span>
-              <input 
-                type="number" 
-                placeholder="0,00"
-                value={withdrawAmount}
-                onChange={(e) => setWithdrawAmount(e.target.value)}
-                step="0.01"
-                min="0.01"
-                max={balance.cashback_balance}
-                required
-              />
-            </div>
-          </div>
-          <button type="submit" className="btn-withdraw" disabled={withdrawing || parseFloat(balance.cashback_balance) <= 0}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="2" x2="12" y2="22"></line>
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-            </svg>
-            {withdrawing ? 'Processando...' : 'Sacar via Pix'}
-          </button>
-        </form>
+
       </div>
       <div className="info-card">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

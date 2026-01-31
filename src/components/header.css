@@ -19,6 +19,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 2rem;
+    width: 100%; /* Garante que o container ocupe a largura disponível */
 }
 
 .logo {
@@ -26,6 +27,7 @@
     align-items: center;
     text-decoration: none;
     color: inherit;
+    flex-shrink: 0; /* Impede que o logo encolha demais */
 }
 
 .logo-full {
@@ -76,6 +78,7 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+    flex-shrink: 0; /* Impede que as ações encolham */
 }
 
 .auth-buttons {
@@ -127,7 +130,6 @@
     cursor: pointer;
     padding: 0.5rem;
     z-index: 1001;
-    margin: -50px 0 0 250px;
 }
 
 .mobile-menu-overlay {
@@ -204,12 +206,7 @@
     color: #fff;
 }
 
-@media (max-width: 768px) {
-    .main-nav { display: none; }
-    .menu-toggle { display: block; }
-}
-
-
+/* Ajustes para tablets */
 @media (max-width: 1200px) {
     .main-nav {
         gap: 1rem;
@@ -220,20 +217,43 @@
     }
 }
 
+/* Ajustes para mobile */
 @media (max-width: 768px) {
-    .main-nav {
-        display: none;
+    .site-header .container {
+        padding: 0 1.5rem; /* Reduz padding lateral para dar mais espaço */
     }
 
     .header-content {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: space-between !important;
         gap: 1rem;
     }
 
-    .menu-toggle {
-        display: block;
+    .main-nav {
+        display: none !important;
     }
 
-    .auth-buttons .btn-login, .auth-buttons .btn-register {
-        display: none; /* Opcional: esconder botões de login/cadastro no mobile */
+    .auth-buttons {
+        display: none !important;
+    }
+
+    .header-actions {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        width: auto !important;
+    }
+
+    .menu-toggle {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .logo-full {
+        height: 40px; /* Reduz um pouco o logo no mobile para evitar overflow */
     }
 }

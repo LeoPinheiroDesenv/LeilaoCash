@@ -48,15 +48,21 @@ const AuctionCard = ({ product }) => {
   const minutes = parts[1] || '00';
   const seconds = parts[2] || '00';
 
+  // URL da imagem padrão
+  // Remove '/api' do final da URL da API para obter a raiz onde está a pasta uploads
+  const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+  const baseUrl = apiUrl.endsWith('/api') ? apiUrl.slice(0, -4) : apiUrl;
+  const defaultImage = `${baseUrl}/uploads/padrao.jpg`;
+
   return (
     <div className="card">
       <div className="card-media">
         <Link to={product.url}>
           <img
-            src={product.image}
+            src={product.image || defaultImage}
             alt={product.title}
             className="product-image"
-            onError={(e) => { e.target.onerror = null; e.target.src = (process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:8000') + '/uploads/padrao.jpg'; }}
+            onError={(e) => { e.target.onerror = null; e.target.src = defaultImage; }}
           />
         </Link>
         <div className="top-badges">
@@ -65,7 +71,7 @@ const AuctionCard = ({ product }) => {
           <div className="top-badges-right">
             {product.cashbackPercent && (
               <div className="badge-item cashback">
-                ✔ {product.cashbackPercent}% Cashback
+                ✔ {product.cashbackPercent}Cashback
               </div>
             )}
           </div>

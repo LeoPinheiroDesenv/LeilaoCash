@@ -167,6 +167,8 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  width: 100%; /* Garante que ocupe a largura disponível */
+  min-width: 0; /* Permite que o flex item encolha se necessário */
 }
 .product-header {
   display: flex;
@@ -325,11 +327,10 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  width: 100%; /* Garante largura total */
+  box-sizing: border-box; /* Inclui padding na largura */
 }
 
-.ajuste_btn_prod{
-  margin-left: -38px
-}
 .bid-input-group {
   display: flex;
   align-items: center;
@@ -339,10 +340,13 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   flex-wrap: wrap;
+  width: 100%; /* Garante largura total */
+  box-sizing: border-box; /* Inclui padding na largura */
 }
 .currency {
   color: #9fb0c8;
   font-weight: 600;
+  padding: 0 20px 0 0;
 }
 .bid-input {
   flex: 1;
@@ -353,12 +357,13 @@
   font-weight: 700;
   outline: none;
   min-width: 80px;
+  margin:0 0 0 -25px;
+  width: 100%; /* Garante que o input ocupe o espaço */
 }
 .bid-input::placeholder {
   color: rgba(255, 255, 255, 0.3);
 }
 .btn-bid {
-  padding: 12px 24px;
   background: linear-gradient(
     90deg,
     var(--color-primary),
@@ -372,6 +377,7 @@
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
+  padding: 8px;
 }
 .btn-bid:hover {
   transform: translateY(-2px);
@@ -482,206 +488,35 @@
   color: var(--color-text);
   font-size: 0.9rem;
 }
-.bid-history-section {
-  margin-top: 0;
-  padding-top: 0;
-  border-top: none;
-}
-.mobile-only {
-  display: none;
-}
-.bid-history-section h3 {
-  color: var(--color-text);
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0 0 1.5rem 0;
-}
-.bid-history-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
 .bid-history-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-}
-.bid-user {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-.bid-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: linear-gradient(
-    135deg,
-    var(--color-primary),
-    var(--color-secondary)
-  );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-weight: 700;
-  font-size: 1rem;
-}
-.bid-user-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-.bid-user-name {
-  color: var(--color-text);
-  font-weight: 600;
-  margin: 0;
-  font-size: 0.95rem;
-}
-.bid-timestamp {
-  color: #9fb0c8;
-  font-size: 0.875rem;
-  margin: 0;
-}
-.bid-amount {
-  color: #dff5ff;
-  font-weight: 700;
-  font-size: 1.1rem;
-}
-.no-bids {
-  text-align: center;
-  color: #9fb0c8;
-  padding: 2rem;
-}
-.product-meta-info {
-  margin: 1.5rem 0;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-}
-.meta-row {
-  display: flex;
-  gap: 2rem;
+  padding: 0.75rem;
   flex-wrap: wrap;
 }
-.meta-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #9fb0c8;
-  font-size: 0.9rem;
+.bid-user-name {
+  font-size: 0.85rem;
 }
-.meta-item svg {
-  color: var(--color-secondary);
-  flex-shrink: 0;
+.bid-timestamp {
+  font-size: 0.75rem;
 }
-.meta-label {
-  font-weight: 500;
-  color: #7a90a6;
-}
-.meta-value {
-  font-weight: 600;
-  color: var(--color-text);
-}
-.product-info-section {
-  margin: 1.5rem 0;
-  padding: 1.5rem;
-  background: rgba(74, 159, 216, 0.05);
-  border: 1px solid rgba(74, 159, 216, 0.15);
-  border-radius: 12px;
-}
-.product-info-section h3 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--color-text);
-  margin: 0 0 1rem 0;
-  font-family: var(--font-secondary, "Roboto", system-ui, sans-serif);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.info-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-}
-.info-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 8px;
-}
-.info-item svg {
-  color: var(--color-secondary);
-  flex-shrink: 0;
-}
-.info-item > div {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-.info-label {
-  font-size: 0.8rem;
-  color: #7a90a6;
-  font-weight: 500;
-}
-.info-value {
+.bid-amount {
   font-size: 0.95rem;
-  color: var(--color-text);
-  font-weight: 600;
+  width: 100%;
+  margin-top: 0.5rem;
+  text-align: right;
 }
-.get-section {
-  margin: 1.5rem 0;
-  padding: 1.5rem;
-  background: rgba(229, 95, 82, 0.05);
-  border: 1px solid rgba(229, 95, 82, 0.15);
-  border-radius: 12px;
+.alert {
+  font-size: 0.85rem !important;
+  padding: 0.6rem !important;
 }
-.get-section h3 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--color-text);
-  margin: 0 0 1rem 0;
-  font-family: var(--font-secondary, "Roboto", system-ui, sans-serif);
+.product-gallery {
+  margin-bottom: 0.8rem;
+  width: 100%;
 }
-.get-info-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
+.product-info {
+  padding-top: 0.6rem;
 }
-.get-info-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 8px;
-}
-.get-info-item svg {
-  color: var(--color-primary);
-  flex-shrink: 0;
-}
-.get-info-item > div {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-.get-label {
-  font-size: 0.8rem;
-  color: #7a90a6;
-  font-weight: 500;
-}
-.get-value {
-  font-size: 0.95rem;
-  color: var(--color-text);
-  font-weight: 600;
+.bid-history-section {
+  margin-top: 1rem;
 }
 
 @media (max-width: 1024px) {
@@ -700,22 +535,31 @@
   .product-layout {
     display: grid;
     grid-template-columns: 1fr;
+    gap: 1.5rem; /* Reduzido o gap para mobile */
   }
   .product-detail .container {
     padding: 0 1rem;
   }
+  .product-info {
+    width: 100%; /* Garante largura total */
+    min-width: 0; /* Permite encolher */
+    padding-top: 0; /* Remove padding top extra */
+  }
   .product-info h1 {
-    font-size: 1.75rem;
+    font-size: 1.5rem; /* Reduzido um pouco mais */
+    line-height: 1.3;
+    word-wrap: break-word; /* Quebra palavras longas */
   }
   .features-grid {
     grid-template-columns: 1fr;
   }
   .price-section {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
   .meta-row {
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.5rem;
   }
   .product-info-section,
   .get-section {
@@ -735,8 +579,8 @@
     -webkit-overflow-scrolling: touch;
     padding-bottom: 0.5rem;
     gap: 0.5rem;
-    justify-content: center;
-    padding-left: 6px;
+    justify-content: flex-start; /* Alinhado à esquerda para scroll */
+    padding-left: 0;
   }
   .thumbnail {
     width: 60px;
@@ -744,17 +588,10 @@
     flex-shrink: 0;
     border-radius: 8px;
   }
-  .thumbnail img {
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-  }
-  .thumbnail.active img {
-    transform: scale(1.03);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.6);
-    border-radius: 8px;
-  }
   .product-header {
     gap: 0.5rem;
     flex-wrap: wrap;
+    margin-bottom: 0.5rem;
   }
   .cashback-tag {
     padding: 4px 8px;
@@ -837,10 +674,7 @@
     padding: 0.6rem !important;
   }
   .product-gallery {
-    margin-bottom: 0.8rem;
-  }
-  .product-info {
-    padding-top: 0.6rem;
+    margin-bottom: 0;
   }
   .bid-history-section {
     margin-top: 1rem;
@@ -852,7 +686,7 @@
     padding: 1rem 0;
   }
   .product-detail .container {
-    padding: 0 0.75rem;
+    padding: 0 1rem; /* Consistente com 768px */
   }
   .breadcrumb {
     margin-bottom: 1rem;
@@ -891,20 +725,27 @@
     justify-content: flex-start;
   }
   .bid-input-group {
-    flex-wrap: nowrap;
+    flex-wrap: wrap; /* Permite quebrar linha em telas muito pequenas */
     padding: 0.75rem;
     gap: 0.5rem;
   }
   .bid-input {
     font-size: 1rem;
-    min-width: 60px;
+    min-width: 100%; /* Ocupa toda a largura em telas pequenas */
+    margin: 0; /* Remove margem negativa */
+    text-align: center; /* Centraliza o texto */
+  }
+  .currency {
+    display: none; /* Esconde o símbolo da moeda para economizar espaço ou ajusta */
   }
   .btn-bid {
-    padding: 10px 16px;
     font-size: 0.9rem;
+    width: 100%; /* Botão ocupa toda a largura */
+    margin-top: 0.5rem;
   }
   .bid-info {
     font-size: 0.75rem;
+    text-align: center;
   }
 }
 
@@ -918,10 +759,6 @@
   }
   .product-info h1 {
     font-size: 1.1rem;
-  }
-  .btn-bid {
-    padding: 8px 12px;
-    font-size: 0.9rem;
   }
   .main-image {
     border-radius: 10px;

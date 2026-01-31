@@ -29,6 +29,12 @@ const ProductPage = () => {
   const prevBidRef = useRef(0);
   const preloadedImagesRef = useRef({});
 
+  // URL da imagem padrão
+  // Remove '/api' do final da URL da API para obter a raiz onde está a pasta uploads
+  const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+  const baseUrl = apiUrl.endsWith('/api') ? apiUrl.slice(0, -4) : apiUrl;
+  const defaultImage = `${baseUrl}/uploads/padrao.jpg`;
+
   const preloadImage = (url) => {
     return new Promise((resolve) => {
       if (!url) return resolve();
@@ -147,14 +153,14 @@ const ProductPage = () => {
   const productImage = product?.image_url 
     ? (product.image_url.startsWith('http') 
         ? product.image_url 
-        : `${process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:8000'}${product.image_url}`)
-    : 'https://via.placeholder.com/400x300?text=Sem+Imagem';
+        : `${baseUrl}${product.image_url}`)
+    : defaultImage;
   
   const additionalImages = product?.images && Array.isArray(product.images) 
     ? product.images.map(img => 
         img.startsWith('http') 
           ? img 
-          : `${process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:8000'}${img}`
+          : `${baseUrl}${img}`
       )
     : [];
 
@@ -395,7 +401,12 @@ const ProductPage = () => {
             <div className="product-gallery-and-history">
               <div className="product-gallery">
                 <div className="main-image">
-                  <img src={currentImage} alt={product.name} className={isImageFading ? 'fading' : ''} />
+                  <img 
+                    src={currentImage} 
+                    alt={product.name} 
+                    className={isImageFading ? 'fading' : ''} 
+                    onError={(e) => { e.target.onerror = null; e.target.src = defaultImage; }}
+                  />
 
                   {isImageLoading && (
                     <div className="image-loader-overlay" aria-hidden>
@@ -440,42 +451,52 @@ const ProductPage = () => {
                         aria-label={`${getText('text_image', 'Imagem')} ${index + 1}`}
                         onClick={() => handleThumbnailClick(index)}
                       >
-                        <img src={img} alt={`Thumbnail ${index + 1}`} />
+                        <img 
+                          src={img} 
+                          alt={`Thumbnail ${index + 1}`} 
+                          onError={(e) => { e.target.onerror = null; e.target.src = defaultImage; }}
+                        />
                       </button>
                     ))}
                   </div>
                 )}
               </div>
 
-              {settings?.show_bid_history === 'true' && (
-                <div className="bid-history-section">
-                  <h3>{getText('text_bid_history', 'Histórico de Lances')}</h3>
-                  <div className="bid-history-list">
-                    {bids && bids.length > 0 ? (
-                      bids.map((bid, index) => (
-                        <div key={index} className="bid-history-item">
-                          <div className="bid-user">
-                            <div className="bid-avatar">
-                              {bid.user?.name?.charAt(0)?.toUpperCase() || '?'}
+              {/* Histórico de lances movido para baixo no mobile via CSS ou aqui se necessário */}
+              {/* No desktop, ele fica na coluna da esquerda, abaixo da galeria */}
+              {/*
+              <div className="bid-history-section desktop-only">
+                  {settings?.show_bid_history === 'true' && (
+                    <>
+                      <h3>{getText('text_bid_history', 'Histórico de Lances')}</h3>
+                      <div className="bid-history-list">
+                        {bids && bids.length > 0 ? (
+                          bids.map((bid, index) => (
+                            <div key={index} className="bid-history-item">
+                              <div className="bid-user">
+                                <div className="bid-avatar">
+                                  {bid.user?.name?.charAt(0)?.toUpperCase() || '?'}
+                                </div>
+                                <div className="bid-user-info">
+                                  <p className="bid-user-name">{bid.user?.name || 'Usuário Anônimo'}</p>
+                                  <p className="bid-timestamp">
+                                    {new Date(bid.created_at).toLocaleDateString('pt-BR')} {new Date(bid.created_at).toLocaleTimeString('pt-BR')}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="bid-amount">
+                                {formatPrice(bid.amount)}
+                              </div>
                             </div>
-                            <div className="bid-user-info">
-                              <p className="bid-user-name">{bid.user?.name || 'Usuário Anônimo'}</p>
-                              <p className="bid-timestamp">
-                                {new Date(bid.created_at).toLocaleDateString('pt-BR')} {new Date(bid.created_at).toLocaleTimeString('pt-BR')}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="bid-amount">
-                            {formatPrice(bid.amount)}
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="no-bids">{getText('text_no_bids_yet', 'Nenhum lance realizado ainda.')}</p>
-                    )}
-                  </div>
-                </div>
-              )}
+                          ))
+                        ) : (
+                          <p className="no-bids">{getText('text_no_bids_yet', 'Nenhum lance realizado ainda.')}</p>
+                        )}
+                      </div>
+                    </>
+                  )}
+              </div>
+              */}
             </div>
 
             <div className="product-info">
@@ -640,16 +661,16 @@ const ProductPage = () => {
                     required
                     disabled={bidding || auction.status !== 'active'}
                   />
-                  <button 
-                    type="submit" 
-                    className="btn-bid ajuste_btn_prod"
+                  <button
+                    type="submit"
+                    className="btn-bid"
                     disabled={bidding || auction.status !== 'active'}
                   >
                     {bidding ? getText('text_bidding', 'Enviando...') : getText('text_place_bid', 'Dar Lance')}
                   </button>
                 </div>
                 <p className="bid-info">{getText('text_min_bid', 'Lance mínimo')}: R$ {minBid.toFixed(2).replace('.', ',')} | {getText('text_increment', 'Incremento')}: R$ 0,50</p>
-                
+
                 {bidMessage.text && (
                     <div className={`alert alert-${bidMessage.type}`} style={{ marginTop: '1rem', padding: '0.8rem', fontSize: '0.9rem' }}>
                         {bidMessage.text}
@@ -744,6 +765,41 @@ const ProductPage = () => {
                   </div>
                 </div>
               )}
+
+              {/* Histórico de lances movido para baixo no mobile */}
+              {/*
+              <div className="bid-history-section mobile-only">
+                  {settings?.show_bid_history === 'true' && (
+                    <>
+                      <h3>{getText('text_bid_history', 'Histórico de Lances')}</h3>
+                      <div className="bid-history-list">
+                        {bids && bids.length > 0 ? (
+                          bids.map((bid, index) => (
+                            <div key={index} className="bid-history-item">
+                              <div className="bid-user">
+                                <div className="bid-avatar">
+                                  {bid.user?.name?.charAt(0)?.toUpperCase() || '?'}
+                                </div>
+                                <div className="bid-user-info">
+                                  <p className="bid-user-name">{bid.user?.name || 'Usuário Anônimo'}</p>
+                                  <p className="bid-timestamp">
+                                    {new Date(bid.created_at).toLocaleDateString('pt-BR')} {new Date(bid.created_at).toLocaleTimeString('pt-BR')}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="bid-amount">
+                                {formatPrice(bid.amount)}
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="no-bids">{getText('text_no_bids_yet', 'Nenhum lance realizado ainda.')}</p>
+                        )}
+                      </div>
+                    </>
+                  )}
+              </div>
+              */}
             </div>
           </div>
 

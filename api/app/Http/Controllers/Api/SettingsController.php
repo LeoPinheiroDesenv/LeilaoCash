@@ -222,6 +222,8 @@ class SettingsController extends Controller
      */
     public function uploadImage(Request $request)
     {
+        $baseUrl = config('app.url');
+
         $validator = Validator::make($request->all(), [
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'key' => 'required|string',
@@ -240,7 +242,7 @@ class SettingsController extends Controller
             $imageName = time() . '_' . $image->getClientOriginalName();
             $image->move(public_path('uploads'), $imageName);
 
-            $imageUrl = 'https://api.vibeget.net/uploads/' . $imageName;
+            $imageUrl = $baseUrl.'/uploads/' . $imageName;
 
             // Update setting
             $setting = Setting::where('key', $request->key)->first();

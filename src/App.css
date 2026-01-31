@@ -394,11 +394,9 @@ body {
 }
 
 .site-main {
-  padding-top:2px;
+  padding-top: 0; /* Removido padding fixo */
   transition: padding-top 0.3s ease;
   background: #080c16;
 }
 
-.site-header.scrolled + .site-main {
-  padding-top: 66px;
-}
+/* Removido ajuste de padding baseado em scroll, pois o header é sticky */
