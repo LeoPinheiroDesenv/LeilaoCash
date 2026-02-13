@@ -34,6 +34,7 @@ const Configuracoes = () => {
   const [message, setMessage] = useState({ type: '', text: '' });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState({ title: '', message: '', success: false });
+  const [activeTextGroup, setActiveTextGroup] = useState('header'); // Estado para o submenu de textos
 
   // Determinar a aba ativa com base na URL
   const getActiveTabFromPath = () => {
@@ -485,6 +486,34 @@ const Configuracoes = () => {
     );
   };
 
+  // Lista de grupos de texto para o submenu
+  const textGroups = [
+    { id: 'header', label: 'Cabeçalho' },
+    { id: 'hero', label: 'Hero (Home)' },
+    { id: 'common', label: 'Geral' },
+    { id: 'home', label: 'Página Inicial' },
+    { id: 'footer', label: 'Rodapé' },
+    { id: 'auth', label: 'Autenticação' },
+    { id: 'dashboard', label: 'Painel' },
+    { id: 'products', label: 'Produtos' },
+    { id: 'auctions', label: 'Leilões' },
+    { id: 'contact', label: 'Contato' },
+    { id: 'about', label: 'Sobre Nós' },
+    { id: 'faq', label: 'FAQ' },
+    { id: 'terms', label: 'Termos de Uso' },
+    { id: 'privacy', label: 'Privacidade' },
+    { id: 'rules', label: 'Regras' },
+    { id: 'how_it_works', label: 'Como Funciona' },
+    { id: 'why_choose_us', label: 'Por que comprar na VibeGet?' },
+    { id: 'page_como_funciona', label: 'Página Como Funciona' },
+    { id: 'page_contato', label: 'Página Contato' },
+    { id: 'page_termos', label: 'Página Termos' },
+    { id: 'page_privacidade', label: 'Página Privacidade' },
+    { id: 'page_regras', label: 'Página Regras' },
+    { id: 'page_faq', label: 'Página FAQ' },
+    { id: 'page_suba_de_nivel', label: 'Página Suba de Nível' }
+  ];
+
   if (loading) {
     return (
       <AdminLayout pageTitle="Configurações" pageSubtitle="Personalize a aparência e funcionalidades do sistema">
@@ -504,6 +533,59 @@ const Configuracoes = () => {
             {message.text}
           </div>
         )}
+
+        <div className="settings-tabs">
+          <button
+            className={`tab-button ${activeTab === 'layout' ? 'active' : ''}`}
+            onClick={() => navigate('/dashboard/configuracoes/layout')}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="9" y1="21" x2="9" y2="9"></line>
+            </svg>
+            Layout
+          </button>
+          <button
+            className={`tab-button ${activeTab === 'textos' ? 'active' : ''}`}
+            onClick={() => navigate('/dashboard/configuracoes/textos')}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            Textos
+          </button>
+          <button
+            className={`tab-button ${activeTab === 'sistema' ? 'active' : ''}`}
+            onClick={() => navigate('/dashboard/configuracoes/sistema')}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M12 1v6m0 6v6m-9-9h6m6 0h6"></path>
+            </svg>
+            Sistema
+          </button>
+        </div>
+
+        {/* Submenu para Textos */}
+        {activeTab === 'textos' && (
+          <div className="text-sub-tabs">
+            {textGroups.map(group => (
+              <button
+                key={group.id}
+                className={`text-tab-button ${activeTextGroup === group.id ? 'active' : ''}`}
+                onClick={() => setActiveTextGroup(group.id)}
+              >
+                {group.label}
+              </button>
+            ))}
+          </div>
+        )}
+
         <div className="settings-content">
           {activeTab === 'layout' && (
             <>
@@ -519,8 +601,7 @@ const Configuracoes = () => {
 
           {activeTab === 'textos' && (
             <ConfiguracoesTextos 
-              settings={settings} 
-              onInputChange={handleInputChange} 
+              activeGroup={activeTextGroup}
             />
           )}
 
@@ -542,27 +623,29 @@ const Configuracoes = () => {
         </div>
 
         <div className="settings-actions">
-          <button 
-            className="btn-save" 
-            onClick={handleSave}
-            disabled={saving}
-          >
-            {saving ? (
-              <>
-                <div className="spinner-small"></div>
-                Salvando...
-              </>
-            ) : (
-              <>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                  <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                  <polyline points="7 3 7 8 15 8"></polyline>
-                </svg>
-                Salvar Configurações
-              </>
-            )}
-          </button>
+          {activeTab !== 'textos' && (
+            <button 
+              className="btn-save" 
+              onClick={handleSave}
+              disabled={saving}
+            >
+              {saving ? (
+                <>
+                  <div className="spinner-small"></div>
+                  Salvando...
+                </>
+              ) : (
+                <>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                    <polyline points="7 3 7 8 15 8"></polyline>
+                  </svg>
+                  Salvar Configurações
+                </>
+              )}
+            </button>
+          )}
           <button 
             className="btn-cancel" 
             onClick={loadSettings}

@@ -5,6 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import {DevSupport} from "@react-buddy/ide-toolbox";
 import {ComponentPreviews, useInitial} from "./dev";
+import './i18n'; // Importar configuração do i18n
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

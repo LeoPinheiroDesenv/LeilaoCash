@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import api from '../services/api';
+import { useTranslation } from 'react-i18next';
 
 // Base URL da API (remove /api do final)
 const API_BASE_URL = (process.env.REACT_APP_API_URL || 'http://localhost:8000/api').replace('/api', '');
@@ -17,6 +18,7 @@ export const useTheme = () => {
 export const ThemeProvider = ({ children }) => {
   const [settings, setSettings] = useState({});
   const [loading, setLoading] = useState(true);
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     loadSettings();
@@ -24,6 +26,7 @@ export const ThemeProvider = ({ children }) => {
 
   const loadSettings = async () => {
     try {
+      // Carregar configurações gerais (cores, logo, etc.)
       const response = await api.get('/settings/public');
       if (response.data.success) {
         const newSettings = response.data.data;
@@ -153,8 +156,41 @@ export const ThemeProvider = ({ children }) => {
     return settings.logo_url || '/logo-vibeget.png';
   };
 
-  // Retorna o valor da configuração ou o defaultValue se não existir
+  // Retorna o valor da tradução (via i18next) ou da configuração antiga como fallback
   const getText = (key, defaultValue = '') => {
+    // Tenta buscar via i18next primeiro
+    // Mapeia chaves antigas para o formato group.key do i18next se necessário
+    let translationKey = key;
+    
+    // Mapeamento de compatibilidade para chaves antigas
+    if (key === 'page_como_funciona') translationKey = 'how_it_works.content';
+    if (key === 'page_contato') translationKey = 'contact.content';
+    if (key === 'page_termos') translationKey = 'terms.content';
+    if (key === 'page_privacidade') translationKey = 'privacy.content';
+    if (key === 'page_regras') translationKey = 'rules.content';
+    if (key === 'page_faq') translationKey = 'faq.content';
+    if (key === 'page_suba_de_nivel') translationKey = 'upgrade_level.content'; // Se existir no seeder
+    
+    // Se a chave contiver '_', pode ser do formato antigo (ex: text_hero_title)
+    // Tenta converter para hero.title se não encontrar direto
+    if (key.startsWith('text_')) {
+        const parts = key.replace('text_', '').split('_');
+        if (parts.length >= 2) {
+            const group = parts[0];
+            const subkey = parts.slice(1).join('_');
+            const newKey = `${group}.${subkey}`;
+            if (i18n.exists(newKey)) {
+                return t(newKey);
+            }
+        }
+    }
+
+    // Se existir no i18next, retorna a tradução
+    if (i18n.exists(translationKey)) {
+        return t(translationKey);
+    }
+
+    // Fallback para settings (sistema antigo)
     return settings[key] !== undefined && settings[key] !== null ? settings[key] : defaultValue;
   };
 

@@ -136,6 +136,11 @@ function App() {
                 <Configuracoes />
               </ProtectedRoute>
             } />
+            <Route path="/dashboard/configuracoes/traducoes" element={
+              <ProtectedRoute adminOnly={true}>
+                <Configuracoes />
+              </ProtectedRoute>
+            } />
             <Route path="/dashboard/configuracoes/sistema" element={
               <ProtectedRoute adminOnly={true}>
                 <Configuracoes />

@@ -9,8 +9,7 @@ import './DynamicPage.css';
  * @param {React.ReactNode} children - Conteúdo adicional a ser renderizado após o conteúdo dinâmico
  */
 const DynamicPage = ({ contentKey, defaultTitle = 'Página', children }) => {
-  const { settings, loading } = useTheme();
-
+  const { getText, loading } = useTheme();
 
     // Função para limpar estilos rígidos de largura
     const cleanHtmlContent = (htmlString) => {
@@ -45,8 +44,8 @@ const DynamicPage = ({ contentKey, defaultTitle = 'Página', children }) => {
     );
   }
 
-  // Usar o conteúdo da API se existir, caso contrário, exibir uma mensagem padrão.
-  const content = settings[contentKey] || `<h1>${defaultTitle}</h1><p>Nenhum conteúdo disponível para esta página no momento.</p>`;
+  // Usar o conteúdo da API (via getText que agora suporta traduções) se existir, caso contrário, exibir uma mensagem padrão.
+  const content = getText(contentKey) || `<h1>${defaultTitle}</h1><p>Nenhum conteúdo disponível para esta página no momento.</p>`;
 
   return (
     <main className="page-content">

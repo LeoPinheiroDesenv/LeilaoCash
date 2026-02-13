@@ -1,0 +1,36 @@
+{
+  "translation": {
+    "header": {
+      "home": "Home",
+      "highlights": "Highlights",
+      "ending_soon": "Ending Soon",
+      "auctions": "Auctions",
+      "how_it_works": "How it Works",
+      "upgrade_level": "Level Up",
+      "contact": "Contact Us",
+      "login": "Login",
+      "register": "Register",
+      "my_dashboard": "My Dashboard",
+      "my_favorites": "My Favorites"
+    },
+    "hero": {
+      "cashback_banner": "Up to 10% Cashback on every bid",
+      "title": "Online Auctions with",
+      "title_highlight": "Real Cashback",
+      "subtitle": "Participate in the best electronics auctions and earn cashback on every bid. Save up to 90% on premium products!",
+      "search_placeholder": "Search auction products...",
+      "stat_users": "Users",
+      "stat_cashback": "In Cashback",
+      "stat_auctions": "Auctions"
+    },
+    "common": {
+      "loading": "Loading...",
+      "error": "An error occurred",
+      "success": "Success",
+      "save": "Save",
+      "cancel": "Cancel",
+      "back": "Back",
+      "see_all": "See all"
+    }
+  }
+}

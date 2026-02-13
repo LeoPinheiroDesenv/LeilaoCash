@@ -61,7 +61,7 @@
 }
 
 .settings-content {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--color-background); /* Alterado para usar a cor de fundo geral */
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   padding: 2rem;
@@ -429,6 +429,46 @@
   width: 100%;
 }
 
+/* Sidebar Menu Styles */
+.textos-sidebar {
+  width: 250px;
+  flex-shrink: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  padding-right: 1rem;
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sidebar-btn {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  border-left: 3px solid transparent;
+  color: #8da4bf;
+  cursor: pointer;
+  border-radius: 0 8px 8px 0;
+  transition: all 0.2s;
+  font-weight: 400;
+  font-size: 0.95rem;
+}
+
+.sidebar-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #e6eef8;
+}
+
+.sidebar-btn.active {
+  background: rgba(74, 159, 216, 0.1);
+  border-left-color: #4A9FD8;
+  color: #4A9FD8;
+  font-weight: 600;
+}
+
 /* Payment Settings Styles */
 .settings-section {
   margin-bottom: 2rem;
@@ -448,6 +488,19 @@
 }
 
 @media (max-width: 768px) {
+  .configuracoes-textos-layout {
+    flex-direction: column;
+  }
+
+  .textos-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-right: 0;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+  }
+
   .settings-content {
     padding: 1.5rem;
   }

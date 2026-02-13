@@ -75,9 +75,14 @@ const HomePage = ({ searchTerm, onSearch }) => {
                 // Transformar leilões em formato de produtos para exibição
                 const nowDate = new Date();
                 const products = auctionsData.flatMap(auction =>
-                    (auction.products || []).map(product => ({
-                        id: product.id,
-                        title: product.name,
+                    (auction.products || [])
+                        .filter(product => {
+                            if (!categoryId) return true;
+                            return String(product.category_id) === String(categoryId) || String(product.category) === String(categoryId);
+                        })
+                        .map(product => ({
+                            id: product.id,
+                            title: product.name,
                         price: `R$ ${parseFloat(auction.current_bid || auction.starting_bid).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
                         oldPrice: `R$ ${parseFloat(product.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
                         cashbackPercent: `${parseFloat(auction.cashback_percentage || 0).toFixed(0)}%`,
@@ -126,6 +131,15 @@ const HomePage = ({ searchTerm, onSearch }) => {
 
     useEffect(() => {
         loadCategories();
+    }, []);
+
+    useEffect(() => {
+        // Se o searchTerm ou a categoria forem limpos (ex: clicando no logo), 
+        // reseta os estados locais se necessário
+        if (searchTerm === '' && selectedCategory !== null) {
+            setSelectedCategory(null);
+        }
+
         const timeoutId = setTimeout(() => {
             loadAuctionsMemo(selectedCategory, searchTerm);
         }, 500);
@@ -180,10 +194,15 @@ const HomePage = ({ searchTerm, onSearch }) => {
     }, [filter, filteredProducts]);
 
     const handleSelectCategory = (categoryId) => {
-        setLoading(true); // [MODIFICAÇÃO]: Define loading imediatamente ao clicar
+        // Se clicar na mesma categoria que já está selecionada, recarrega os dados
+        // ou se clicar em "Todos" (null) e já estiver em "Todos"
+        if (selectedCategory === categoryId && !searchTerm) {
+            loadAuctionsMemo(categoryId, searchTerm);
+            return;
+        }
+
+        setLoading(true);
         setSelectedCategory(categoryId);
-
-
     };
 
     // [MODIFICAÇÃO]: Removido o bloco de retorno antecipado "if (loading && ...)" para que o Hero seja sempre exibido
@@ -266,39 +285,76 @@ const HomePage = ({ searchTerm, onSearch }) => {
                     </div>
                 ) : (
                     <>
-                        <ProductSection
-                            title={getText('text_section_destaques_title', 'Em Destaque')}
-                            subtitle={getText('text_section_destaques_subtitle', 'Os leilões mais disputados')}
-                            icon={getText('icon_section_destaques', '⭐')}
-                            products={featured}
-                            viewAllLink="/?filter=featured"
-                        />
-
-                        <ProductSection
-                            title={getText('text_section_quentes_title', 'Ofertas Quentes')}
-                            subtitle={getText('text_section_quentes_subtitle', 'Preços irresistíveis')}
-                            icon={getText('icon_section_quentes', '🔥')}
-                            products={hotOffers}
-                            viewAllLink="/?filter=hot"
-                        />
-
-                        <ProductSection
-                            title={getText('text_section_encerrando_title', 'Encerrando em Breve')}
-                            subtitle={getText('text_section_encerrando_subtitle', 'Última chance!')}
-                            icon={getText('icon_section_encerrando', '⏰')}
-                            products={endingSoon}
-                            viewAllLink="/?filter=ending"
-                        />
-
-                        {auctions.length === 0 && (
-                            <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
-                                <p style={{ color: '#8da4bf', fontSize: '1.1rem' }}>
-                                    Nenhum leilão ativo no momento.
-                                </p>
-                                <p style={{ color: '#8da4bf', marginTop: '0.5rem' }}>
-                                    Volte em breve para ver novos produtos!
-                                </p>
+                        {selectedCategory || searchTerm ? (
+                            <div className="container" style={{ padding: '2rem' }}>
+                                <div style={{ marginBottom: '2rem' }}>
+                                    <h1 style={{ marginTop: '1rem', marginBottom: '0.5rem', fontSize: '2rem', color: '#fff' }}>
+                                        {searchTerm ? (
+                                            <>Resultados para "{searchTerm}"</>
+                                        ) : (
+                                            categories.find(c => c.id === selectedCategory)?.name || 'Categoria'
+                                        )}
+                                    </h1>
+                                    <p style={{ color: '#8da4bf', marginTop: '0.5rem', fontSize: '0.9rem' }}>
+                                        {auctions.length} produto{auctions.length !== 1 ? 's' : ''} encontrado{auctions.length !== 1 ? 's' : ''}
+                                    </p>
+                                </div>
+                                {auctions.length > 0 ? (
+                                    <div style={{
+                                        display: 'grid',
+                                        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                                        gap: '1.5rem'
+                                    }}>
+                                        {auctions.map((product, index) => (
+                                            <AuctionCard key={index} product={product} />
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div style={{ padding: '4rem 2rem', textAlign: 'center' }}>
+                                        <p style={{ color: '#8da4bf', fontSize: '1.1rem' }}>
+                                            Nenhum leilão ativo encontrado.
+                                        </p>
+                                    </div>
+                                )}
                             </div>
+                        ) : (
+                            /* Caso contrário, mostra as seções de destaque padrão */
+                            <>
+                                <ProductSection
+                                    title={getText('text_section_destaques_title', 'Em Destaque')}
+                                    subtitle={getText('text_section_destaques_subtitle', 'Os leilões mais disputados')}
+                                    icon={getText('icon_section_destaques', '⭐')}
+                                    products={featured}
+                                    viewAllLink="/?filter=featured"
+                                />
+
+                                <ProductSection
+                                    title={getText('text_section_quentes_title', 'Ofertas Quentes')}
+                                    subtitle={getText('text_section_quentes_subtitle', 'Preços irresistíveis')}
+                                    icon={getText('icon_section_quentes', '🔥')}
+                                    products={hotOffers}
+                                    viewAllLink="/?filter=hot"
+                                />
+
+                                <ProductSection
+                                    title={getText('text_section_encerrando_title', 'Encerrando em Breve')}
+                                    subtitle={getText('text_section_encerrando_subtitle', 'Última chance!')}
+                                    icon={getText('icon_section_encerrando', '⏰')}
+                                    products={endingSoon}
+                                    viewAllLink="/?filter=ending"
+                                />
+
+                                {auctions.length === 0 && (
+                                    <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
+                                        <p style={{ color: '#8da4bf', fontSize: '1.1rem' }}>
+                                            Nenhum leilão ativo no momento.
+                                        </p>
+                                        <p style={{ color: '#8da4bf', marginTop: '0.5rem' }}>
+                                            Volte em breve para ver novos produtos!
+                                        </p>
+                                    </div>
+                                )}
+                            </>
                         )}
 
                         <section className="cta-section">

@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Auction;
 use App\Models\Product;
 use App\Models\User;
+use App\Models\Bid;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
@@ -52,11 +54,14 @@ class AuctionController extends Controller
                 $query->where('status', $request->status);
             }
 
-            if ($request->has('category_id')) {
+            if ($request->has('category_id') && !empty($request->category_id)) {
                 $categoryId = $request->category_id;
                 $query->whereHas('products', function($q) use ($categoryId) {
-                    $q->where('category_id', $categoryId)
-                      ->orWhere('category', $categoryId); // Caso ainda usem o nome da categoria no campo texto
+                    if (is_numeric($categoryId)) {
+                        $q->where('category_id', $categoryId);
+                    } else {
+                        $q->where('category', $categoryId);
+                    }
                 });
             }
 
@@ -343,6 +348,9 @@ class AuctionController extends Controller
                         'new_total' => $winner->auctions_won
                     ]);
                 }
+
+                // Distribuir Cashback para os participantes não vencedores
+                $this->distributeCashback($auction);
             }
 
             Log::info('[AuctionController] Leilão atualizado', [
@@ -420,5 +428,90 @@ class AuctionController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Distribui cashback para os participantes do leilão (exceto o vencedor)
+     */
+    private function distributeCashback(Auction $auction)
+    {
+        try {
+            // Buscar todos os usuários que deram lances neste leilão
+            $bidders = Bid::where('auction_id', $auction->id)
+                        ->select('user_id')
+                        ->distinct()
+                        ->pluck('user_id');
+
+            foreach ($bidders as $userId) {
+                // Pular o vencedor (geralmente não recebe cashback dos lances, pois ganhou o produto)
+                if ($userId == $auction->winner_id) {
+                    continue;
+                }
+
+                $user = User::find($userId);
+                if (!$user) continue;
+
+                // Calcular total gasto pelo usuário neste leilão
+                $totalSpent = Bid::where('auction_id', $auction->id)
+                                ->where('user_id', $userId)
+                                ->sum('amount');
+
+                if ($totalSpent > 0) {
+                    $percentage = $this->calculateCashbackPercentage($user->auctions_won ?? 0);
+                    $cashbackAmount = $totalSpent * ($percentage / 100);
+
+                    // Creditar cashback
+                    $user->cashback_balance = ($user->cashback_balance ?? 0) + $cashbackAmount;
+                    $user->save();
+
+                    // Registrar transação
+                    Transaction::create([
+                        'user_id' => $user->id,
+                        'type' => 'cashback',
+                        'amount' => $cashbackAmount,
+                        'status' => 'completed',
+                        'description' => "Cashback de {$percentage}% referente ao leilão #{$auction->id} (Nível: " . $this->getLevelName($user->auctions_won ?? 0) . ")",
+                        'auction_id' => $auction->id
+                    ]);
+
+                    Log::info("[AuctionController] Cashback creditado", [
+                        'user_id' => $user->id,
+                        'auction_id' => $auction->id,
+                        'amount' => $cashbackAmount,
+                        'percentage' => $percentage,
+                        'level' => $this->getLevelName($user->auctions_won ?? 0)
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('[AuctionController] Erro ao distribuir cashback', [
+                'auction_id' => $auction->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Calcula a porcentagem de cashback baseada no número de vitórias
+     */
+    private function calculateCashbackPercentage($wins)
+    {
+        if ($wins >= 14) return 60; // Platina (14+)
+        if ($wins >= 12) return 50; // Diamante (12-13)
+        if ($wins >= 5)  return 45; // Prata (5-8) e Ouro (9-11)
+        return 40;                  // Base/Bronze (0-4)
+    }
+
+    /**
+     * Retorna o nome do nível baseado nas vitórias
+     */
+    private function getLevelName($wins)
+    {
+        if ($wins >= 14) return 'Platina';
+        if ($wins >= 12) return 'Diamante';
+        if ($wins >= 9)  return 'Ouro';
+        if ($wins >= 5)  return 'Prata';
+        if ($wins >= 1)  return 'Bronze';
+        return 'Inscrito';
     }
 }

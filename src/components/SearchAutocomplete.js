@@ -93,7 +93,7 @@ const SearchAutocomplete = ({ placeholder, onSearch, minChars = 3 }) => {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     onFocus={() => searchTerm.length >= minChars && setShowSuggestions(true)}
-                    autoComplete="off"
+                    autoComplete="on"
                     className="search-input"
                     style={{
                         width: '100%',

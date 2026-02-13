@@ -59,6 +59,9 @@ Route::get('/products', [\App\Http\Controllers\Api\ProductController::class, 'in
 // Public routes - Contact (form submission)
 Route::post('/contacts', [\App\Http\Controllers\Api\ContactController::class, 'store']);
 
+// Public routes - Translations (RENOMEADO PARA EVITAR CONFLITO)
+Route::get('/translations/public', [\App\Http\Controllers\Api\TranslationController::class, 'index']);
+
 
 // Protected routes
 Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
@@ -158,6 +161,13 @@ Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
             Route::put('/{key}', [\App\Http\Controllers\Api\SettingsController::class, 'update']);
             Route::post('/batch', [\App\Http\Controllers\Api\SettingsController::class, 'updateBatch']);
             Route::post('/upload-image', [\App\Http\Controllers\Api\SettingsController::class, 'uploadImage']);
+        });
+
+        // Translations management (Admin only - para edição)
+        Route::prefix('translations')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Api\TranslationController::class, 'adminIndex']);
+            Route::put('/{id}', [\App\Http\Controllers\Api\TranslationController::class, 'update']);
+            Route::post('/', [\App\Http\Controllers\Api\TranslationController::class, 'store']);
         });
 
         // User management

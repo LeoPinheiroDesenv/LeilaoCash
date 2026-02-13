@@ -1,0 +1,36 @@
+{
+  "translation": {
+    "header": {
+      "home": "Inicio",
+      "highlights": "Destacados",
+      "ending_soon": "Terminando",
+      "auctions": "Subastas",
+      "how_it_works": "Cómo Funciona",
+      "upgrade_level": "Sube de Nivel",
+      "contact": "Contáctanos",
+      "login": "Entrar",
+      "register": "Registrarse",
+      "my_dashboard": "Mi Panel",
+      "my_favorites": "Mis Favoritos"
+    },
+    "hero": {
+      "cashback_banner": "Hasta 10% de Cashback en cada puja",
+      "title": "Subastas Online con",
+      "title_highlight": "Cashback Real",
+      "subtitle": "Participa en las mejores subastas de electrónica y gana cashback en cada puja. ¡Ahorra hasta un 90% en productos premium!",
+      "search_placeholder": "Buscar productos en subasta...",
+      "stat_users": "Usuarios",
+      "stat_cashback": "En Cashback",
+      "stat_auctions": "Subastas"
+    },
+    "common": {
+      "loading": "Cargando...",
+      "error": "Ocurrió un error",
+      "success": "Éxito",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "back": "Volver",
+      "see_all": "Ver todos"
+    }
+  }
+}

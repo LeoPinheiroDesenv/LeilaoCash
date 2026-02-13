@@ -59,9 +59,11 @@ const PublicAuctions = ({ searchTerm }) => {
         const auctionsData = response.data.data.data || response.data.data || [];
         
         const products = auctionsData.flatMap(auction => 
-          (auction.products || []).map(product => ({
-            id: product.id,
-            title: product.name,
+          (auction.products || [])
+            .filter(product => !filters.category_id || String(product.category_id) === String(filters.category_id) || String(product.category) === String(filters.category_id))
+            .map(product => ({
+              id: product.id,
+              title: product.name,
             price: `R$ ${parseFloat(auction.current_bid || auction.starting_bid).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
             oldPrice: `R$ ${parseFloat(product.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
             cashbackPercent: parseFloat(auction.cashback_percentage || 0).toFixed(0),

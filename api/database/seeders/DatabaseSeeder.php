@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             ProductSeeder::class,
             AuctionSeeder::class,
             TextSettingsSeeder::class, // Adicionado
+            SimulationSeeder::class, // Adicionado para simular dados realistas
         ]);
     }
 }

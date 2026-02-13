@@ -214,13 +214,12 @@ const DashboardUsuario = () => {
 
   // Função para calcular o nível do usuário
   const getUserLevel = (wins) => {
-    if (!wins) return { name: 'Inscrito', icon: '📝', nextLevel: 1, color: '#9fb0c8' };
-    if (wins >= 15) return { name: 'Viber Platina', icon: '👑', nextLevel: null, color: '#e5e4e2' };
-    if (wins >= 13) return { name: 'Viber Diamante', icon: '💎', nextLevel: 15, color: '#b9f2ff' };
-    if (wins >= 10) return { name: 'Viber Ouro', icon: '🥇', nextLevel: 13, color: '#ffd700' };
-    if (wins >= 5) return { name: 'Viber Prata', icon: '🥈', nextLevel: 10, color: '#c0c0c0' };
-    if (wins >= 1) return { name: 'Viber Bronze', icon: '🥉', nextLevel: 5, color: '#cd7f32' };
-    return { name: 'Inscrito', icon: '📝', nextLevel: 1, color: '#9fb0c8' };
+    if (!wins || wins < 5) return { name: 'Inscrito', icon: '📝', nextLevel: 5, color: '#9fb0c8' };
+    if (wins >= 14) return { name: 'Viber Platina', icon: '👑', nextLevel: null, color: '#e5e4e2' };
+    if (wins >= 12) return { name: 'Viber Diamante', icon: '💎', nextLevel: 14, color: '#b9f2ff' };
+    if (wins >= 9) return { name: 'Viber Ouro', icon: '🥇', nextLevel: 12, color: '#ffd700' };
+    if (wins >= 5) return { name: 'Viber Prata', icon: '🥈', nextLevel: 9, color: '#c0c0c0' };
+    return { name: 'Inscrito', icon: '📝', nextLevel: 5, color: '#9fb0c8' };
   };
 
   const userLevel = getUserLevel(user?.auctions_won || 0);

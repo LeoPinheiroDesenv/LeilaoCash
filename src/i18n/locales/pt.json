@@ -1,0 +1,36 @@
+{
+  "translation": {
+    "header": {
+      "home": "Início",
+      "highlights": "Destaques",
+      "ending_soon": "Encerrando",
+      "auctions": "Leilões",
+      "how_it_works": "Como Funciona",
+      "upgrade_level": "Suba de Nível",
+      "contact": "Fale Conosco",
+      "login": "Entrar",
+      "register": "Cadastrar",
+      "my_dashboard": "Meu Painel",
+      "my_favorites": "Meus Favoritos"
+    },
+    "hero": {
+      "cashback_banner": "Até 10% de Cashback em cada lance",
+      "title": "Leilões Online com",
+      "title_highlight": "Cashback Real",
+      "subtitle": "Participe dos melhores leilões de eletrônicos e ganhe cashback em cada lance. Economize até 90% em produtos premium!",
+      "search_placeholder": "Buscar produtos em leilão...",
+      "stat_users": "Usuários",
+      "stat_cashback": "Em Cashback",
+      "stat_auctions": "Leilões"
+    },
+    "common": {
+      "loading": "Carregando...",
+      "error": "Ocorreu um erro",
+      "success": "Sucesso",
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "back": "Voltar",
+      "see_all": "Ver todos"
+    }
+  }
+}
