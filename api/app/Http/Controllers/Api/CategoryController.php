@@ -16,7 +16,11 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = Category::query()->withCount('products');
+            $query = Category::query()->withCount(['products' => function($q) {
+                $q->whereHas('auction', function($aq) {
+                    $aq->where('status', 'active');
+                });
+            }]);
             // Filtros
             if ($request->has('search')) {
                 $search = $request->search;

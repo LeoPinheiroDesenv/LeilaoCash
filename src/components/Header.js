@@ -31,12 +31,10 @@ const Header = ({ onSearch, showSearch = true }) => {
     }
   };
 
-  const handleLogoClick = () => {
-    if (onSearch) {
-      onSearch('');
-    }
-    setSearchTerm(''); // Limpa o estado local do input também
-    setIsMenuOpen(false);
+  const handleLogoClick = (e) => {
+    e.preventDefault();
+    // Força reload completo da página
+    window.location.href = '/';
   };
 
   return (
@@ -47,7 +45,7 @@ const Header = ({ onSearch, showSearch = true }) => {
             <img src={logoSrc} alt="Logo" className="logo-full" />
           </Link>
           <nav className="main-nav">
-            <Link to="/" className="nav-link">{t('header.home')}</Link>
+            <Link to="/" className="nav-link" onClick={handleLogoClick}>{t('header.home')}</Link>
             <Link to="/?filter=featured" className="nav-link">{t('header.highlights')}</Link>
             <Link to="/?filter=ending" className="nav-link">{t('header.ending_soon')}</Link>
             <Link to="/leiloes" className="nav-link">{t('header.auctions')}</Link>
@@ -98,7 +96,7 @@ const Header = ({ onSearch, showSearch = true }) => {
       {isMenuOpen && (
         <div className="mobile-menu-overlay" role="dialog" aria-modal="true" onKeyDown={(e) => { if (e.key === 'Escape') setIsMenuOpen(false); }} tabIndex={-1}>
           <div className="mobile-overlay-top">
-            <Link to="/" className="logo" onClick={() => setIsMenuOpen(false)}>
+            <Link to="/" className="logo" onClick={handleLogoClick}>
               <img src={logoSrc} alt="Logo" className="logo-full" />
             </Link>
             <button className="menu-close" onClick={() => setIsMenuOpen(false)} aria-label="Fechar menu">
@@ -110,7 +108,7 @@ const Header = ({ onSearch, showSearch = true }) => {
           </div>
 
           <nav className="mobile-nav">
-            <Link to="/" className="nav-link" onClick={() => setIsMenuOpen(false)}>{t('header.home')}</Link>
+            <Link to="/" className="nav-link" onClick={handleLogoClick}>{t('header.home')}</Link>
             <Link to="/?filter=featured" className="nav-link" onClick={() => setIsMenuOpen(false)}>{t('header.highlights')}</Link>
             <Link to="/?filter=ending" className="nav-link" onClick={() => setIsMenuOpen(false)}>{t('header.ending_soon')}</Link>
             <Link to="/leiloes" className="nav-link" onClick={() => setIsMenuOpen(false)}>{t('header.auctions')}</Link>

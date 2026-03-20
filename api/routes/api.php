@@ -59,6 +59,10 @@ Route::get('/products', [\App\Http\Controllers\Api\ProductController::class, 'in
 // Public routes - Contact (form submission)
 Route::post('/contacts', [\App\Http\Controllers\Api\ContactController::class, 'store']);
 
+// Public routes - Pages (footer dynamic pages)
+Route::get('/pages/public', [\App\Http\Controllers\Api\PageController::class, 'publicIndex']);
+Route::get('/pages/public/{slug}', [\App\Http\Controllers\Api\PageController::class, 'showBySlug']);
+
 // Public routes - Translations (RENOMEADO PARA EVITAR CONFLITO)
 Route::get('/translations/public', [\App\Http\Controllers\Api\TranslationController::class, 'index']);
 
@@ -264,5 +268,13 @@ Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
 
         // Mercado Pago Validation (Admin only)
         Route::post('/mercadopago/validate', [\App\Http\Controllers\Api\PaymentController::class, 'validateMercadoPago']);
+
+        // Page management (Admin only)
+        Route::prefix('pages')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Api\PageController::class, 'index']);
+            Route::post('/', [\App\Http\Controllers\Api\PageController::class, 'store']);
+            Route::put('/{id}', [\App\Http\Controllers\Api\PageController::class, 'update']);
+            Route::delete('/{id}', [\App\Http\Controllers\Api\PageController::class, 'destroy']);
+        });
     });
 });

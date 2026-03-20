@@ -41,6 +41,8 @@ import {
   DashboardUsuarioMeusFavoritos
 } from './pages/DashboardUsuarioPages';
 
+import Manual from './pages/Manual';
+
 function App() {
   const [searchTerm, setSearchTerm] = React.useState('');
 
@@ -172,14 +174,15 @@ function App() {
             {/* Rotas públicas */}
             <Route path="/" element={<Layout onSearch={handleSearch}><HomePage searchTerm={searchTerm} onSearch={handleSearch} /></Layout>} />
             <Route path="/leiloes" element={<Layout onSearch={handleSearch}><PublicAuctions searchTerm={searchTerm} /></Layout>} />
-            <Route path="/produto/:id" element={<Layout><ProductPage /></Layout>} />
-            <Route path="/suba-de-nivel" element={<Layout><SubaDeNivel /></Layout>} />
-            <Route path="/como-funciona" element={<Layout><ComoFunciona /></Layout>} />
-            <Route path="/contato" element={<Layout><Contato /></Layout>} />
-            <Route path="/faq" element={<Layout><FAQ /></Layout>} />
-            <Route path="/termos" element={<Layout><Termos /></Layout>} />
-            <Route path="/privacidade" element={<Layout><Privacidade /></Layout>} />
-            <Route path="/regras" element={<Layout><Regras /></Layout>} />
+            <Route path="/produto/:id" element={<Layout onSearch={handleSearch}><ProductPage /></Layout>} />
+            <Route path="/suba-de-nivel" element={<Layout onSearch={handleSearch}><SubaDeNivel /></Layout>} />
+            <Route path="/como-funciona" element={<Layout onSearch={handleSearch}><ComoFunciona /></Layout>} />
+            <Route path="/contato" element={<Layout onSearch={handleSearch}><Contato /></Layout>} />
+            <Route path="/faq" element={<Layout onSearch={handleSearch}><FAQ /></Layout>} />
+            <Route path="/termos" element={<Layout onSearch={handleSearch}><Termos /></Layout>} />
+            <Route path="/privacidade" element={<Layout onSearch={handleSearch}><Privacidade /></Layout>} />
+            <Route path="/regras" element={<Layout onSearch={handleSearch}><Regras /></Layout>} />
+            <Route path="/manual" element={<Layout onSearch={handleSearch}><Manual /></Layout>} />
           </Routes>
         </div>
       </AuthProvider>

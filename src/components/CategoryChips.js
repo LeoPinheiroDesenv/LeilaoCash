@@ -1,7 +1,17 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import './categoryChips.css';
 
 const CategoryChips = ({ categories = [], onSelectCategory, selectedCategory }) => {
+    const { t, i18n } = useTranslation();
+
+    // Retorna o nome traduzido da categoria conforme o idioma atual
+    const getCategoryName = (cat) => {
+        const lang = i18n.language;
+        if (lang === 'en' && cat.name_en) return cat.name_en;
+        if (lang === 'es' && cat.name_es) return cat.name_es;
+        return cat.name;
+    };
 
     // Função auxiliar para encontrar a contagem correta independentemente do nome da propriedade na API
     const getCount = (cat) => {
@@ -18,7 +28,7 @@ const CategoryChips = ({ categories = [], onSelectCategory, selectedCategory }) 
                 className={`chip ${!selectedCategory ? 'active' : ''}`}
             >
                 <span className="chip-emoji">✨</span>
-                <span className="chip-name">Todos</span>
+                <span className="chip-name">{t('categories.all', 'Todos')}</span>
             </button>
 
             {categories.map(cat => (
@@ -28,7 +38,7 @@ const CategoryChips = ({ categories = [], onSelectCategory, selectedCategory }) 
                     className={`chip ${selectedCategory === cat.id ? 'active' : ''}`}
                 >
                     {cat.icon && <span className="chip-emoji">{cat.icon}</span>}
-                    <span className="chip-name">{cat.name}</span>
+                    <span className="chip-name">{getCategoryName(cat)}</span>
                     {/* Usa a função auxiliar para exibir a contagem */}
                     <span className="chip-count">{getCount(cat)}</span>
                 </button>

@@ -1,10 +1,12 @@
 import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import AuctionCard from './AuctionCard';
 import { useTheme } from '../contexts/ThemeContext';
 import './productSection.css';
 
 const ProductSection = ({ title, subtitle, icon, products, viewAllLink }) => {
+  const { t } = useTranslation();
   const { getText } = useTheme();
   const scrollContainer = useRef(null);
 
@@ -51,7 +53,7 @@ const ProductSection = ({ title, subtitle, icon, products, viewAllLink }) => {
           <div className="section-header-actions">
             {viewAllLink && (
               <Link to={viewAllLink} className="btn-see-all">
-                {getText('text_ver_todos', 'Ver todos')}
+                {t('common.see_all')}
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M5 12h14"></path>
                   <path d="m12 5 7 7-7 7"></path>

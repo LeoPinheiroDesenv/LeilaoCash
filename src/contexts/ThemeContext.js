@@ -83,16 +83,16 @@ export const ThemeProvider = ({ children }) => {
     if (!themeSettings['color_header_bg']) root.style.setProperty('--color-header-bg', 'rgba(7, 16, 38, 0.8)');
     if (!themeSettings['color_header_link']) root.style.setProperty('--color-header-link', '#9fb0c8');
     if (!themeSettings['color_header_link_hover']) root.style.setProperty('--color-header-link-hover', '#e6eef8');
-    
+
     if (!themeSettings['color_hero_bg']) root.style.setProperty('--color-hero-bg', '#07080d');
     if (!themeSettings['color_hero_title']) root.style.setProperty('--color-hero-title', '#ffffff');
     if (!themeSettings['color_hero_subtitle']) root.style.setProperty('--color-hero-subtitle', '#8da4bf');
-    
+
     if (!themeSettings['color_card_bg']) root.style.setProperty('--color-card-bg', '#0D1529');
     if (!themeSettings['color_card_border']) root.style.setProperty('--color-card-border', 'rgba(255, 255, 255, 0.1)');
     if (!themeSettings['color_card_title']) root.style.setProperty('--color-card-title', '#ffffff');
     if (!themeSettings['color_card_price']) root.style.setProperty('--color-card-price', '#584eff');
-    
+
     if (!themeSettings['color_footer_bg']) root.style.setProperty('--color-footer-bg', '#061026');
     if (!themeSettings['color_footer_text']) root.style.setProperty('--color-footer-text', '#9fb0c8');
     if (!themeSettings['color_footer_title']) root.style.setProperty('--color-footer-title', '#e6eef8');
@@ -161,7 +161,7 @@ export const ThemeProvider = ({ children }) => {
     // Tenta buscar via i18next primeiro
     // Mapeia chaves antigas para o formato group.key do i18next se necessário
     let translationKey = key;
-    
+
     // Mapeamento de compatibilidade para chaves antigas
     if (key === 'page_como_funciona') translationKey = 'how_it_works.content';
     if (key === 'page_contato') translationKey = 'contact.content';
@@ -169,8 +169,9 @@ export const ThemeProvider = ({ children }) => {
     if (key === 'page_privacidade') translationKey = 'privacy.content';
     if (key === 'page_regras') translationKey = 'rules.content';
     if (key === 'page_faq') translationKey = 'faq.content';
-    if (key === 'page_suba_de_nivel') translationKey = 'upgrade_level.content'; // Se existir no seeder
-    
+    if (key === 'page_suba_de_nivel') translationKey = 'level_up.content'; // Se existir no seeder
+
+
     // Se a chave contiver '_', pode ser do formato antigo (ex: text_hero_title)
     // Tenta converter para hero.title se não encontrar direto
     if (key.startsWith('text_')) {

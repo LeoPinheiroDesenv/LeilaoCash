@@ -5,24 +5,57 @@ import '../components/TextEditor.css';
 
 const ConfiguracoesTextos = ({ activeGroup }) => {
   const [translations, setTranslations] = useState([]);
+  const [settings, setSettings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
   useEffect(() => {
-    loadTranslations();
+    loadData();
   }, []);
 
-  const loadTranslations = async () => {
+  const loadData = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/translations'); // Rota admin que retorna lista completa
-      if (response.data.success) {
-        setTranslations(response.data.data);
+      const [translationsRes, settingsRes] = await Promise.all([
+        api.get('/translations'),
+        api.get('/settings')
+      ]);
+
+      if (translationsRes.data.success) {
+        setTranslations(translationsRes.data.data);
       }
+      
+      if (settingsRes.data.success) {
+        const data = settingsRes.data.data;
+        
+        const ensureSettingExists = (group, key, description, defaultValue = '', type = 'html') => {
+          if (!data[group]) data[group] = [];
+          if (!data[group].some(s => s.key === key)) {
+            data[group].push({
+              key,
+              value: defaultValue,
+              description,
+              type,
+              group
+            });
+          }
+        };
+
+        ensureSettingExists('content', 'page_como_funciona', 'Conteúdo da página Como Funciona');
+        ensureSettingExists('content', 'page_contato', 'Conteúdo da página Contato');
+        ensureSettingExists('content', 'page_termos', 'Conteúdo da página Termos de Uso');
+        ensureSettingExists('content', 'page_privacidade', 'Conteúdo da página Privacidade');
+        ensureSettingExists('content', 'page_regras', 'Conteúdo da página Regras');
+        ensureSettingExists('content', 'page_faq', 'Conteúdo da página FAQ');
+        ensureSettingExists('content', 'page_suba_de_nivel', 'Conteúdo da página Suba de Nível');
+        
+        setSettings(data.content || []);
+      }
+
     } catch (error) {
-      console.error('Erro ao carregar traduções:', error);
-      setMessage({ type: 'error', text: 'Erro ao carregar traduções.' });
+      console.error('Erro ao carregar dados:', error);
+      setMessage({ type: 'error', text: 'Erro ao carregar dados.' });
     } finally {
       setLoading(false);
     }
@@ -33,10 +66,23 @@ const ConfiguracoesTextos = ({ activeGroup }) => {
       t.id === id ? { ...t, [field]: value, isDirty: true } : t
     ));
   };
+  
+  const handleSettingChange = (key, value) => {
+    setSettings(prev => prev.map(s => 
+      s.key === key ? { ...s, value: value, isDirty: true } : s
+    ));
+  };
 
   const handleSave = async (id) => {
     const translation = translations.find(t => t.id === id);
     if (!translation) return;
+
+    // Validação: Português é obrigatório
+    if (!translation.text_pt || translation.text_pt.trim() === '') {
+      setMessage({ type: 'error', text: 'O texto em Português é obrigatório!' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+      return;
+    }
 
     try {
       setSaving(true);
@@ -47,22 +93,52 @@ const ConfiguracoesTextos = ({ activeGroup }) => {
       });
 
       if (response.data.success) {
-        // Atualiza o estado com os dados retornados do servidor para garantir sincronia
-        setTranslations(prev => prev.map(t => 
-          t.id === id ? { ...response.data.data, isDirty: false } : t
-        ));
-        setMessage({ type: 'success', text: 'Tradução salva com sucesso!' });
+        setMessage({ type: 'success', text: '✅ Tradução salva com sucesso!' });
         setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+        await loadData(); // Recarregar dados
+      } else {
+        setMessage({ type: 'error', text: response.data.message || 'Erro ao salvar tradução.' });
       }
     } catch (error) {
       console.error('Erro ao salvar tradução:', error);
-      setMessage({ type: 'error', text: 'Erro ao salvar tradução.' });
+      setMessage({ type: 'error', text: '❌ Erro ao salvar tradução. Tente novamente.' });
+    } finally {
+      setSaving(false);
+    }
+  };
+  
+  const handleSettingSave = async (key) => {
+    const setting = settings.find(s => s.key === key);
+    if (!setting) return;
+
+    // Validação: Conteúdo não pode estar vazio
+    if (!setting.value || setting.value.trim() === '') {
+      setMessage({ type: 'error', text: 'O conteúdo não pode estar vazio!' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+      return;
+    }
+
+    try {
+      setSaving(true);
+      const response = await api.post('/settings/batch', {
+        settings: { [key]: setting.value }
+      });
+
+      if (response.data.success) {
+        setMessage({ type: 'success', text: '✅ Conteúdo salvo com sucesso!' });
+        setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+        await loadData(); // Recarregar dados
+      } else {
+        setMessage({ type: 'error', text: response.data.message || 'Erro ao salvar conteúdo.' });
+      }
+    } catch (error) {
+      console.error('Erro ao salvar conteúdo:', error);
+      setMessage({ type: 'error', text: '❌ Erro ao salvar conteúdo. Tente novamente.' });
     } finally {
       setSaving(false);
     }
   };
 
-  // Agrupar traduções por 'group'
   const groupedTranslations = useMemo(() => {
     const groups = {};
     translations.forEach(t => {
@@ -74,20 +150,10 @@ const ConfiguracoesTextos = ({ activeGroup }) => {
     return groups;
   }, [translations]);
 
-  // Função para determinar se deve usar o editor rico
   const shouldUseRichEditor = (translation) => {
-    // Se a chave termina em 'content' ou 'html', ou se o grupo é de uma página específica
-    if (translation.key.endsWith('content') || translation.key.endsWith('html')) return true;
-    
-    const richTextGroups = [
-      'how_it_works', 'terms', 'privacy', 'rules', 'faq', 'about', 
-      'page_como_funciona', 'page_contato', 'page_termos', 'page_privacidade', 
-      'page_regras', 'page_faq', 'page_suba_de_nivel'
-    ];
-    
-    if (richTextGroups.includes(translation.group)) return true;
-
-    // Fallback: se o texto for muito longo ou contiver tags HTML
+    if (translation.key === 'content') {
+      return true;
+    }
     const text = translation.text_pt || '';
     return text.length > 100 || /<[a-z][\s\S]*>/i.test(text);
   };
@@ -95,12 +161,54 @@ const ConfiguracoesTextos = ({ activeGroup }) => {
   if (loading) {
     return <div className="loading-container"><div className="spinner"></div><p>Carregando textos...</p></div>;
   }
+  
+  const isPageContentGroup = activeGroup && activeGroup.startsWith('page_');
 
-  // Se não houver grupo ativo ou o grupo não tiver traduções
+  if (isPageContentGroup) {
+    const setting = settings.find(s => s.key === activeGroup);
+    
+    if (!setting) {
+      return <div className="no-content" style={{ padding: '2rem', textAlign: 'center', color: '#8da4bf' }}>Conteúdo não encontrado para esta página.</div>;
+    }
+
+    return (
+      <div className="configuracoes-textos-layout">
+        {message.text && (
+          <div className={`alert alert-${message.type}`} style={{ marginBottom: '2rem' }}>
+            {message.text}
+          </div>
+        )}
+        <div className="translation-card" style={{ background: 'rgba(255,255,255,0.03)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+          <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <div>
+              <span style={{ color: '#e6eef8', fontWeight: '500' }}>{setting.description || setting.key}</span>
+            </div>
+            {setting.isDirty && (
+              <button 
+                className="btn-save" 
+                onClick={() => handleSettingSave(setting.key)} 
+                disabled={saving}
+                style={{ padding: '0.5rem 1.5rem', fontSize: '0.9rem' }}
+              >
+                {saving ? 'Salvando...' : 'Salvar Alterações'}
+              </button>
+            )}
+          </div>
+          <TextEditor
+            value={setting.value || ''}
+            onChange={(val) => handleSettingChange(setting.key, val)}
+          />
+        </div>
+      </div>
+    );
+  }
+
   if (!activeGroup || !groupedTranslations[activeGroup]) {
     return (
-      <div className="no-content" style={{ padding: '2rem', textAlign: 'center', color: '#8da4bf' }}>
-        <p>Selecione uma seção no menu acima para editar os textos.</p>
+      <div className="no-content" style={{ padding: '3rem', textAlign: 'center', color: '#8da4bf' }}>
+        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📝</div>
+        <h3 style={{ color: '#e6eef8', marginBottom: '0.5rem' }}>Selecione uma seção</h3>
+        <p>Escolha um grupo no menu acima para editar os textos e traduções.</p>
       </div>
     );
   }
@@ -173,6 +281,9 @@ const ConfiguracoesTextos = ({ activeGroup }) => {
               <div className="lang-field">
                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', color: '#e6eef8', fontWeight: '500' }}>
                   <span style={{ fontSize: '1.2rem' }}>🇺🇸</span> Inglês
+                  {(!t.text_en || t.text_en.trim() === '') && (
+                    <span style={{ fontSize: '0.7rem', color: '#ff9800', marginLeft: '0.5rem' }}>⚠️ Vazio</span>
+                  )}
                 </label>
                 {shouldUseRichEditor(t) ? (
                   <TextEditor
@@ -194,6 +305,9 @@ const ConfiguracoesTextos = ({ activeGroup }) => {
               <div className="lang-field">
                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', color: '#e6eef8', fontWeight: '500' }}>
                   <span style={{ fontSize: '1.2rem' }}>🇪🇸</span> Espanhol
+                  {(!t.text_es || t.text_es.trim() === '') && (
+                    <span style={{ fontSize: '0.7rem', color: '#ff9800', marginLeft: '0.5rem' }}>⚠️ Vazio</span>
+                  )}
                 </label>
                 {shouldUseRichEditor(t) ? (
                   <TextEditor

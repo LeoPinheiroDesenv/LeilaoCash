@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Hero from './Hero';
 import WhyChooseUs from './WhyChooseUs';
 import ProductSection from './ProductSection';
@@ -23,8 +24,10 @@ const calculateTimeRemaining = (endDate) => {
 };
 
 const HomePage = ({ searchTerm, onSearch }) => {
+    const { t, i18n } = useTranslation();
     const { getText } = useTheme();
     const [searchParams] = useSearchParams();
+    const location = useLocation();
     const filter = searchParams.get('filter');
 
     const [loading, setLoading] = useState(true);
@@ -49,105 +52,93 @@ const HomePage = ({ searchTerm, onSearch }) => {
         }
     };
 
-    const loadAuctionsMemo = useCallback(async (categoryId = null, search = '') => {
-        try {
-            setLoading(true);
-            setError(null);
-
-            let url = '/auctions/public?status=active&per_page=20';
-            if (categoryId) {
-                url += `&category_id=${categoryId}`;
-            }
-            if (search) {
-                url += `&search=${search}`;
-            }
-
-            // Buscar leilões ativos e agendados
-            const response = await api.get(url, {
-                headers: {
-                    'Accept': 'application/json'
-                }
-            });
-
-            if (response.data.success) {
-                const auctionsData = response.data.data.data || response.data.data || [];
-
-                // Transformar leilões em formato de produtos para exibição
-                const nowDate = new Date();
-                const products = auctionsData.flatMap(auction =>
-                    (auction.products || [])
-                        .filter(product => {
-                            if (!categoryId) return true;
-                            return String(product.category_id) === String(categoryId) || String(product.category) === String(categoryId);
-                        })
-                        .map(product => ({
-                            id: product.id,
-                            title: product.name,
-                        price: `R$ ${parseFloat(auction.current_bid || auction.starting_bid).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-                        oldPrice: `R$ ${parseFloat(product.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-                        cashbackPercent: `${parseFloat(auction.cashback_percentage || 0).toFixed(0)}%`,
-                        discount: Math.round(((parseFloat(product.price) - parseFloat(auction.current_bid || auction.starting_bid)) / parseFloat(product.price)) * 100),
-                        isHot: auction.status === 'active',
-                        timer: auction.end_date ? calculateTimeRemaining(auction.end_date) : '00:00:00',
-                        remainingSeconds: auction.end_date ? Math.max(0, Math.floor((new Date(auction.end_date) - nowDate) / 1000)) : 0,
-                        bids: auction.bids_count || '0',
-                        url: `/produto/${product.id}`,
-                        image: product.image_url
-                            ? (product.image_url.startsWith('http')
-                                ? product.image_url
-                                : `${process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:8000'}${product.image_url}`)
-                            : `${process.env.REACT_APP_API_URL?.replace('/', '') || ''}/uploads/padrao.jpg`,
-                        description: product.description || '',
-                        visits: product.visits || '0',
-                        type: product.categoryModel?.name || product.category || 'Geral',
-                        location: 'Online',
-                        vibeDate: auction.start_date ? new Date(auction.start_date).toLocaleDateString('pt-BR') : '',
-                        initialPrice: `R$ ${parseFloat(auction.starting_bid).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-                        bidHistory: []
-                    }))
-                );
-
-                setAuctions(products);
-
-                // Preencher seções: Em Destaque (mais disputados), Ofertas Quentes (maior desconto), Encerrando em Breve (menor tempo restante)
-                const productsWithBids = products.map(p => ({...p, bidsCount: parseInt(p.bids, 10) || 0}));
-
-                const featuredList = [...productsWithBids].sort((a,b) => b.bidsCount - a.bidsCount).slice(0, 4);
-                const hotList = [...productsWithBids].sort((a,b) => (b.discount || 0) - (a.discount || 0)).slice(0, 4);
-                const endingList = [...productsWithBids].filter(p => p.remainingSeconds > 0).sort((a,b) => a.remainingSeconds - b.remainingSeconds).slice(0, 4);
-
-                setFeatured(featuredList);
-                setHotOffers(hotList);
-                setEndingSoon(endingList);
-            }
-        } catch (error) {
-            console.error('Erro ao carregar leilões:', error);
-            setError('Erro ao carregar produtos. Tente novamente mais tarde.');
-            setAuctions([]);
-        } finally {
-            setLoading(false);
-        }
-    }, []); // Dependências vazias, pois calculateTimeRemaining agora é externa
-
     useEffect(() => {
         loadCategories();
     }, []);
 
     useEffect(() => {
-        // Se o searchTerm ou a categoria forem limpos (ex: clicando no logo), 
-        // reseta os estados locais se necessário
-        if (searchTerm === '' && selectedCategory !== null) {
-            setSelectedCategory(null);
-        }
+        const loadAuctions = async () => {
+            try {
+                setLoading(true);
+                setError(null);
 
-        const timeoutId = setTimeout(() => {
-            loadAuctionsMemo(selectedCategory, searchTerm);
-        }, 500);
+                let url = '/auctions/public?status=active&per_page=20';
+                if (selectedCategory) {
+                    url += `&category_id=${selectedCategory}`;
+                }
+                if (searchTerm) {
+                    url += `&search=${searchTerm}`;
+                }
 
+                const response = await api.get(url, {
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (response.data.success) {
+                    const auctionsData = response.data.data.data || response.data.data || [];
+                    const nowDate = new Date();
+
+                    const products = auctionsData.flatMap(auction =>
+                        (auction.products || []).map(product => ({
+                            id: product.id,
+                            title: product.name,
+                            price: `R$ ${parseFloat(auction.current_bid || auction.starting_bid).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+                            oldPrice: `R$ ${parseFloat(product.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+                            cashbackPercent: `${parseFloat(auction.cashback_percentage || 0).toFixed(0)}%`,
+                            discount: Math.round(((parseFloat(product.price) - parseFloat(auction.current_bid || auction.starting_bid)) / parseFloat(product.price)) * 100),
+                            isHot: auction.status === 'active',
+                            timer: auction.end_date ? calculateTimeRemaining(auction.end_date) : '00:00:00',
+                            remainingSeconds: auction.end_date ? Math.max(0, Math.floor((new Date(auction.end_date) - nowDate) / 1000)) : 0,
+                            bids: auction.bids_count || '0',
+                            url: `/produto/${product.id}`,
+                            image: product.image_url
+                                ? (product.image_url.startsWith('http')
+                                    ? product.image_url
+                                    : `${process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:8000'}${product.image_url}`)
+                                : `${process.env.REACT_APP_API_URL?.replace('/', '') || ''}/uploads/padrao.jpg`,
+                            category_id: product.category_id
+                        }))
+                    );
+                    
+                    const finalProducts = selectedCategory 
+                        ? products.filter(p => String(p.category_id) === String(selectedCategory))
+                        : products;
+
+                    setAuctions(finalProducts);
+
+                    if (!selectedCategory && !searchTerm) {
+                        const productsWithBids = finalProducts.map(p => ({...p, bidsCount: parseInt(p.bids, 10) || 0}));
+                        const featuredList = [...productsWithBids].sort((a,b) => b.bidsCount - a.bidsCount).slice(0, 4);
+                        const hotList = [...productsWithBids].sort((a,b) => (b.discount || 0) - (a.discount || 0)).slice(0, 4);
+                        const endingList = [...productsWithBids].filter(p => p.remainingSeconds > 0).sort((a,b) => a.remainingSeconds - b.remainingSeconds).slice(0, 4);
+
+                        setFeatured(featuredList);
+                        setHotOffers(hotList);
+                        setEndingSoon(endingList);
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao carregar leilões:', error);
+                setError('Erro ao carregar produtos. Tente novamente mais tarde.');
+                setAuctions([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        const timeoutId = setTimeout(loadAuctions, 300);
         return () => clearTimeout(timeoutId);
-    }, [loadAuctionsMemo, selectedCategory, searchTerm]);
+    }, [selectedCategory, searchTerm]);
 
-    // Effect para aplicar filtros quando há query params
+    useEffect(() => {
+        // Se a localização mudar para a raiz (sem query params), reseta os filtros.
+        // O uso do state.reset (via Header/Footer) garante que o reset ocorra mesmo já estando na Home.
+        if (location.pathname === '/' && !location.search) {
+            setSelectedCategory(null);
+            if (onSearch && searchTerm) onSearch('');
+        }
+    }, [location, onSearch, searchTerm]);
+
     useEffect(() => {
         if (filter && auctions.length > 0) {
             let filtered = [];
@@ -166,47 +157,32 @@ const HomePage = ({ searchTerm, onSearch }) => {
                 default:
                     filtered = auctions;
             }
-
             setFilteredProducts(filtered);
         } else {
             setFilteredProducts([]);
         }
     }, [filter, auctions]);
 
-    // Quando houver um filtro via query string, rola a página até o início da visualização dos resultados.
     useEffect(() => {
         if (!filter) return;
-
-        // Aguarda a renderização dos produtos filtrados e então realiza o scroll.
         const id = setTimeout(() => {
             const el = resultsRef.current;
             if (!el) return;
-
-            // Compensa a altura do cabeçalho sticky
             const header = document.querySelector('.site-header');
             const headerHeight = header ? header.getBoundingClientRect().height : 0;
-            const top = el.getBoundingClientRect().top + window.scrollY - headerHeight - 8; // pequeno espaçamento
-
+            const top = el.getBoundingClientRect().top + window.scrollY - headerHeight - 8;
             window.scrollTo({ top, behavior: 'smooth' });
         }, 80);
-
         return () => clearTimeout(id);
     }, [filter, filteredProducts]);
 
     const handleSelectCategory = (categoryId) => {
-        // Se clicar na mesma categoria que já está selecionada, recarrega os dados
-        // ou se clicar em "Todos" (null) e já estiver em "Todos"
-        if (selectedCategory === categoryId && !searchTerm) {
-            loadAuctionsMemo(categoryId, searchTerm);
-            return;
+        if (selectedCategory === categoryId) {
+            setSelectedCategory(null);
+        } else {
+            setSelectedCategory(categoryId);
         }
-
-        setLoading(true);
-        setSelectedCategory(categoryId);
     };
-
-    // [MODIFICAÇÃO]: Removido o bloco de retorno antecipado "if (loading && ...)" para que o Hero seja sempre exibido
-    // e o loading seja tratado dentro da tag <main> abaixo.
 
     if (error) {
         return (
@@ -215,13 +191,13 @@ const HomePage = ({ searchTerm, onSearch }) => {
                     categories={categories}
                     selectedCategory={selectedCategory}
                     onSelectCategory={handleSelectCategory}
-                    onSearch={onSearch} // Adicionado onSearch que estava faltando no bloco de erro original
+                    onSearch={onSearch}
                 />
                 <main>
                     <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
                         <p style={{ color: '#E55F52', marginBottom: '1rem' }}>{error}</p>
-                        <button onClick={() => loadAuctionsMemo(selectedCategory, searchTerm)} style={{ padding: '0.75rem 1.5rem', background: '#4A9FD8', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
-                            {getText('text_try_again', 'Tentar Novamente')}
+                        <button onClick={() => window.location.reload()} style={{ padding: '0.75rem 1.5rem', background: '#4A9FD8', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
+                            {t('common.try_again', 'Tentar Novamente')}
                         </button>
                     </div>
                 </main>
@@ -239,29 +215,29 @@ const HomePage = ({ searchTerm, onSearch }) => {
                 onSearch={onSearch}
             />
             <main>
-                {loading ? ( // [MODIFICAÇÃO]: Verifica loading aqui para exibir o spinner durante qualquer carregamento
+                {loading ? (
                     <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
                         <div className="spinner" style={{ width: '48px', height: '48px', margin: '0 auto', border: '4px solid rgba(255, 255, 255, 0.1)', borderTopColor: '#4A9FD8', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-                        <p style={{ marginTop: '1rem', color: '#8da4bf' }}>{getText('text_loading', 'Carregando...')}</p>
+                        <p style={{ marginTop: '1rem', color: '#8da4bf' }}>{t('common.loading', 'Carregando...')}</p>
                     </div>
                 ) : filter && filteredProducts.length > 0 ? (
                     <div ref={resultsRef} className="container" style={{ padding: '2rem' }}>
                         <div style={{ marginBottom: '2rem' }}>
                             <Link to="/" style={{ color: '#4A9FD8', textDecoration: 'none', fontSize: '0.9rem' }}>
-                                ← Voltar
+                                ← {t('common.back', 'Voltar')}
                             </Link>
                             <h1 style={{ marginTop: '1rem', marginBottom: '0.5rem', fontSize: '2rem', color: '#fff' }}>
-                                {filter === 'featured' && getText('text_section_destaques_title', 'Em Destaque')}
-                                {filter === 'hot' && getText('text_section_quentes_title', 'Ofertas Quentes')}
-                                {filter === 'ending' && getText('text_section_encerrando_title', 'Encerrando em Breve')}
+                                {filter === 'featured' && t('home.featured_title')}
+                                {filter === 'hot' && t('home.hot_title')}
+                                {filter === 'ending' && t('home.ending_title')}
                             </h1>
                             <p style={{ color: '#8da4bf' }}>
-                                {filter === 'featured' && getText('text_section_destaques_subtitle', 'Os leilões mais disputados')}
-                                {filter === 'hot' && getText('text_section_quentes_subtitle', 'Preços irresistíveis')}
-                                {filter === 'ending' && getText('text_section_encerrando_subtitle', 'Última chance!')}
+                                {filter === 'featured' && t('home.featured_subtitle')}
+                                {filter === 'hot' && t('home.hot_subtitle')}
+                                {filter === 'ending' && t('home.ending_subtitle')}
                             </p>
                             <p style={{ color: '#8da4bf', marginTop: '0.5rem', fontSize: '0.9rem' }}>
-                                {filteredProducts.length} produto{filteredProducts.length !== 1 ? 's' : ''} encontrado{filteredProducts.length !== 1 ? 's' : ''}
+                                {filteredProducts.length} {t('home.products_found', 'produto(s) encontrado(s)')}
                             </p>
                         </div>
                         <div style={{
@@ -274,15 +250,6 @@ const HomePage = ({ searchTerm, onSearch }) => {
                             ))}
                         </div>
                     </div>
-                ) : filter && filteredProducts.length === 0 ? (
-                    <div ref={resultsRef} className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
-                        <Link to="/" style={{ color: '#4A9FD8', textDecoration: 'none', fontSize: '0.9rem' }}>
-                            ← Voltar
-                        </Link>
-                        <p style={{ color: '#8da4bf', fontSize: '1.1rem', marginTop: '2rem' }}>
-                            Nenhum produto encontrado nesta categoria.
-                        </p>
-                    </div>
                 ) : (
                     <>
                         {selectedCategory || searchTerm ? (
@@ -290,13 +257,20 @@ const HomePage = ({ searchTerm, onSearch }) => {
                                 <div style={{ marginBottom: '2rem' }}>
                                     <h1 style={{ marginTop: '1rem', marginBottom: '0.5rem', fontSize: '2rem', color: '#fff' }}>
                                         {searchTerm ? (
-                                            <>Resultados para "{searchTerm}"</>
+                                            <>{t('home.results_for', 'Resultados para')} "{searchTerm}"</>
                                         ) : (
-                                            categories.find(c => c.id === selectedCategory)?.name || 'Categoria'
+                                            (() => {
+                                                const cat = categories.find(c => String(c.id) === String(selectedCategory));
+                                                if (!cat) return 'Categoria';
+                                                const lang = i18n.language;
+                                                if (lang === 'en' && cat.name_en) return cat.name_en;
+                                                if (lang === 'es' && cat.name_es) return cat.name_es;
+                                                return cat.name;
+                                            })()
                                         )}
                                     </h1>
                                     <p style={{ color: '#8da4bf', marginTop: '0.5rem', fontSize: '0.9rem' }}>
-                                        {auctions.length} produto{auctions.length !== 1 ? 's' : ''} encontrado{auctions.length !== 1 ? 's' : ''}
+                                        {auctions.length} {t('home.products_found', 'produto(s) encontrado(s)')}
                                     </p>
                                 </div>
                                 {auctions.length > 0 ? (
@@ -312,45 +286,44 @@ const HomePage = ({ searchTerm, onSearch }) => {
                                 ) : (
                                     <div style={{ padding: '4rem 2rem', textAlign: 'center' }}>
                                         <p style={{ color: '#8da4bf', fontSize: '1.1rem' }}>
-                                            Nenhum leilão ativo encontrado.
+                                            {t('home.no_auctions_category', 'Nenhum leilão ativo encontrado para esta categoria.')}
                                         </p>
                                     </div>
                                 )}
                             </div>
                         ) : (
-                            /* Caso contrário, mostra as seções de destaque padrão */
                             <>
                                 <ProductSection
-                                    title={getText('text_section_destaques_title', 'Em Destaque')}
-                                    subtitle={getText('text_section_destaques_subtitle', 'Os leilões mais disputados')}
+                                    title={t('home.featured_title')}
+                                    subtitle={t('home.featured_subtitle')}
                                     icon={getText('icon_section_destaques', '⭐')}
                                     products={featured}
                                     viewAllLink="/?filter=featured"
                                 />
 
                                 <ProductSection
-                                    title={getText('text_section_quentes_title', 'Ofertas Quentes')}
-                                    subtitle={getText('text_section_quentes_subtitle', 'Preços irresistíveis')}
+                                    title={t('home.hot_title')}
+                                    subtitle={t('home.hot_subtitle')}
                                     icon={getText('icon_section_quentes', '🔥')}
                                     products={hotOffers}
                                     viewAllLink="/?filter=hot"
                                 />
 
                                 <ProductSection
-                                    title={getText('text_section_encerrando_title', 'Encerrando em Breve')}
-                                    subtitle={getText('text_section_encerrando_subtitle', 'Última chance!')}
+                                    title={t('home.ending_title')}
+                                    subtitle={t('home.ending_subtitle')}
                                     icon={getText('icon_section_encerrando', '⏰')}
                                     products={endingSoon}
                                     viewAllLink="/?filter=ending"
                                 />
 
-                                {auctions.length === 0 && (
+                                {auctions.length === 0 && !loading && (
                                     <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
                                         <p style={{ color: '#8da4bf', fontSize: '1.1rem' }}>
-                                            Nenhum leilão ativo no momento.
+                                            {t('home.no_auctions_now', 'Nenhum leilão ativo no momento.')}
                                         </p>
                                         <p style={{ color: '#8da4bf', marginTop: '0.5rem' }}>
-                                            Volte em breve para ver novos produtos!
+                                            {t('home.come_back_soon', 'Volte em breve para ver novos produtos!')}
                                         </p>
                                     </div>
                                 )}
@@ -359,11 +332,11 @@ const HomePage = ({ searchTerm, onSearch }) => {
 
                         <section className="cta-section">
                             <div className="container">
-                                <h2>{getText('text_cta_title', 'Comece a ganhar Cashback agora!')}</h2>
-                                <p>{getText('text_cta_subtitle', 'Cadastre-se gratuitamente e participe dos melhores leilões online do Brasil.')}</p>
+                                <h2>{t('home.cta_title')}</h2>
+                                <p>{t('home.cta_subtitle')}</p>
                                 <div className="cta-buttons">
-                                    <Link to="/cadastro" className="btn-cta-primary">{getText('text_header_cadastro', 'Criar Conta Grátis')}</Link>
-                                    <Link to="/como-funciona" className="btn-cta-secondary">{getText('text_header_como_funciona', 'Como Funciona')}</Link>
+                                    <Link to="/cadastro" className="btn-cta-primary">{t('header.register')}</Link>
+                                    <Link to="/como-funciona" className="btn-cta-secondary">{t('header.how_it_works')}</Link>
                                 </div>
                             </div>
                         </section>

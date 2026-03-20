@@ -1,15 +1,24 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import './footer.css';
 
-const Footer = () => {
+const Footer = ({ onSearch }) => {
+  const { t } = useTranslation();
   const { getLogoUrl, getText } = useTheme();
   const logoSrc = getLogoUrl();
-  const phoneLabel = getText('text_contact_phone_label', 'Telefone');
+  const phoneLabel = t('contact.info_phone_label', 'Telefone');
   const phoneValue = getText('text_contact_phone_value', '+55 (11) 3000-0000');
-  const addressLabel = getText('text_contact_address_label', 'Endereço');
+  const addressLabel = t('contact.info_address_label', 'Endereço');
   const addressValue = getText('text_contact_address_value', 'São Paulo, SP - Brasil');
+
+  const handleLogoClick = () => {
+    if (onSearch) {
+      onSearch('');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <>
@@ -17,11 +26,11 @@ const Footer = () => {
         <div className="container">
           <div className="footer-grid">
             <div className="footer-col">
-              <Link to="/" className="footer-logo">
+              <Link to="/" state={{ reset: Date.now() }} className="footer-logo" onClick={handleLogoClick}>
                 <img src={logoSrc} alt="Logo" className="logo-full" style={{ height: '40px' }} />
               </Link>
               <p className="footer-description">
-                {getText('text_footer_sobre_desc', 'A maior plataforma de leilões com cashback do Brasil. Produtos novos, lacrados e com garantia.')}
+                {t('footer.description')}
               </p>
               <div className="social-links">
                 <a href="#" aria-label="Instagram">
@@ -36,23 +45,23 @@ const Footer = () => {
               </div>
             </div>
             <div className="footer-col">
-              <h4>{getText('text_footer_quick_links', 'Links Rápidos')}</h4>
+              <h4>{t('footer.quick_links')}</h4>
               <ul>
-                <li><Link to="/leiloes">Leilões</Link></li>
-                <li><Link to="/como-funciona">Como Funciona</Link></li>
-                <li><Link to="/faq">FAQ</Link></li>
+                <li><Link to="/leiloes">{t('footer.auctions')}</Link></li>
+                <li><Link to="/como-funciona">{t('footer.how_it_works')}</Link></li>
+                <li><Link to="/faq">{t('footer.faq')}</Link></li>
               </ul>
             </div>
             <div className="footer-col">
-              <h4>{getText('text_footer_legal', 'Legal')}</h4>
+              <h4>{t('footer.legal')}</h4>
               <ul>
-                <li><Link to="/termos">Termos de Uso</Link></li>
-                <li><Link to="/privacidade">Política de Privacidade</Link></li>
-                <li><Link to="/regras">Regras</Link></li>
+                <li><Link to="/termos">{t('footer.terms')}</Link></li>
+                <li><Link to="/privacidade">{t('footer.privacy')}</Link></li>
+                <li><Link to="/regras">{t('footer.rules')}</Link></li>
               </ul>
             </div>
             <div className="footer-col">
-              <h4>{getText('text_footer_contato', 'Contato')}</h4>
+              <h4>{t('footer.contact')}</h4>
               <ul>
                 <li><a href={`mailto:${getText('contact_email', 'contato@leilaocash.com')}`}>{getText('contact_email', 'contato@leilaocash.com')}</a></li>
               </ul>
@@ -73,7 +82,7 @@ const Footer = () => {
             </div>
           </div>
           <div className="footer-copyright">
-            <p>{getText('text_footer_copyright', `© ${new Date().getFullYear()} LeilaoCash. Todos os direitos reservados.`)}</p>
+            <p>© {new Date().getFullYear()} VibeGet. {t('footer.copyright')}</p>
           </div>
         </div>
       </footer>

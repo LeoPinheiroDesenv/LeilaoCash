@@ -7,15 +7,17 @@
     "@fortawesome/react-fontawesome": "^3.1.1",
     "@phosphor-icons/react": "^2.1.7",
     "@react-buddy/ide-toolbox": "^2.4.0",
+    "ajv": "^8.18.0",
     "animate.css": "^4.1.1",
     "apexcharts": "^4.3.0",
     "axios": "^1.13.2",
     "bootstrap": "^5.3.3",
-    "ckeditor5": "^43.0.0",
+    "ckeditor5": "^47.5.0",
     "highlight.js": "^11.9.0",
     "i18next": "^23.10.0",
     "i18next-browser-languagedetector": "^7.2.0",
     "i18next-http-backend": "^2.5.0",
+    "marked": "^17.0.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
@@ -25,8 +27,8 @@
     "web-vitals": "^5.1.0"
   },
   "devDependencies": {
-    "react-scripts": "^5.0.1",
-    "env-cmd": "^10.1.0"
+    "env-cmd": "^10.1.0",
+    "react-scripts": "^5.0.1"
   },
   "scripts": {
     "start": "env-cmd -f .env.local react-scripts start",

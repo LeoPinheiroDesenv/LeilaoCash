@@ -13,7 +13,7 @@ const Layout = ({ children, onSearch }) => {
       <main className="site-main">
         {children}
       </main>
-      <Footer />
+      <Footer onSearch={onSearch} />
     </div>
   );
 };

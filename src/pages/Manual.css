@@ -1,0 +1,132 @@
+.manual-page {
+  min-height: 100vh;
+  background: #0a0f1c;
+  padding: 2rem 1rem;
+}
+
+.manual-container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 3rem;
+  color: #c8d6e5;
+  line-height: 1.8;
+}
+
+.manual-container h1 {
+  color: #fff;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid rgba(74, 159, 216, 0.3);
+}
+
+.manual-container h2 {
+  color: #4A9FD8;
+  font-size: 1.5rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.manual-container h3 {
+  color: #e2e8f0;
+  font-size: 1.2rem;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.manual-container p {
+  margin-bottom: 1rem;
+  color: #8da4bf;
+}
+
+.manual-container strong {
+  color: #e2e8f0;
+}
+
+.manual-container ul,
+.manual-container ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.manual-container li {
+  margin-bottom: 0.5rem;
+  color: #8da4bf;
+}
+
+.manual-container hr {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 2rem 0;
+}
+
+.manual-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0 1.5rem;
+  font-size: 0.9rem;
+}
+
+.manual-container th {
+  background: rgba(74, 159, 216, 0.15);
+  color: #4A9FD8;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-weight: 600;
+}
+
+.manual-container td {
+  padding: 0.6rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #8da4bf;
+}
+
+.manual-container tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.manual-container code {
+  background: rgba(74, 159, 216, 0.1);
+  color: #4A9FD8;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+.manual-container a {
+  color: #4A9FD8;
+  text-decoration: none;
+}
+
+.manual-container a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .manual-container {
+    padding: 1.5rem;
+  }
+
+  .manual-container h1 {
+    font-size: 1.5rem;
+  }
+
+  .manual-container h2 {
+    font-size: 1.25rem;
+  }
+
+  .manual-container table {
+    font-size: 0.8rem;
+  }
+
+  .manual-container th,
+  .manual-container td {
+    padding: 0.5rem;
+  }
+}

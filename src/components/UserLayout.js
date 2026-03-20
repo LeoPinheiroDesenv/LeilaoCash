@@ -64,7 +64,7 @@ const UserLayout = ({ children }) => {
     <div className="user-dashboard">
       <header className="dashboard-header">
         <div className="header-content">
-          <Link to="/" className="header-logo" target="_blank">
+          <Link to="/" state={{ reset: Date.now() }} className="header-logo">
             <img src={logoSrc} alt={settings.site_name || "VibeGet"} style={{height: '45px', width: 'auto', objectFit: 'contain'}} />
           </Link>
           <div className="header-actions">

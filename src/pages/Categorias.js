@@ -17,6 +17,8 @@ const Categorias = () => {
 
   const [formData, setFormData] = useState({
     name: '',
+    name_en: '',
+    name_es: '',
     slug: '',
     description: '',
     icon: '',
@@ -54,6 +56,8 @@ const Categorias = () => {
       setEditingCategory(category);
       setFormData({
         name: category.name || '',
+        name_en: category.name_en || '',
+        name_es: category.name_es || '',
         slug: category.slug || '',
         description: category.description || '',
         icon: category.icon || '',
@@ -64,6 +68,8 @@ const Categorias = () => {
       setEditingCategory(null);
       setFormData({
         name: '',
+        name_en: '',
+        name_es: '',
         slug: '',
         description: '',
         icon: '',
@@ -282,6 +288,31 @@ const Categorias = () => {
                     required
                     className="form-input"
                   />
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Nome em Inglês</label>
+                    <input
+                      type="text"
+                      name="name_en"
+                      value={formData.name_en}
+                      onChange={handleInputChange}
+                      className="form-input"
+                      placeholder="English name"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Nome em Espanhol</label>
+                    <input
+                      type="text"
+                      name="name_es"
+                      value={formData.name_es}
+                      onChange={handleInputChange}
+                      className="form-input"
+                      placeholder="Nombre en español"
+                    />
+                  </div>
                 </div>
 
                 <div className="form-group form-group-full">

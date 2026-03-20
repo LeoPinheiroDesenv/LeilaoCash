@@ -148,7 +148,7 @@ const AdminLayout = ({ children, pageTitle, pageSubtitle }) => {
       {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)}></div>}
       <aside className={`admin-sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
-          <Link to="/" className="sidebar-logo" target="_blank">
+          <Link to="/" state={{ reset: Date.now() }} className="sidebar-logo">
             <img src={logoSrc} alt={settings.site_name || "VibeGet"} style={{height: '45px', width: 'auto', objectFit: 'contain'}} />
           </Link>
         </div>
@@ -215,7 +215,7 @@ const AdminLayout = ({ children, pageTitle, pageSubtitle }) => {
             </div>
           </div>
           <div className="sidebar-actions">
-            <Link to="/" className="btn-ver-site">Ver Site</Link>
+            <Link to="/" state={{ reset: Date.now() }} className="btn-ver-site">Ver Site</Link>
             <button className="btn-logout" onClick={handleLogout} title="Sair">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -232,7 +232,7 @@ const AdminLayout = ({ children, pageTitle, pageSubtitle }) => {
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
           </button>
           <div className="mobile-logo-container">
-            <Link to="/" className="sidebar-logo">
+            <Link to="/" state={{ reset: Date.now() }} className="sidebar-logo">
               <img src={logoSrc} alt={settings.site_name || "VibeGet"} style={{height: '35px', width: 'auto', objectFit: 'contain'}} />
             </Link>
           </div>

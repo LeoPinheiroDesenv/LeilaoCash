@@ -488,30 +488,25 @@ const Configuracoes = () => {
 
   // Lista de grupos de texto para o submenu
   const textGroups = [
-    { id: 'header', label: 'Cabeçalho' },
-    { id: 'hero', label: 'Hero (Home)' },
-    { id: 'common', label: 'Geral' },
-    { id: 'home', label: 'Página Inicial' },
-    { id: 'footer', label: 'Rodapé' },
-    { id: 'auth', label: 'Autenticação' },
-    { id: 'dashboard', label: 'Painel' },
-    { id: 'products', label: 'Produtos' },
-    { id: 'auctions', label: 'Leilões' },
-    { id: 'contact', label: 'Contato' },
-    { id: 'about', label: 'Sobre Nós' },
-    { id: 'faq', label: 'FAQ' },
-    { id: 'terms', label: 'Termos de Uso' },
-    { id: 'privacy', label: 'Privacidade' },
-    { id: 'rules', label: 'Regras' },
-    { id: 'how_it_works', label: 'Como Funciona' },
-    { id: 'why_choose_us', label: 'Por que comprar na VibeGet?' },
-    { id: 'page_como_funciona', label: 'Página Como Funciona' },
-    { id: 'page_contato', label: 'Página Contato' },
-    { id: 'page_termos', label: 'Página Termos' },
-    { id: 'page_privacidade', label: 'Página Privacidade' },
-    { id: 'page_regras', label: 'Página Regras' },
-    { id: 'page_faq', label: 'Página FAQ' },
-    { id: 'page_suba_de_nivel', label: 'Página Suba de Nível' }
+    // Traduções de Interface
+    { id: 'header', label: '🧭 Cabeçalho', type: 'translation', description: 'Menu de navegação superior' },
+    { id: 'footer', label: '🦶 Rodapé', type: 'translation', description: 'Rodapé do site' },
+    { id: 'hero', label: '🎯 Hero', type: 'translation', description: 'Banner principal da homepage' },
+    { id: 'home', label: '🏠 Página Inicial', type: 'translation', description: 'Seções da homepage' },
+    { id: 'why_choose_us', label: '⭐ Por Que Escolher', type: 'translation', description: 'Cards de benefícios' },
+    { id: 'products', label: '📦 Produtos', type: 'translation', description: 'Página de produtos e leilões' },
+    { id: 'contact', label: '📧 Contato', type: 'translation', description: 'Formulário de contato' },
+    { id: 'auth', label: '🔐 Autenticação', type: 'translation', description: 'Login, cadastro, recuperação de senha' },
+    { id: 'auctions', label: '🏷️ Leilões', type: 'translation', description: 'Página de leilões públicos' },
+    { id: 'common', label: '🔧 Textos Comuns', type: 'translation', description: 'Botões, mensagens genéricas' },
+    { id: 'separator', label: '─────────────────', type: 'separator' },
+    // Páginas HTML Completas (Traduções de Conteúdo)
+    { id: 'how_it_works', label: '📖 Como Funciona', type: 'translation', description: 'Conteúdo da página institucional' },
+    { id: 'terms', label: '📜 Termos de Uso', type: 'translation', description: 'Conteúdo dos termos e condições' },
+    { id: 'privacy', label: '🔒 Privacidade', type: 'translation', description: 'Conteúdo da política de privacidade' },
+    { id: 'rules', label: '⚖️ Regras', type: 'translation', description: 'Conteúdo das regras dos leilões' },
+    { id: 'faq', label: '❓ FAQ', type: 'translation', description: 'Conteúdo de perguntas frequentes' },
+    { id: 'level_up', label: '🚀 Suba de Nível', type: 'translation', description: 'Conteúdo do sistema de níveis' }
   ];
 
   if (loading) {
@@ -574,15 +569,32 @@ const Configuracoes = () => {
         {/* Submenu para Textos */}
         {activeTab === 'textos' && (
           <div className="text-sub-tabs">
-            {textGroups.map(group => (
-              <button
-                key={group.id}
-                className={`text-tab-button ${activeTextGroup === group.id ? 'active' : ''}`}
-                onClick={() => setActiveTextGroup(group.id)}
-              >
-                {group.label}
-              </button>
-            ))}
+            {textGroups.map(group => {
+              if (group.type === 'separator') {
+                return (
+                  <div key={group.id} style={{ 
+                    width: '100%', 
+                    textAlign: 'center', 
+                    color: 'rgba(255,255,255,0.2)', 
+                    fontSize: '0.7rem',
+                    padding: '0.5rem 0',
+                    userSelect: 'none'
+                  }}>
+                    PÁGINAS HTML
+                  </div>
+                );
+              }
+              return (
+                <button
+                  key={group.id}
+                  className={`text-tab-button ${activeTextGroup === group.id ? 'active' : ''}`}
+                  onClick={() => setActiveTextGroup(group.id)}
+                  title={group.description}
+                >
+                  {group.label}
+                </button>
+              );
+            })}
           </div>
         )}
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import ProductSection from '../components/ProductSection';
 import api from '../services/api';
@@ -20,7 +21,15 @@ const calculateTimeRemaining = (endDate) => {
 };
 
 const PublicAuctions = ({ searchTerm }) => {
+  const { t, i18n } = useTranslation();
   const { getText } = useTheme();
+
+  const getCategoryName = (cat) => {
+    const lang = i18n.language;
+    if (lang === 'en' && cat.name_en) return cat.name_en;
+    if (lang === 'es' && cat.name_es) return cat.name_es;
+    return cat.name;
+  };
   const [loading, setLoading] = useState(true);
   const [auctions, setAuctions] = useState([]);
   const [error, setError] = useState(null);
@@ -109,9 +118,9 @@ const PublicAuctions = ({ searchTerm }) => {
     <div className="public-auctions-page">
       <div className="container">
         <div className="page-header">
-          <h1>{getText('text_auctions_title', 'Todos os Leilões')}</h1>
+          <h1>{t('auctions.title', 'Todos os Leilões')}</h1>
 
-          <p className="corrije_sub">{getText('text_auctions_subtitle', '')}</p>
+          <p className="corrije_sub">{t('auctions.subtitle', '')}</p>
         </div>
 
         <div className="filters-bar">
@@ -120,9 +129,9 @@ const PublicAuctions = ({ searchTerm }) => {
             onChange={(e) => setFilters({...filters, category_id: e.target.value})}
             className="category-select"
           >
-            <option value="">{getText('text_all_categories', 'Todas as Categorias')}</option>
+            <option value="">{t('auctions.all_categories', 'Todas as Categorias')}</option>
             {categories.map(cat => (
-              <option key={cat.id} value={cat.id}>{cat.name}</option>
+              <option key={cat.id} value={cat.id}>{getCategoryName(cat)}</option>
             ))}
           </select>
         </div>
@@ -130,16 +139,16 @@ const PublicAuctions = ({ searchTerm }) => {
         {loading ? (
           <div className="loading-container">
             <div className="spinner"></div>
-            <p>{getText('text_loading', 'Carregando...')}</p>
+            <p>{t('common.loading', 'Carregando...')}</p>
           </div>
         ) : error ? (
           <div className="error-container">
             <p>{error}</p>
-            <button onClick={loadAuctions} className="btn-retry">{getText('text_try_again', 'Tentar Novamente')}</button>
+            <button onClick={loadAuctions} className="btn-retry">{t('common.try_again', 'Tentar Novamente')}</button>
           </div>
         ) : auctions.length === 0 ? (
           <div className="empty-state">
-            <p>{getText('text_no_auctions', 'Nenhum leilão encontrado com os filtros selecionados.')}</p>
+            <p>{t('auctions.no_auctions', 'Nenhum leilão encontrado com os filtros selecionados.')}</p>
           </div>
         ) : (
           <ProductSection 

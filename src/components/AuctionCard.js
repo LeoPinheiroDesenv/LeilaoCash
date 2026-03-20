@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import './auctionCard.css';
 
 const AuctionCard = ({ product }) => {
   const { getText } = useTheme();
+  const { t } = useTranslation();
   const [displayTimer, setDisplayTimer] = useState(product.timer || '00:00:00');
 
   useEffect(() => {
@@ -77,7 +79,7 @@ const AuctionCard = ({ product }) => {
           </div>
         </div>
         <div className="bottom-overlay">
-          <div className="timer-pills" aria-label={getText('text_time_remaining', 'Tempo restante')}>
+          <div className="timer-pills" aria-label={t('products.time_remaining')}>
             <span className="timer-pill">{hours}</span>
             <span className="timer-sep">:</span>
             <span className="timer-pill">{minutes}</span>
@@ -102,9 +104,9 @@ const AuctionCard = ({ product }) => {
               <path d="M23 21v-2a4 4 0 0 0-3-3"></path>
               <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
-            {product.bids} {getText('text_bids', 'lances')}
+            {product.bids} {t('products.bids')}
           </div>
-          <Link to={product.url} className="btn-view">{getText('text_ver_leilao', 'Ver Leilão')}</Link>
+          <Link to={product.url} className="btn-view">{t('products.view_auction')}</Link>
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import './Login.css';
@@ -12,6 +13,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   
   const { login, isAuthenticated, user } = useAuth();
+  const { t } = useTranslation();
   const { getText,getLogoUrl } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
@@ -53,8 +55,8 @@ const Login = () => {
                     <img src={logoSrc} alt="Logo" className="logo-full" />
                   </Link>
         <div className="auth-content">
-          <h1>{getText('text_login_title', 'Bem-vindo de volta')}</h1>
-          <p>{getText('text_login_subtitle', 'Entre na sua conta para continuar')}</p>
+          <h1>{t('auth.login_title', 'Bem-vindo de volta')}</h1>
+          <p>{t('auth.login_subtitle', 'Entre na sua conta para continuar')}</p>
           
           {error && (
             <div className="alert alert-error">
@@ -69,12 +71,12 @@ const Login = () => {
 
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
-              <label>{getText('text_email_label', 'Email')}</label>
+              <label>{t('auth.email_label', 'Email')}</label>
               <div className="input-wrapper">
 
                 <input
                   type="email"
-                  placeholder={getText('text_email_placeholder', 'seu@email.com')}
+                  placeholder={t('auth.email_placeholder', 'seu@email.com')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -83,8 +85,8 @@ const Login = () => {
             </div>
             <div className="form-group">
               <div className="label-row">
-                <label>{getText('text_password_label', 'Senha')}</label>
-                <Link to="/recuperar-senha" className="forgot-link">{getText('text_forgot_password_link', 'Esqueceu a senha?')}</Link>
+                <label>{t('auth.password_label', 'Senha')}</label>
+                <Link to="/recuperar-senha" className="forgot-link">{t('auth.forgot_password_link', 'Esqueceu a senha?')}</Link>
               </div>
               <div className="input-wrapper">
 
@@ -118,7 +120,7 @@ const Login = () => {
 
             </div>
             <button type="submit" className="btn-submit" disabled={loading}>
-              {loading ? getText('text_logging_in', 'Entrando...') : getText('text_login_button', 'Entrar')}
+              {loading ? t('auth.logging_in', 'Entrando...') : t('auth.login_button', 'Entrar')}
               {!loading && (
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <line x1="5" y1="12" x2="19" y2="12"/>
@@ -129,7 +131,7 @@ const Login = () => {
             
           </form>
           <p className="auth-footer">
-            {getText('text_no_account', 'Não tem uma conta?')} <Link to="/cadastro">{getText('text_signup_free', 'Cadastre-se grátis')}</Link>
+            {t('auth.no_account', 'Não tem uma conta?')} <Link to="/cadastro">{t('auth.signup_free', 'Cadastre-se grátis')}</Link>
           </p>
         </div>
       </div>

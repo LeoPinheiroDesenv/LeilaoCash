@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import './DynamicPage.css';
 
@@ -10,6 +11,7 @@ import './DynamicPage.css';
  */
 const DynamicPage = ({ contentKey, defaultTitle = 'Página', children }) => {
   const { getText, loading } = useTheme();
+  const { t } = useTranslation();
 
     // Função para limpar estilos rígidos de largura
     const cleanHtmlContent = (htmlString) => {
@@ -37,7 +39,7 @@ const DynamicPage = ({ contentKey, defaultTitle = 'Página', children }) => {
         <div className="container">
           <div className="loading-container">
             <div className="spinner"></div>
-            <p>Carregando conteúdo...</p>
+            <p>{t('common.loading_content', 'Carregando conteúdo...')}</p>
           </div>
         </div>
       </main>
@@ -45,7 +47,7 @@ const DynamicPage = ({ contentKey, defaultTitle = 'Página', children }) => {
   }
 
   // Usar o conteúdo da API (via getText que agora suporta traduções) se existir, caso contrário, exibir uma mensagem padrão.
-  const content = getText(contentKey) || `<h1>${defaultTitle}</h1><p>Nenhum conteúdo disponível para esta página no momento.</p>`;
+  const content = getText(contentKey) || `<h1>${defaultTitle}</h1><p>${t('common.no_content', 'Nenhum conteúdo disponível para esta página no momento.')}</p>`;
 
   return (
     <main className="page-content">

@@ -1,15 +1,17 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import './whyChooseUs.css';
 
 export default function WhyChooseUs() {
+  const { t } = useTranslation();
   const { getText } = useTheme();
 
   return (
     <section className="why-choose-us-section">
       <div className="container">
         <div className="why-header">
-          <h2>{getText('text_why_title', 'Por que comprar na LeilãoCash?')}</h2>
+          <h2>{t('why_choose_us.title')}</h2>
         </div>
         
         <div className="why-grid">
@@ -20,8 +22,8 @@ export default function WhyChooseUs() {
               </svg>
             </div>
             <div className="why-number">1</div>
-            <h3>{getText('text_why_card_1_title', 'Uma Nova Forma de Adquirir')}</h3>
-            <p>{getText('text_why_card_1_desc', 'Ao invés de comprar de forma convencional, você participa de uma Vibe interativa onde o Get que você está disposto a investir é o que define sua chance de ganhar. Isso transforma cada Vibe em uma experiência emocionante!')}</p>
+            <h3>{t('why_choose_us.card_1_title')}</h3>
+            <p>{t('why_choose_us.card_1_desc')}</p>
           </div>
 
           <div className="why-card">
@@ -32,8 +34,8 @@ export default function WhyChooseUs() {
               </svg>
             </div>
             <div className="why-number">2</div>
-            <h3>{getText('text_why_card_2_title', 'Cash Back Sempre ao Seu Lado')}</h3>
-            <p>{getText('text_why_card_2_desc', 'Não importa se você ganha ou perde a Vibe, você sempre ganha Cash back! Mesmo não sendo o Champion Get, você recebe 40% de volta do valor que investiu, para continuar participando de mais Vibes. Mais oportunidades, mais chances de ganhar!')}</p>
+            <h3>{t('why_choose_us.card_2_title')}</h3>
+            <p>{t('why_choose_us.card_2_desc')}</p>
           </div>
 
           <div className="why-card">
@@ -45,8 +47,8 @@ export default function WhyChooseUs() {
               </svg>
             </div>
             <div className="why-number">3</div>
-            <h3>{getText('text_why_card_3_title', 'Produtos Cobiçados')}</h3>
-            <p>{getText('text_why_card_3_desc', 'Oferecemos uma ampla variedade de produtos que atendem aos mais diversos gostos. A cada Vibe, você tem a chance de adquirir itens que são realmente desejados por todos.')}</p>
+            <h3>{t('why_choose_us.card_3_title')}</h3>
+            <p>{t('why_choose_us.card_3_desc')}</p>
           </div>
 
           <div className="why-card">
@@ -56,8 +58,8 @@ export default function WhyChooseUs() {
               </svg>
             </div>
             <div className="why-number">4</div>
-            <h3>{getText('text_why_card_4_title', 'Agilidade e Praticidade')}</h3>
-            <p>{getText('text_why_card_4_desc', 'Nosso cadastro é rápido e gratuito, e a recarga de crédito pode ser feita de forma simples por Pix ou Cartão de Crédito. Tudo é feito para ser rápido, seguro e sem complicação, permitindo que você participe de Vibes sem perder tempo.')}</p>
+            <h3>{t('why_choose_us.card_4_title')}</h3>
+            <p>{t('why_choose_us.card_4_desc')}</p>
           </div>
         </div>
       </div>

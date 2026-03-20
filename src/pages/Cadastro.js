@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 import { useTheme } from '../contexts/ThemeContext';
 import './Cadastro.css';
 
 const Cadastro = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { getText, getLogoUrl } = useTheme();
   const [formData, setFormData] = useState({
     nome: '',
@@ -102,10 +104,10 @@ const Cadastro = () => {
   };
 
   const benefits = [
-    { icon: '💰', text: getText('text_benefit_cashback', 'Cashback em cada lance') },
-    { icon: '💸', text: getText('text_benefit_economy', 'Economize até 90%') },
-    { icon: '✅', text: getText('text_benefit_guarantee', 'Produtos garantidos') },
-    { icon: '🛡️', text: getText('text_benefit_support', 'Suporte 24/7') }
+    { icon: '💰', text: t('auth.benefit_cashback', 'Cashback em cada lance') },
+    { icon: '💸', text: t('auth.benefit_economy', 'Economize até 90%') },
+    { icon: '✅', text: t('auth.benefit_guarantee', 'Produtos garantidos') },
+    { icon: '🛡️', text: t('auth.benefit_support', 'Suporte 24/7') }
   ];
 
   return (
@@ -115,8 +117,8 @@ const Cadastro = () => {
                     <img src={logoSrc} alt="Logo" className="logo-full" />
                   </Link>
         <div className="auth-content">
-          <h1>{getText('text_signup_title', 'Criar Conta')}</h1>
-          <p>{getText('text_signup_subtitle', 'Junte-se a milhares de usuários')}</p>
+          <h1>{t('auth.signup_title', 'Criar Conta')}</h1>
+          <p>{t('auth.signup_subtitle', 'Junte-se a milhares de usuários')}</p>
           
           <div className="benefits-grid">
             {benefits.map((benefit, index) => (
@@ -132,13 +134,13 @@ const Cadastro = () => {
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-row">
               <div className="form-group">
-                <label>{getText('text_fullname_label', 'Nome completo')}</label>
+                <label>{t('auth.fullname_label', 'Nome completo')}</label>
                 <div className="input-wrapper">
                   
                   <input
                     type="text"
                     name="nome"
-                    placeholder={getText('text_fullname_placeholder', 'João Silva')}
+                    placeholder={t('auth.fullname_placeholder', 'João Silva')}
                     value={formData.nome}
                     onChange={handleChange}
                     required
@@ -146,13 +148,13 @@ const Cadastro = () => {
                 </div>
               </div>
               <div className="form-group">
-                <label>{getText('text_email_label', 'Email')}</label>
+                <label>{t('auth.email_label', 'Email')}</label>
                 <div className="input-wrapper">
                   
                   <input
                     type="email"
                     name="email"
-                    placeholder={getText('text_email_placeholder', 'seu@email.com')}
+                    placeholder={t('auth.email_placeholder', 'seu@email.com')}
                     value={formData.email}
                     onChange={handleChange}
                     required
@@ -162,7 +164,7 @@ const Cadastro = () => {
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label>{getText('text_phone_label', 'Telefone')}</label>
+                <label>{t('auth.phone_label', 'Telefone')}</label>
                 <div className="input-wrapper">
                   
                   <input
@@ -176,7 +178,7 @@ const Cadastro = () => {
                 </div>
               </div>
               <div className="form-group">
-                <label>{getText('text_cpf_label', 'CPF')}</label>
+                <label>{t('auth.cpf_label', 'CPF')}</label>
                 <div className="input-wrapper">
                   
                   <input
@@ -192,7 +194,7 @@ const Cadastro = () => {
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label>{getText('text_password_label', 'Senha')}</label>
+                <label>{t('auth.password_label', 'Senha')}</label>
                 <div className="input-wrapper">
                   
                   <input
@@ -225,7 +227,7 @@ const Cadastro = () => {
                 </div>
               </div>
               <div className="form-group">
-                <label>{getText('text_confirm_password_label', 'Confirmar senha')}</label>
+                <label>{t('auth.confirm_password_label', 'Confirmar senha')}</label>
                 <div className="input-wrapper">
                   
                   <input
@@ -267,11 +269,11 @@ const Cadastro = () => {
                   onChange={(e) => setAcceptTerms(e.target.checked)}
                   required
                 />
-                <span>{getText('text_accept_terms_prefix', 'Li e aceito os')} <Link to="/termos">{getText('text_terms_of_use', 'Termos de Uso')}</Link> {getText('text_and', 'e')} <Link to="/privacidade">{getText('text_privacy_policy', 'Política de Privacidade')}</Link></span>
+                <span>{t('auth.accept_terms_prefix', 'Li e aceito os')} <Link to="/termos">{t('auth.terms_of_use', 'Termos de Uso')}</Link> {t('auth.and', 'e')} <Link to="/privacidade">{t('auth.privacy_policy', 'Política de Privacidade')}</Link></span>
               </label>
             </div>
             <button type="submit" className="btn-submit" disabled={!acceptTerms || loading}>
-              {loading ? getText('text_creating_account', 'Criando conta...') : getText('text_create_account_button', 'Criar Conta')}
+              {loading ? t('auth.creating_account', 'Criando conta...') : t('auth.create_account_button', 'Criar Conta')}
               {!loading && (
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <line x1="5" y1="12" x2="19" y2="12"/>
@@ -281,7 +283,7 @@ const Cadastro = () => {
             </button>
           </form>
           <p className="auth-footer">
-            {getText('text_already_have_account', 'Já tem uma conta?')} <Link to="/login">{getText('text_login_button', 'Fazer login')}</Link>
+            {t('auth.already_have_account', 'Já tem uma conta?')} <Link to="/login">{t('auth.do_login', 'Fazer login')}</Link>
           </p>
         </div>
       </div>

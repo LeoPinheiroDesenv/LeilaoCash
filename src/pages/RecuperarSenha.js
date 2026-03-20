@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import api from '../services/api';
 import './RecuperarSenha.css';
@@ -9,6 +10,7 @@ const RecuperarSenha = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
   const { getText, getLogoUrl } = useTheme();
   const logoSrc = getLogoUrl();
 
@@ -40,8 +42,8 @@ const RecuperarSenha = () => {
                     <img src={logoSrc} alt="Logo" className="logo-full" />
                   </Link>
         <div className="auth-content">
-          <h1>{getText('text_recover_password_title', 'Recuperar Senha')}</h1>
-          <p>{getText('text_recover_password_subtitle', 'Insira seu email para receber o link de redefinição.')}</p>
+          <h1>{t('auth.recover_password_title', 'Recuperar Senha')}</h1>
+          <p>{t('auth.recover_password_subtitle', 'Insira seu email para receber o link de redefinição.')}</p>
           
           {message && (
             <div className="alert alert-success">
@@ -56,12 +58,12 @@ const RecuperarSenha = () => {
 
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
-              <label>{getText('text_email_label', 'Email')}</label>
+              <label>{t('auth.email_label', 'Email')}</label>
               <div className="input-wrapper">
                 
                 <input
                   type="email"
-                  placeholder={getText('text_email_placeholder', 'seu@email.com')}
+                  placeholder={t('auth.email_placeholder', 'seu@email.com')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -69,11 +71,11 @@ const RecuperarSenha = () => {
               </div>
             </div>
             <button type="submit" className="btn-submit" disabled={loading}>
-              {loading ? getText('text_sending_link', 'Enviando link...') : getText('text_send_link_button', 'Enviar Link')}
+              {loading ? t('auth.sending_link', 'Enviando link...') : t('auth.send_link_button', 'Enviar Link')}
             </button>
           </form>
           <p className="auth-footer">
-            {getText('text_remembered_password', 'Lembrou a senha?')} <Link to="/login">{getText('text_login_button', 'Fazer login')}</Link>
+            {t('auth.remembered_password', 'Lembrou a senha?')} <Link to="/login">{t('auth.do_login', 'Fazer login')}</Link>
           </p>
         </div>
       </div>
