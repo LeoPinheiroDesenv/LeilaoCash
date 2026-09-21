@@ -44,7 +44,15 @@ class BrandController extends Controller
             ], 422);
         }
 
-        $brand = Brand::create($request->all());
+        $data = $request->all();
+        if (!\Schema::hasColumn('brands', 'slug')) {
+            unset($data['slug']);
+        }
+        if (!\Schema::hasColumn('brands', 'meta_keywords')) {
+            unset($data['meta_keywords']);
+        }
+
+        $brand = Brand::create($data);
 
         return response()->json([
             'success' => true,
@@ -94,7 +102,15 @@ class BrandController extends Controller
             ], 422);
         }
 
-        $brand->update($request->all());
+        $updateData = $request->all();
+        if (!\Schema::hasColumn('brands', 'slug')) {
+            unset($updateData['slug']);
+        }
+        if (!\Schema::hasColumn('brands', 'meta_keywords')) {
+            unset($updateData['meta_keywords']);
+        }
+
+        $brand->update($updateData);
 
         return response()->json([
             'success' => true,

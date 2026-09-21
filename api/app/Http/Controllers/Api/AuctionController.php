@@ -214,7 +214,7 @@ class AuctionController extends Controller
 
             try {
                 // Criar leilão
-                $auction = Auction::create([
+                $auctionData = [
                     'title' => $request->title,
                     'description' => $request->description,
                     'status' => $request->status ?? 'draft',
@@ -225,7 +225,13 @@ class AuctionController extends Controller
                     'bid_increment' => $request->bid_increment ?? 1.00,
                     'min_bids' => $request->min_bids ?? 0,
                     'cashback_percentage' => $request->cashback_percentage ?? 0,
-                ]);
+                ];
+
+                if (\Schema::hasColumn('auctions', 'meta_keywords') && $request->has('meta_keywords')) {
+                    $auctionData['meta_keywords'] = $request->meta_keywords;
+                }
+
+                $auction = Auction::create($auctionData);
 
                 // Associar produtos ao leilão
                 Product::whereIn('id', $productIds)->update([
@@ -335,7 +341,11 @@ class AuctionController extends Controller
             $newStatus = $request->status;
 
             // Atualizar outros campos
-            $auction->update($request->except('product_ids'));
+            $updateData = $request->except('product_ids');
+            if (!\Schema::hasColumn('auctions', 'meta_keywords')) {
+                unset($updateData['meta_keywords']);
+            }
+            $auction->update($updateData);
 
             // Se o leilão foi finalizado e tem um vencedor, incrementar vitórias do usuário
             if ($oldStatus !== 'finished' && $newStatus === 'finished' && $auction->winner_id) {
@@ -507,11 +517,152 @@ class AuctionController extends Controller
      */
     private function getLevelName($wins)
     {
-        if ($wins >= 14) return 'Platina';
-        if ($wins >= 12) return 'Diamante';
-        if ($wins >= 9)  return 'Ouro';
-        if ($wins >= 5)  return 'Prata';
+        if ($wins >= 15) return 'Diamond';
+        if ($wins >= 13) return 'Platinum';
+        if ($wins >= 10) return 'Gold';
+        if ($wins >= 5)  return 'Silver';
         if ($wins >= 1)  return 'Bronze';
         return 'Inscrito';
+    }
+
+    /**
+     * Atualizar dados de pós-venda de uma Vibe encerrada
+     */
+    public function updatePostSale(Request $request, $id)
+    {
+        try {
+            $auction = Auction::findOrFail($id);
+
+            if ($auction->status !== 'finished') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Apenas Vibes encerradas podem ter dados de pós-venda.'
+                ], 422);
+            }
+
+            $fillable = [
+                'post_sale_status', 'winner_choice', 'shipping_address',
+                'shipping_supplier', 'shipping_date', 'shipping_cost',
+                'shipping_tracking', 'post_sale_notes'
+            ];
+
+            foreach ($fillable as $field) {
+                if ($request->has($field) && \Schema::hasColumn('auctions', $field)) {
+                    $auction->$field = $request->input($field);
+                }
+            }
+
+            $auction->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Dados de pós-venda atualizados.',
+                'data' => $auction->load('winner', 'products')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao atualizar pós-venda.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Encerrar Vibe manualmente (admin)
+     */
+    public function closeVibe($id)
+    {
+        try {
+            $auction = Auction::findOrFail($id);
+
+            if ($auction->status !== 'active') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Apenas Vibes ativas podem ser encerradas.'
+                ], 422);
+            }
+
+            // Usar o mesmo comando
+            \Artisan::call('vibes:close-expired', [], new \Symfony\Component\Console\Output\NullOutput());
+
+            // Se o comando não encerrou (porque não expirou), forçar
+            $auction->refresh();
+            if ($auction->status === 'active') {
+                // Forçar encerramento
+                $championBid = Bid::where('auction_id', $auction->id)
+                    ->orderByDesc('amount')
+                    ->first();
+
+                $totalGets = Bid::where('auction_id', $auction->id)->sum('amount');
+
+                $auction->status = 'finished';
+                if (\Schema::hasColumn('auctions', 'closed_at')) {
+                    $auction->closed_at = now();
+                    $auction->total_gets_amount = $totalGets;
+                }
+
+                if ($championBid) {
+                    $auction->winner_id = $championBid->user_id;
+                    $auction->current_bid = $championBid->amount;
+                    if (\Schema::hasColumn('auctions', 'champion_get_amount')) {
+                        $auction->champion_get_amount = $championBid->amount;
+                    }
+                    if (\Schema::hasColumn('auctions', 'post_sale_status')) {
+                        $auction->post_sale_status = 'pending_contact';
+                    }
+
+                    Bid::where('auction_id', $auction->id)->update(['is_winning' => false]);
+                    $championBid->is_winning = true;
+                    $championBid->save();
+
+                    $winner = User::find($championBid->user_id);
+                    if ($winner) {
+                        $winner->auctions_won = ($winner->auctions_won ?? 0) + 1;
+                        $winner->save();
+                        if (method_exists($winner, 'recalculateViberLevel')) {
+                            $winner->recalculateViberLevel();
+                        }
+                    }
+                }
+
+                $auction->save();
+
+                // Creditar perdedores
+                $losingBids = Bid::where('auction_id', $auction->id)
+                    ->where('is_winning', false)
+                    ->get();
+
+                foreach ($losingBids as $bid) {
+                    $user = User::find($bid->user_id);
+                    if (!$user) continue;
+                    $cashbackAmount = round($bid->amount * 0.40, 2);
+                    if ($cashbackAmount > 0) {
+                        $user->cashback_balance += $cashbackAmount;
+                        $user->save();
+                        Transaction::create([
+                            'user_id' => $user->id,
+                            'type' => 'cashback',
+                            'amount' => $cashbackAmount,
+                            'status' => 'completed',
+                            'description' => "GetCoin: 40% de retorno na Vibe \"{$auction->title}\"",
+                            'auction_id' => $auction->id,
+                        ]);
+                    }
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Vibe encerrada com sucesso.',
+                'data' => $auction->load('winner', 'products')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao encerrar Vibe.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

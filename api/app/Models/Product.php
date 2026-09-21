@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Product extends Model
 {
@@ -12,20 +13,21 @@ class Product extends Model
 
     protected $fillable = [
         'name',
+        'slug',
         'description',
         'category',
         'category_id',
         'price',
         'image_url',
         'images',
-        'brand', // Mantido para compatibilidade temporária
-        'model', // Mantido para compatibilidade temporária
+        'brand',
+        'model',
         'brand_id',
         'product_model_id',
         'specifications',
+        'meta_keywords',
         'is_active',
         'auction_id',
-
     ];
 
     protected function casts(): array
@@ -36,6 +38,45 @@ class Product extends Model
             'specifications' => 'array',
             'is_active' => 'boolean',
         ];
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($product) {
+            if (empty($product->slug) && \Schema::hasColumn('products', 'slug')) {
+                $product->slug = static::generateUniqueSlug($product->name);
+            }
+        });
+
+        static::updating(function ($product) {
+            if (\Schema::hasColumn('products', 'slug') && $product->isDirty('name') && !$product->isDirty('slug')) {
+                $product->slug = static::generateUniqueSlug($product->name, $product->id);
+            }
+        });
+    }
+
+    public static function generateUniqueSlug(string $name, ?int $excludeId = null): string
+    {
+        $base = Str::slug($name);
+        if (empty($base)) {
+            $base = 'produto';
+        }
+        $slug = $base;
+        $i = 1;
+        $query = static::withTrashed()->where('slug', $slug);
+        if ($excludeId) {
+            $query->where('id', '!=', $excludeId);
+        }
+        while ($query->exists()) {
+            $slug = $base . '-' . $i++;
+            $query = static::withTrashed()->where('slug', $slug);
+            if ($excludeId) {
+                $query->where('id', '!=', $excludeId);
+            }
+        }
+        return $slug;
     }
 
     /**

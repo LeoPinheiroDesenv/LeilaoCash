@@ -90,7 +90,7 @@ const HomePage = ({ searchTerm, onSearch }) => {
                             timer: auction.end_date ? calculateTimeRemaining(auction.end_date) : '00:00:00',
                             remainingSeconds: auction.end_date ? Math.max(0, Math.floor((new Date(auction.end_date) - nowDate) / 1000)) : 0,
                             bids: auction.bids_count || '0',
-                            url: `/produto/${product.id}`,
+                            url: `/produto/${product.slug || product.id}`,
                             image: product.image_url
                                 ? (product.image_url.startsWith('http')
                                     ? product.image_url

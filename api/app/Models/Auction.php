@@ -13,9 +13,11 @@ class Auction extends Model
     protected $fillable = [
         'title',
         'description',
+        'meta_keywords',
         'status',
         'start_date',
         'end_date',
+        'closed_at',
         'starting_bid',
         'current_bid',
         'bid_increment',
@@ -23,7 +25,17 @@ class Auction extends Model
         'bids_count',
         'cashback_percentage',
         'winner_id',
-        'product_id', // Adicionado product_id que estava faltando no fillable
+        'product_id',
+        'champion_get_amount',
+        'total_gets_amount',
+        'post_sale_status',
+        'winner_choice',
+        'shipping_address',
+        'shipping_supplier',
+        'shipping_date',
+        'shipping_cost',
+        'shipping_tracking',
+        'post_sale_notes',
     ];
 
     protected function casts(): array

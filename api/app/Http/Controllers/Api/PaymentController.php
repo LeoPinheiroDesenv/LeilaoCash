@@ -370,6 +370,30 @@ class PaymentController extends Controller
                             if (!$user->transactions()->where('id', $transaction->id)->where('status', 'completed')->exists()) {
                                 $user->balance += $transaction->amount;
                                 $user->save();
+
+                                // Cashback Getcoin automático para recargas via Pix
+                                if ($transaction->payment_method === 'pix') {
+                                    $enabled = Setting::getValue('pix_cashback_enabled', 'true');
+                                    if ($enabled === 'true') {
+                                        $percentage = (float) Setting::getValue('pix_cashback_percentage', '10');
+                                        $percentage = max(0, min(100, $percentage));
+                                        $cashbackAmount = round($transaction->amount * ($percentage / 100), 2);
+
+                                        if ($cashbackAmount > 0) {
+                                            $user->cashback_balance += $cashbackAmount;
+                                            $user->save();
+
+                                            \App\Models\Transaction::create([
+                                                'user_id' => $user->id,
+                                                'type' => 'cashback',
+                                                'payment_method' => 'pix',
+                                                'amount' => $cashbackAmount,
+                                                'status' => 'completed',
+                                                'description' => "Getcoin: {$percentage}% de cashback na recarga Pix de R$ " . number_format($transaction->amount, 2, ',', '.'),
+                                            ]);
+                                        }
+                                    }
+                                }
                             }
                         }
                         $transaction->save();

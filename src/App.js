@@ -41,7 +41,12 @@ import {
   DashboardUsuarioMeusFavoritos
 } from './pages/DashboardUsuarioPages';
 
+import GetcoinMarketplace from './pages/GetcoinMarketplace';
+
 import Manual from './pages/Manual';
+import Paginas from './pages/Paginas';
+import CustomPage from './pages/CustomPage';
+import Logs from './pages/Logs';
 
 function App() {
   const [searchTerm, setSearchTerm] = React.useState('');
@@ -125,6 +130,16 @@ function App() {
                 <DashboardAdminContatos />
               </ProtectedRoute>
             } />
+            <Route path="/dashboard/paginas" element={
+              <ProtectedRoute adminOnly={true}>
+                <Paginas />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/logs" element={
+              <ProtectedRoute adminOnly={true}>
+                <Logs />
+              </ProtectedRoute>
+            } />
             
             {/* Rotas de Configurações */}
             <Route path="/dashboard/configuracoes" element={<Navigate to="/dashboard/configuracoes/layout" replace />} />
@@ -165,6 +180,11 @@ function App() {
                 <DashboardUsuarioMeuCashback />
               </ProtectedRoute>
             } />
+            <Route path="/dashboard/getcoin-marketplace" element={
+              <ProtectedRoute>
+                <GetcoinMarketplace />
+              </ProtectedRoute>
+            } />
             <Route path="/dashboard/meus-favoritos" element={
               <ProtectedRoute>
                 <DashboardUsuarioMeusFavoritos />
@@ -174,7 +194,7 @@ function App() {
             {/* Rotas públicas */}
             <Route path="/" element={<Layout onSearch={handleSearch}><HomePage searchTerm={searchTerm} onSearch={handleSearch} /></Layout>} />
             <Route path="/leiloes" element={<Layout onSearch={handleSearch}><PublicAuctions searchTerm={searchTerm} /></Layout>} />
-            <Route path="/produto/:id" element={<Layout onSearch={handleSearch}><ProductPage /></Layout>} />
+            <Route path="/produto/:slug" element={<Layout onSearch={handleSearch}><ProductPage /></Layout>} />
             <Route path="/suba-de-nivel" element={<Layout onSearch={handleSearch}><SubaDeNivel /></Layout>} />
             <Route path="/como-funciona" element={<Layout onSearch={handleSearch}><ComoFunciona /></Layout>} />
             <Route path="/contato" element={<Layout onSearch={handleSearch}><Contato /></Layout>} />
@@ -183,6 +203,7 @@ function App() {
             <Route path="/privacidade" element={<Layout onSearch={handleSearch}><Privacidade /></Layout>} />
             <Route path="/regras" element={<Layout onSearch={handleSearch}><Regras /></Layout>} />
             <Route path="/manual" element={<Layout onSearch={handleSearch}><Manual /></Layout>} />
+            <Route path="/p/:slug" element={<Layout onSearch={handleSearch}><CustomPage /></Layout>} />
           </Routes>
         </div>
       </AuthProvider>

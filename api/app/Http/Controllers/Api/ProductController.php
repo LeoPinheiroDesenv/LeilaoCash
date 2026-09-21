@@ -93,7 +93,7 @@ class ProductController extends Controller
     public function show($id)
     {
         try {
-            $product = Product::with([
+            $query = Product::with([
                 'auction.bids' => function($query) {
                     $query->latest()->limit(10)->with('user:id,name');
                 },
@@ -101,7 +101,23 @@ class ProductController extends Controller
                 'categoryModel',
                 'brandModel',
                 'productModel'
-            ])->findOrFail($id);
+            ]);
+
+            if (is_numeric($id)) {
+                $product = $query->findOrFail($id);
+            } else {
+                $product = $query->where('slug', $id)->firstOrFail();
+            }
+
+            // Se a Vibe estiver ativa, ocultar Gets individuais (regra de negócio)
+            // Ninguém vê valores individuais até a Vibe encerrar
+            if ($product->auction && $product->auction->status === 'active') {
+                $auction = $product->auction;
+                // Remover bids individuais - manter apenas contagem e somatória
+                $product->auction->setRelation('bids', collect([]));
+                // Ocultar current_bid (maior Get) durante a Vibe ativa
+                $product->auction->makeHidden(['current_bid']);
+            }
 
             return response()->json([
                 'success' => true,
@@ -152,6 +168,14 @@ class ProductController extends Controller
             }
 
             $data = $request->except(['image', 'additional_images']);
+
+            // Remove campos que podem não existir na tabela ainda
+            if (!\Schema::hasColumn('products', 'slug')) {
+                unset($data['slug']);
+            }
+            if (!\Schema::hasColumn('products', 'meta_keywords')) {
+                unset($data['meta_keywords']);
+            }
 
             if (isset($data['is_active'])) {
                 $data['is_active'] = filter_var($data['is_active'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? true;
@@ -256,6 +280,14 @@ class ProductController extends Controller
             }
 
             $data = $request->except(['image', 'additional_images']);
+
+            // Remove campos que podem não existir na tabela ainda
+            if (!\Schema::hasColumn('products', 'slug')) {
+                unset($data['slug']);
+            }
+            if (!\Schema::hasColumn('products', 'meta_keywords')) {
+                unset($data['meta_keywords']);
+            }
 
             if (isset($data['is_active'])) {
                 $data['is_active'] = filter_var($data['is_active'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? $product->is_active;
@@ -366,6 +398,43 @@ class ProductController extends Controller
                 'success' => false,
                 'message' => 'Erro ao deletar produto',
                 'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Produtos relacionados (mesma categoria, com leilão ativo)
+     */
+    public function related($id)
+    {
+        try {
+            $product = is_numeric($id)
+                ? Product::findOrFail($id)
+                : Product::where('slug', $id)->firstOrFail();
+
+            $query = Product::where('id', '!=', $product->id)
+                ->where('is_active', true)
+                ->whereHas('auction', callback: fn($q) => $q->where('status', 'active'));
+
+            // Prioriza mesma categoria
+            if ($product->category_id) {
+                $query->orderByRaw('CASE WHEN category_id = ? THEN 0 ELSE 1 END', [$product->category_id]);
+            }
+
+            $related = $query->with(['auction', 'categoryModel'])
+                ->orderBy('created_at', 'desc')
+                ->limit(4)
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $related
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao buscar produtos relacionados',
+                'data' => []
             ], 500);
         }
     }

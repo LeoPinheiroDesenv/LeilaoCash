@@ -153,7 +153,7 @@ export const DashboardAdminLances = () => {
   };
 
   return (
-    <AdminLayout pageTitle="Lances" pageSubtitle="Visualize e gerencie todos os lances realizados">
+    <AdminLayout pageTitle="Gets" pageSubtitle="Visualize e gerencie todos os Gets realizados">
       <div className="content-header">
         
       </div>
@@ -268,7 +268,7 @@ export const DashboardAdminCashback = () => {
   };
 
   return (
-    <AdminLayout pageTitle="Cashback" pageSubtitle="Gerencie o sistema de cashback e pagamentos">
+    <AdminLayout pageTitle="GetCoin" pageSubtitle="Gerencie o sistema de GetCoin e pagamentos">
       <div className="content-header">
         <div>
          
@@ -608,39 +608,63 @@ export const DashboardAdminRelatorios = () => {
             </div>
             <div className="report-metrics">
               <div className="report-metric-item">
-                <p className="report-metric-label">Lances no Período</p>
+                <p className="report-metric-label">Gets no Período</p>
                 <p className="report-metric-value">{formatNumber(generalReport?.total_bids_period)}</p>
               </div>
               <div className="report-metric-item">
-                <p className="report-metric-label">Receita no Período</p>
-                <p className="report-metric-value">{formatPrice(generalReport?.total_revenue_period)}</p>
+                <p className="report-metric-label">Depósitos em R$</p>
+                <p className="report-metric-value">{formatPrice(generalReport?.total_deposits)}</p>
               </div>
               <div className="report-metric-item">
-                <p className="report-metric-label">Cashback no Período</p>
-                <p className="report-metric-value">{formatPrice(generalReport?.total_cashback_period)}</p>
+                <p className="report-metric-label">Depósitos no Período</p>
+                <p className="report-metric-value">{formatPrice(generalReport?.total_deposits_period)}</p>
               </div>
               <div className="report-metric-item">
-                <p className="report-metric-label">Total Usuários</p>
+                <p className="report-metric-label">R$ em Vibes Encerradas</p>
+                <p className="report-metric-value">{formatPrice(generalReport?.reais_in_vibes_finished)}</p>
+              </div>
+              <div className="report-metric-item">
+                <p className="report-metric-label">R$ Disponíveis (Vibers)</p>
+                <p className="report-metric-value">{formatPrice(generalReport?.reais_available_users)}</p>
+              </div>
+              <div className="report-metric-item">
+                <p className="report-metric-label">GetCoin Disponíveis (Vibers)</p>
+                <p className="report-metric-value">{formatPrice(generalReport?.getcoin_available_users)}</p>
+              </div>
+              <div className="report-metric-item">
+                <p className="report-metric-label">GetCoin em Vibes Encerradas</p>
+                <p className="report-metric-value">{formatPrice(generalReport?.getcoin_in_vibes_finished)}</p>
+              </div>
+              <div className="report-metric-item">
+                <p className="report-metric-label">Receita Total Vibes Encerradas</p>
+                <p className="report-metric-value">{formatPrice(generalReport?.receita_vibes_encerradas)}</p>
+              </div>
+              <div className="report-metric-item">
+                <p className="report-metric-label">Total Vibers</p>
                 <p className="report-metric-value">{formatNumber(generalReport?.total_users)}</p>
               </div>
               <div className="report-metric-item">
-                <p className="report-metric-label">Usuários Ativos</p>
+                <p className="report-metric-label">Vibers Ativos</p>
                 <p className="report-metric-value">{formatNumber(generalReport?.active_users)}</p>
               </div>
               <div className="report-metric-item">
-                <p className="report-metric-label">Leilões Ativos</p>
+                <p className="report-metric-label">Vibes Ativas</p>
                 <p className="report-metric-value">{formatNumber(generalReport?.active_auctions)}</p>
               </div>
               <div className="report-metric-item">
-                <p className="report-metric-label">Receita Total (Histórico)</p>
-                <p className="report-metric-value">{formatPrice(generalReport?.total_revenue)}</p>
+                <p className="report-metric-label">Vibes Encerradas</p>
+                <p className="report-metric-value">{formatNumber(generalReport?.finished_auctions)}</p>
+              </div>
+              <div className="report-metric-item">
+                <p className="report-metric-label">GetCoin Total Distribuído</p>
+                <p className="report-metric-value">{formatPrice(generalReport?.total_cashback)}</p>
               </div>
               <div className="report-metric-item">
                 <p className="report-metric-label">Saques Pendentes</p>
                 <p className="report-metric-value">{formatNumber(generalReport?.pending_withdrawals)}</p>
               </div>
               <div className="report-metric-item">
-                <p className="report-metric-label">Valor Pendente</p>
+                <p className="report-metric-label">Valor Pendente Saques</p>
                 <p className="report-metric-value">{formatPrice(generalReport?.pending_withdrawals_amount)}</p>
               </div>
             </div>
@@ -655,11 +679,11 @@ export const DashboardAdminRelatorios = () => {
             </div>
             <div className="report-metrics">
               <div className="report-metric-item">
-                <p className="report-metric-label">Lances Hoje</p>
+                <p className="report-metric-label">Gets Hoje</p>
                 <p className="report-metric-value">{formatNumber(todayMetrics?.bids_today)}</p>
               </div>
               <div className="report-metric-item">
-                <p className="report-metric-label">Lances Ontem</p>
+                <p className="report-metric-label">Gets Ontem</p>
                 <p className="report-metric-value">{formatNumber(todayMetrics?.bids_yesterday)}</p>
               </div>
               <div className="report-metric-item">
@@ -675,7 +699,7 @@ export const DashboardAdminRelatorios = () => {
                 <p className="report-metric-value">{formatPrice(todayMetrics?.revenue_today)}</p>
               </div>
               <div className="report-metric-item">
-                <p className="report-metric-label">Cashback Hoje</p>
+                <p className="report-metric-label">GetCoin Hoje</p>
                 <p className="report-metric-value">{formatPrice(todayMetrics?.cashback_today)}</p>
               </div>
             </div>

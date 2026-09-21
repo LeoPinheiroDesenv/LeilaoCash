@@ -160,6 +160,23 @@ Veja relatórios e métricas do sistema.
 
 Leia as mensagens enviadas pelos visitantes pelo formulário de contato.
 
+### Páginas
+
+Crie e gerencie páginas extras que aparecem no rodapé do site. Cada página pode ser adicionada à seção "Links Rápidos" ou "Legal".
+
+Para criar uma nova página:
+
+1. Acesse **Páginas** no menu lateral
+2. Clique em **"+ Nova Página"**
+3. Preencha o título em português (obrigatório), inglês e espanhol (opcionais)
+4. O campo "Slug" define o endereço da página (ex: "sobre-nos" gera o link /p/sobre-nos). Se deixar vazio, será gerado automaticamente a partir do título
+5. Escolha a seção do rodapé: **Links Rápidos** ou **Legal**
+6. Defina a ordem de exibição (números menores aparecem primeiro)
+7. Escreva o conteúdo usando o editor visual — há abas separadas para cada idioma (Português, Inglês, Espanhol)
+8. Clique em **"Criar Página"**
+
+A página aparecerá automaticamente no rodapé do site, na seção escolhida. Para editar ou excluir, use os botões na listagem.
+
 ---
 
 ## Configurações do Site

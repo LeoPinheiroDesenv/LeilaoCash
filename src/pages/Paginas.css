@@ -132,6 +132,11 @@
   border-bottom-color: transparent;
 }
 
+.input-error {
+  border-color: #E55F52 !important;
+  box-shadow: 0 0 0 1px rgba(229, 95, 82, 0.3);
+}
+
 @media (max-width: 768px) {
   .form-row {
     flex-direction: column;

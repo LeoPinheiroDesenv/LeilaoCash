@@ -78,7 +78,7 @@ const SearchAutocomplete = ({ placeholder, onSearch, minChars = 3 }) => {
         setShowSuggestions(false);
 
         // Navega direto para a página do produto usando o ID
-        navigate(`/produto/${product.id}`);
+        navigate(`/produto/${product.slug || product.id}`);
 
         // Opcional: Avisa o componente pai que uma busca foi feita
         if (onSearch) onSearch(product.name);

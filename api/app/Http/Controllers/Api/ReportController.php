@@ -51,6 +51,27 @@ class ReportController extends Controller
                 'pending_withdrawals_amount' => Transaction::where('type', 'withdrawal')
                     ->where('status', 'pending')
                     ->sum('amount'),
+
+                // Novos campos detalhados
+                'total_deposits' => Transaction::where('type', 'deposit')
+                    ->where('status', 'completed')
+                    ->sum('amount'),
+                'total_deposits_period' => Transaction::where('type', 'deposit')
+                    ->where('status', 'completed')
+                    ->whereBetween('created_at', [$dateFrom, $dateTo])
+                    ->sum('amount'),
+                'reais_in_vibes_finished' => Bid::whereHas('auction', function($q) {
+                        $q->where('status', 'finished');
+                    })->sum('amount'),
+                'reais_available_users' => User::sum('balance'),
+                'getcoin_available_users' => User::sum('cashback_balance'),
+                'getcoin_in_vibes_finished' => Transaction::where('type', 'cashback')
+                    ->where('status', 'completed')
+                    ->whereNotNull('auction_id')
+                    ->sum('amount'),
+                'receita_vibes_encerradas' => Bid::whereHas('auction', function($q) {
+                        $q->where('status', 'finished');
+                    })->sum('amount'),
             ];
 
             return response()->json([

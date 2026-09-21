@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
+import api from '../services/api';
 import './footer.css';
 
 const Footer = ({ onSearch }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { getLogoUrl, getText } = useTheme();
+  const [customPages, setCustomPages] = useState([]);
   const logoSrc = getLogoUrl();
   const phoneLabel = t('contact.info_phone_label', 'Telefone');
   const phoneValue = getText('text_contact_phone_value', '+55 (11) 3000-0000');
@@ -19,6 +21,28 @@ const Footer = ({ onSearch }) => {
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  useEffect(() => {
+    const loadPages = async () => {
+      try {
+        const res = await api.get('/pages/public');
+        if (res.data.success) setCustomPages(res.data.data);
+      } catch (err) {
+        console.error('Erro ao carregar páginas do footer:', err);
+      }
+    };
+    loadPages();
+  }, []);
+
+  const getPageTitle = (page) => {
+    const lang = i18n.language;
+    if (lang === 'en' && page.title_en) return page.title_en;
+    if (lang === 'es' && page.title_es) return page.title_es;
+    return page.title;
+  };
+
+  const quickLinkPages = customPages.filter(p => p.section === 'quick_links');
+  const legalLinkPages = customPages.filter(p => p.section === 'legal');
 
   return (
     <>
@@ -50,6 +74,9 @@ const Footer = ({ onSearch }) => {
                 <li><Link to="/leiloes">{t('footer.auctions')}</Link></li>
                 <li><Link to="/como-funciona">{t('footer.how_it_works')}</Link></li>
                 <li><Link to="/faq">{t('footer.faq')}</Link></li>
+                {quickLinkPages.map(page => (
+                  <li key={page.id}><Link to={`/p/${page.slug}`}>{getPageTitle(page)}</Link></li>
+                ))}
               </ul>
             </div>
             <div className="footer-col">
@@ -58,6 +85,9 @@ const Footer = ({ onSearch }) => {
                 <li><Link to="/termos">{t('footer.terms')}</Link></li>
                 <li><Link to="/privacidade">{t('footer.privacy')}</Link></li>
                 <li><Link to="/regras">{t('footer.rules')}</Link></li>
+                {legalLinkPages.map(page => (
+                  <li key={page.id}><Link to={`/p/${page.slug}`}>{getPageTitle(page)}</Link></li>
+                ))}
               </ul>
             </div>
             <div className="footer-col">

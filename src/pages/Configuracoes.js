@@ -383,33 +383,100 @@ const Configuracoes = () => {
     if (!generalSettings.some(s => s.key === 'show_bid_history')) {
         displaySettings.push(showBidHistorySetting);
     }
+
+    // Separar configurações SEO das demais
+    const seoKeys = ['site_name', 'site_description', 'site_keywords'];
+    const seoSettings = displaySettings.filter(s => seoKeys.includes(s.key));
+    const otherSettings = displaySettings.filter(s => !seoKeys.includes(s.key));
+
+    // Descrições amigáveis para SEO
+    const seoDescriptions = {
+      site_name: 'Nome do site (aparece na aba do navegador)',
+      site_description: 'Descrição do site (aparece nos resultados do Google)',
+      site_keywords: 'Palavras-chave do site (separadas por vírgula, ajudam na indexação)'
+    };
     
     return (
-      <div className="settings-grid">
-        {displaySettings.map(setting => (
-          <div key={setting.key} className="setting-item">
-            <div className="setting-header">
-              <label className="setting-label" htmlFor={`input-${setting.key}`}>{setting.description || setting.key}</label>
-              <span className="setting-key">{setting.key}</span>
+      <>
+        {seoSettings.length > 0 && (
+          <div className="settings-section" style={{marginBottom: '2rem'}}>
+            <h3>SEO — Otimização para Buscadores</h3>
+            <p className="section-description">
+              Estas configurações controlam como o site aparece nos resultados do Google e outros buscadores.
+            </p>
+            <div className="settings-grid">
+              {seoSettings.map(setting => (
+                <div key={setting.key} className="setting-item">
+                  <div className="setting-header">
+                    <label className="setting-label" htmlFor={`input-${setting.key}`}>{seoDescriptions[setting.key] || setting.description || setting.key}</label>
+                    <span className="setting-key">{setting.key}</span>
+                  </div>
+                  {setting.key === 'site_keywords' ? (
+                    <>
+                      <input
+                        type="text"
+                        id={`input-${setting.key}`}
+                        name={setting.key}
+                        value={setting.value || ''}
+                        onChange={(e) => handleInputChange(setting.key, e.target.value)}
+                        className="text-input"
+                        placeholder="leilão online, cashback, comprar barato (separadas por vírgula)"
+                      />
+                      <p className="setting-help-text" style={{fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)', marginTop: '0.3rem'}}>
+                        Palavras-chave ajudam os buscadores a entender o conteúdo do site
+                      </p>
+                    </>
+                  ) : setting.key === 'site_description' ? (
+                    <>
+                      <textarea
+                        id={`input-${setting.key}`}
+                        name={setting.key}
+                        value={setting.value || ''}
+                        onChange={(e) => handleInputChange(setting.key, e.target.value)}
+                        className="text-input"
+                        rows="3"
+                        placeholder="Descrição curta do site para os buscadores"
+                        style={{resize: 'vertical', minHeight: '60px'}}
+                      />
+                      <p className="setting-help-text" style={{fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)', marginTop: '0.3rem'}}>
+                        Recomendado: entre 50 e 160 caracteres
+                      </p>
+                    </>
+                  ) : (
+                    renderTextInput(setting)
+                  )}
+                </div>
+              ))}
             </div>
-            
-            {setting.key === 'show_bid_history' ? (
-                <select
-                    id={`input-${setting.key}`}
-                    name={setting.key}
-                    value={setting.value || 'true'}
-                    onChange={(e) => handleInputChange(setting.key, e.target.value)}
-                    className="text-input"
-                >
-                    <option value="true">Sim</option>
-                    <option value="false">Não</option>
-                </select>
-            ) : (
-                renderTextInput(setting)
-            )}
           </div>
-        ))}
-      </div>
+        )}
+
+        <div className="settings-grid">
+          {otherSettings.map(setting => (
+            <div key={setting.key} className="setting-item">
+              <div className="setting-header">
+                <label className="setting-label" htmlFor={`input-${setting.key}`}>{setting.description || setting.key}</label>
+                <span className="setting-key">{setting.key}</span>
+              </div>
+              
+              {setting.key === 'show_bid_history' ? (
+                  <select
+                      id={`input-${setting.key}`}
+                      name={setting.key}
+                      value={setting.value || 'true'}
+                      onChange={(e) => handleInputChange(setting.key, e.target.value)}
+                      className="text-input"
+                  >
+                      <option value="true">Sim</option>
+                      <option value="false">Não</option>
+                  </select>
+              ) : (
+                  renderTextInput(setting)
+              )}
+            </div>
+          ))}
+        </div>
+      </>
     );
   };
 
@@ -429,8 +496,55 @@ const Configuracoes = () => {
       return existing ? { ...existing, ...field, value: existing.value } : field;
     });
 
+    // Getcoin settings
+    const pixCashbackEnabled = paymentSettings.find(s => s.key === 'pix_cashback_enabled')?.value ?? 'true';
+    const pixCashbackPercentage = paymentSettings.find(s => s.key === 'pix_cashback_percentage')?.value ?? '10';
+
     return (
       <div className="settings-section">
+        {/* Getcoin — Cashback em Pix */}
+        <h3>Getcoin — Cashback em Recargas via Pix</h3>
+        <p className="section-description">
+          Quando ativado, o usuário recebe automaticamente um percentual do valor recarregado via Pix como Getcoin (saldo de cashback).
+        </p>
+        <div className="settings-grid" style={{marginBottom: '2rem'}}>
+          <div className="setting-item">
+            <div className="setting-header">
+              <label className="setting-label">Ativar Getcoin no Pix</label>
+              <span className="setting-key">pix_cashback_enabled</span>
+            </div>
+            <select
+              value={pixCashbackEnabled}
+              onChange={(e) => handleInputChange('pix_cashback_enabled', e.target.value)}
+              className="text-input"
+            >
+              <option value="true">Sim — ativado</option>
+              <option value="false">Não — desativado</option>
+            </select>
+          </div>
+          <div className="setting-item">
+            <div className="setting-header">
+              <label className="setting-label">Percentual de Getcoin (%)</label>
+              <span className="setting-key">pix_cashback_percentage</span>
+            </div>
+            <input
+              type="number"
+              min="1"
+              max="100"
+              step="0.5"
+              value={pixCashbackPercentage}
+              onChange={(e) => handleInputChange('pix_cashback_percentage', e.target.value)}
+              className="text-input"
+              placeholder="10"
+            />
+            <p className="setting-help-text" style={{fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)', marginTop: '0.3rem'}}>
+              Recomendado: entre 10% e 15%. Ex: recarga de R$ 100 com 10% = R$ 10 em Getcoin
+            </p>
+          </div>
+        </div>
+
+        <div className="settings-divider"></div>
+
         <h3>Configurações do Mercado Pago</h3>
         <p className="section-description">
           Configure as credenciais de integração com o Mercado Pago para processar pagamentos via Pix e Cartão de Crédito.
@@ -625,6 +739,69 @@ const Configuracoes = () => {
               <div className="settings-divider"></div>
               
               {renderPaymentSettings()}
+
+              <div className="settings-divider"></div>
+
+              <div className="settings-section">
+                <h3>Níveis de Viber</h3>
+                <p className="section-description">
+                  Configure os requisitos e benefícios de cada nível. Os Vibers sobem de nível ao vencer Vibes.
+                </p>
+                <div className="settings-grid">
+                  {[
+                    { level: 'inscrito', label: '📝 Inscrito', pctKey: 'getcoin_pct_inscrito', refKey: 'referral_getcoin_inscrito' },
+                    { level: 'bronze', label: '🥉 Bronze', pctKey: 'getcoin_pct_bronze', refKey: 'referral_getcoin_bronze', vibesKey: 'vibes_to_bronze' },
+                    { level: 'silver', label: '🥈 Silver', pctKey: 'getcoin_pct_silver', refKey: 'referral_getcoin_silver', vibesKey: 'vibes_to_silver' },
+                    { level: 'gold', label: '🥇 Gold', pctKey: 'getcoin_pct_gold', refKey: 'referral_getcoin_gold', vibesKey: 'vibes_to_gold' },
+                    { level: 'platinum', label: '👑 Platinum', pctKey: 'getcoin_pct_platinum', refKey: 'referral_getcoin_platinum', vibesKey: 'vibes_to_platinum' },
+                    { level: 'diamond', label: '💎 Diamond', pctKey: 'getcoin_pct_diamond', refKey: 'referral_getcoin_diamond', vibesKey: 'vibes_to_diamond' },
+                  ].map(({ level, label, pctKey, refKey, vibesKey }) => {
+                    const paymentSettings = settings.payment || [];
+                    const pctVal = paymentSettings.find(s => s.key === pctKey)?.value ?? '';
+                    const refVal = paymentSettings.find(s => s.key === refKey)?.value ?? '';
+                    const vibesVal = vibesKey ? (paymentSettings.find(s => s.key === vibesKey)?.value ?? '') : null;
+                    return (
+                      <div key={level} className="setting-item" style={{border: '1px solid rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '10px'}}>
+                        <div className="setting-header">
+                          <label className="setting-label" style={{fontSize: '1.1rem'}}>{label}</label>
+                        </div>
+                        {vibesKey && (
+                          <div style={{marginBottom: '0.5rem'}}>
+                            <label style={{fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)'}}>Vibes para atingir</label>
+                            <input
+                              type="number" min="1"
+                              value={vibesVal}
+                              onChange={(e) => handleInputChange(vibesKey, e.target.value)}
+                              className="text-input"
+                              style={{marginTop: '0.25rem'}}
+                            />
+                          </div>
+                        )}
+                        <div style={{marginBottom: '0.5rem'}}>
+                          <label style={{fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)'}}>% GetCoin por Get</label>
+                          <input
+                            type="number" min="0" max="100" step="0.5"
+                            value={pctVal}
+                            onChange={(e) => handleInputChange(pctKey, e.target.value)}
+                            className="text-input"
+                            style={{marginTop: '0.25rem'}}
+                          />
+                        </div>
+                        <div>
+                          <label style={{fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)'}}>GetCoins por indicação</label>
+                          <input
+                            type="number" min="0"
+                            value={refVal}
+                            onChange={(e) => handleInputChange(refKey, e.target.value)}
+                            className="text-input"
+                            style={{marginTop: '0.25rem'}}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
 
               <div className="settings-divider"></div>
               

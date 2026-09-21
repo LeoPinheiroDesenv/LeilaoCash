@@ -179,6 +179,11 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
+.text-input option {
+  background-color: #1a2942;
+  color: #e6eef8;
+}
+
 .color-input-wrapper {
   display: flex;
   gap: 1rem;

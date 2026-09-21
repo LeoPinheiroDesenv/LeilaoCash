@@ -26,6 +26,7 @@ const Leiloes = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    meta_keywords: '',
     status: 'draft',
     start_date: '',
     end_date: '',
@@ -97,6 +98,7 @@ const Leiloes = () => {
       setFormData({
         title: auction.title || '',
         description: auction.description || '',
+        meta_keywords: auction.meta_keywords || '',
         status: auction.status || 'draft',
         start_date: auction.start_date ? new Date(auction.start_date).toISOString().slice(0, 16) : '',
         end_date: auction.end_date ? new Date(auction.end_date).toISOString().slice(0, 16) : '',
@@ -111,6 +113,7 @@ const Leiloes = () => {
       setFormData({
         title: '',
         description: '',
+        meta_keywords: '',
         status: 'draft',
         start_date: '',
         end_date: '',
@@ -185,7 +188,7 @@ const Leiloes = () => {
       }
 
       if (response.data.success) {
-        setMessage({ type: 'success', text: editingAuction ? 'Leilão atualizado com sucesso!' : 'Leilão criado com sucesso!' });
+        setMessage({ type: 'success', text: editingAuction ? 'Vibe atualizada com sucesso!' : 'Vibe criada com sucesso!' });
         handleCloseModal();
         loadAuctions();
       }
@@ -206,20 +209,88 @@ const Leiloes = () => {
   };
 
   const handleDelete = async (auctionId) => {
-    if (!window.confirm('Tem certeza que deseja deletar este leilão?')) {
+    if (!window.confirm('Tem certeza que deseja deletar esta Vibe?')) {
       return;
     }
 
     try {
       const response = await api.delete(`/auctions/${auctionId}`);
       if (response.data.success) {
-        setMessage({ type: 'success', text: 'Leilão deletado com sucesso!' });
+        setMessage({ type: 'success', text: 'Vibe deletada com sucesso!' });
         loadAuctions();
       }
     } catch (error) {
       console.error('Erro ao deletar leilão:', error);
       const errorMessage = error.response?.data?.message || 'Erro ao deletar leilão';
       setMessage({ type: 'error', text: errorMessage });
+    }
+  };
+
+  const handleCloseVibe = async (auctionId) => {
+    if (!window.confirm('Tem certeza que deseja encerrar esta Vibe? Os Gets serão revelados e o vencedor será definido.')) {
+      return;
+    }
+
+    try {
+      const response = await api.post(`/auctions/${auctionId}/close`);
+      if (response.data.success) {
+        setMessage({ type: 'success', text: 'Vibe encerrada com sucesso!' });
+        loadAuctions();
+      }
+    } catch (error) {
+      console.error('Erro ao encerrar Vibe:', error);
+      setMessage({ type: 'error', text: error.response?.data?.message || 'Erro ao encerrar Vibe' });
+    }
+  };
+
+  const [showPostSale, setShowPostSale] = useState(false);
+  const [postSaleData, setPostSaleData] = useState({
+    post_sale_status: 'pending_contact',
+    winner_choice: '',
+    shipping_address: '',
+    shipping_supplier: '',
+    shipping_date: '',
+    shipping_cost: '',
+    shipping_tracking: '',
+    post_sale_notes: ''
+  });
+  const [postSaleAuction, setPostSaleAuction] = useState(null);
+  const [savingPostSale, setSavingPostSale] = useState(false);
+
+  const handleOpenPostSale = (auction) => {
+    setPostSaleAuction(auction);
+    setPostSaleData({
+      post_sale_status: auction.post_sale_status || 'pending_contact',
+      winner_choice: auction.winner_choice || '',
+      shipping_address: auction.shipping_address || '',
+      shipping_supplier: auction.shipping_supplier || '',
+      shipping_date: auction.shipping_date || '',
+      shipping_cost: auction.shipping_cost || '',
+      shipping_tracking: auction.shipping_tracking || '',
+      post_sale_notes: auction.post_sale_notes || ''
+    });
+    setShowPostSale(true);
+  };
+
+  const handlePostSaleChange = (e) => {
+    const { name, value } = e.target;
+    setPostSaleData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSavePostSale = async (e) => {
+    e.preventDefault();
+    setSavingPostSale(true);
+    try {
+      const response = await api.put(`/auctions/${postSaleAuction.id}/post-sale`, postSaleData);
+      if (response.data.success) {
+        setMessage({ type: 'success', text: 'Pós-venda atualizado!' });
+        setShowPostSale(false);
+        loadAuctions();
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: error.response?.data?.message || 'Erro ao salvar pós-venda' });
+    } finally {
+      setSavingPostSale(false);
     }
   };
 
@@ -239,8 +310,8 @@ const Leiloes = () => {
 
   return (
     <AdminLayout 
-      pageTitle="Gerenciamento de Leilões" 
-      pageSubtitle="Crie e gerencie leilões de produtos"
+      pageTitle="Gerenciamento de Vibes" 
+      pageSubtitle="Crie e gerencie Vibes de produtos"
     >
       <div className="leiloes-page">
         {message.text && (
@@ -281,7 +352,7 @@ const Leiloes = () => {
               <line x1="12" y1="5" x2="12" y2="19"></line>
               <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
-            Novo Leilão
+            Novo Vibe
           </button>
         </div>
 
@@ -311,6 +382,33 @@ const Leiloes = () => {
                         </div>
                       </div>
                       <div className="auction-actions">
+                        {auction.status === 'active' && (
+                          <button
+                            className="btn-icon"
+                            onClick={() => handleCloseVibe(auction.id)}
+                            title="Encerrar Vibe"
+                            style={{color: '#E55F52'}}
+                          >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                              <line x1="9" y1="9" x2="15" y2="15"></line>
+                              <line x1="15" y1="9" x2="9" y2="15"></line>
+                            </svg>
+                          </button>
+                        )}
+                        {auction.status === 'finished' && (
+                          <button
+                            className="btn-icon"
+                            onClick={() => handleOpenPostSale(auction)}
+                            title="Pós-venda"
+                            style={{color: '#10b981'}}
+                          >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                              <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                          </button>
+                        )}
                         <button
                           className="btn-icon"
                           onClick={() => handleOpenModal(auction)}
@@ -341,11 +439,11 @@ const Leiloes = () => {
 
                     <div className="auction-details">
                       <div className="detail-item">
-                        <span className="detail-label">Lance Inicial:</span>
+                        <span className="detail-label">Get Inicial:</span>
                         <span className="detail-value">R$ {parseFloat(auction.starting_bid || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                       </div>
                       <div className="detail-item">
-                        <span className="detail-label">Lance Atual:</span>
+                        <span className="detail-label">Get Atual:</span>
                         <span className="detail-value">R$ {parseFloat(auction.current_bid || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                       </div>
                       <div className="detail-item">
@@ -424,7 +522,7 @@ const Leiloes = () => {
           <div className="modal-overlay" onClick={handleCloseModal}>
             <div className="modal-content modal-large" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
-                <h2>{editingAuction ? 'Editar Leilão' : 'Novo Leilão'}</h2>
+                <h2>{editingAuction ? 'Editar Vibe' : 'Nova Vibe'}</h2>
                 <button className="modal-close" onClick={handleCloseModal}>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -435,7 +533,7 @@ const Leiloes = () => {
 
               <form onSubmit={handleSubmit} className="auction-form">
                 <div className="form-group form-group-full">
-                  <label>Título do Leilão *</label>
+                  <label>Título da Vibe *</label>
                   <input
                     type="text"
                     name="title"
@@ -457,6 +555,19 @@ const Leiloes = () => {
                   />
                 </div>
 
+                <div className="form-group">
+                  <label>Palavras-chave (SEO)</label>
+                  <input
+                    type="text"
+                    name="meta_keywords"
+                    value={formData.meta_keywords}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    placeholder="leilão, eletrônicos, cashback (separadas por vírgula)"
+                  />
+                  <p className="form-help">Palavras-chave para melhorar a indexação nos buscadores</p>
+                </div>
+
                 <div className="form-row">
                   <div className="form-group">
                     <label>Status</label>
@@ -475,7 +586,7 @@ const Leiloes = () => {
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Lance Inicial (R$) *</label>
+                    <label>Get Inicial (R$) *</label>
                     <input
                       type="number"
                       name="starting_bid"
@@ -515,7 +626,7 @@ const Leiloes = () => {
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Incremento de Lance (R$)</label>
+                    <label>Incremento de Get (R$)</label>
                     <input
                       type="number"
                       name="bid_increment"
@@ -528,7 +639,7 @@ const Leiloes = () => {
                     />
                   </div>
                   <div className="form-group">
-                    <label>Lances Mínimos</label>
+                    <label>Gets Mínimos</label>
                     <input
                       type="number"
                       name="min_bids"
@@ -617,6 +728,94 @@ const Leiloes = () => {
                     ) : (
                       editingAuction ? 'Atualizar' : 'Criar'
                     )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {showPostSale && postSaleAuction && (
+          <div className="modal-overlay" onClick={() => setShowPostSale(false)}>
+            <div className="modal-content modal-large" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Pós-venda: {postSaleAuction.title}</h2>
+                <button className="modal-close" onClick={() => setShowPostSale(false)}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+
+              <div style={{padding: '1rem', background: 'rgba(16,185,129,0.1)', borderRadius: '8px', marginBottom: '1rem'}}>
+                <p style={{color: '#10b981', fontWeight: '600'}}>
+                  Champion Get: R$ {parseFloat(postSaleAuction.champion_get_amount || postSaleAuction.current_bid || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                </p>
+                <p style={{color: '#8da4bf', fontSize: '0.9rem'}}>
+                  Vencedor: {postSaleAuction.winner?.name || 'Carregando...'}
+                  {postSaleAuction.winner?.email && ` (${postSaleAuction.winner.email})`}
+                </p>
+                <p style={{color: '#8da4bf', fontSize: '0.9rem'}}>
+                  Total Gets: R$ {parseFloat(postSaleAuction.total_gets_amount || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                </p>
+              </div>
+
+              <form onSubmit={handleSavePostSale} className="auction-form">
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Status Pós-venda</label>
+                    <select name="post_sale_status" value={postSaleData.post_sale_status} onChange={handlePostSaleChange} className="form-select">
+                      <option value="pending_contact">Aguardando contato</option>
+                      <option value="contacted">Viber contatado</option>
+                      <option value="product_chosen">Produto escolhido</option>
+                      <option value="shipped">Enviado</option>
+                      <option value="delivered">Entregue</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Escolha do Viber (cor, tamanho, observações)</label>
+                  <textarea name="winner_choice" value={postSaleData.winner_choice} onChange={handlePostSaleChange} rows="3" className="form-textarea" placeholder="Ex: Cor preta, 128GB"></textarea>
+                </div>
+
+                <div className="form-group">
+                  <label>Endereço de envio</label>
+                  <textarea name="shipping_address" value={postSaleData.shipping_address} onChange={handlePostSaleChange} rows="2" className="form-textarea" placeholder="Endereço completo"></textarea>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Fornecedor</label>
+                    <input type="text" name="shipping_supplier" value={postSaleData.shipping_supplier} onChange={handlePostSaleChange} className="form-input" placeholder="Nome do fornecedor" />
+                  </div>
+                  <div className="form-group">
+                    <label>Data de envio</label>
+                    <input type="date" name="shipping_date" value={postSaleData.shipping_date} onChange={handlePostSaleChange} className="form-input" />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Custo de envio (R$)</label>
+                    <input type="number" name="shipping_cost" value={postSaleData.shipping_cost} onChange={handlePostSaleChange} className="form-input" step="0.01" min="0" placeholder="0.00" />
+                  </div>
+                  <div className="form-group">
+                    <label>Código de rastreamento</label>
+                    <input type="text" name="shipping_tracking" value={postSaleData.shipping_tracking} onChange={handlePostSaleChange} className="form-input" placeholder="BR123456789" />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Notas internas</label>
+                  <textarea name="post_sale_notes" value={postSaleData.post_sale_notes} onChange={handlePostSaleChange} rows="3" className="form-textarea" placeholder="Observações internas sobre este envio"></textarea>
+                </div>
+
+                <div className="modal-actions">
+                  <button type="button" className="btn-secondary" onClick={() => setShowPostSale(false)}>Fechar</button>
+                  <button type="submit" className="btn-primary" disabled={savingPostSale}>
+                    {savingPostSale ? 'Salvando...' : 'Salvar Pós-venda'}
                   </button>
                 </div>
               </form>

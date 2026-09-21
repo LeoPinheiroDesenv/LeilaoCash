@@ -32,6 +32,9 @@ class AuthController extends Controller
             'cpf' => 'nullable|string|max:14|unique:users',
             'phone' => 'nullable|string|max:20',
             'birth_date' => 'nullable|date',
+            'guardian_name' => 'nullable|string|max:255',
+            'guardian_cpf' => 'nullable|string|max:14',
+            'referral_code' => 'nullable|string|max:20',
         ]);
 
         if ($validator->fails()) {
@@ -43,7 +46,7 @@ class AuthController extends Controller
         }
 
         try {
-            $user = User::create([
+            $userData = [
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
@@ -54,8 +57,30 @@ class AuthController extends Controller
                 'cashback_balance' => 0,
                 'is_admin' => false,
                 'is_active' => true,
-                'auctions_won' => 0, // Inicializa com 0 vitórias
-            ]);
+                'auctions_won' => 0,
+                'viber_level' => 'inscrito',
+            ];
+
+            // Campos de responsável (menores 16-17)
+            if ($request->guardian_name) {
+                $userData['guardian_name'] = $request->guardian_name;
+                $userData['guardian_cpf'] = $request->guardian_cpf;
+            }
+
+            // Gerar código de indicação único
+            if (\Schema::hasColumn('users', 'referral_code')) {
+                $userData['referral_code'] = strtoupper(substr(md5(uniqid()), 0, 8));
+            }
+
+            // Vincular indicação se código fornecido
+            if ($request->referral_code && \Schema::hasColumn('users', 'referred_by')) {
+                $referrer = User::where('referral_code', strtoupper(trim($request->referral_code)))->first();
+                if ($referrer) {
+                    $userData['referred_by'] = $referrer->id;
+                }
+            }
+
+            $user = User::create($userData);
 
             $token = $user->createToken('auth_token')->plainTextToken;
 

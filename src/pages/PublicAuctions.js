@@ -80,7 +80,7 @@ const PublicAuctions = ({ searchTerm }) => {
             isHot: auction.status === 'active',
             timer: auction.end_date ? calculateTimeRemaining(auction.end_date) : '00:00:00',
             bids: auction.bids_count || '0',
-            url: `/produto/${product.id}`,
+            url: `/produto/${product.slug || product.id}`,
             image: product.image_url 
               ? (product.image_url.startsWith('http') 
                   ? product.image_url 

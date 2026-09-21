@@ -18,14 +18,18 @@
 .card-media {
   position: relative;
   aspect-ratio: 4 / 3;
-  background: #000;
+  background: #080d1a;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .product-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  padding: 12px;
   transition: transform 0.4s ease;
 }
 
@@ -234,23 +238,13 @@
 }
 
 .meta-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   padding-top: 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  margin-top: 12px;
-}
-
-.bids-count {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: #8da4bf;
+  margin-top: auto;
 }
 
 .btn-view {
+  display: block;
   width: 100%;
   padding: 12px;
   background: linear-gradient(90deg, #584eff, #9747ff);

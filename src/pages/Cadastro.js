@@ -14,6 +14,10 @@ const Cadastro = () => {
     email: '',
     telefone: '',
     cpf: '',
+    data_nascimento: '',
+    guardian_name: '',
+    guardian_cpf: '',
+    referral_code: '',
     senha: '',
     confirmarSenha: ''
   });
@@ -22,7 +26,21 @@ const Cadastro = () => {
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isMinor, setIsMinor] = useState(false);
+  const [isTooYoung, setIsTooYoung] = useState(false);
   const logoSrc = getLogoUrl();
+
+  const calculateAge = (birthDate) => {
+    if (!birthDate) return null;
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const m = today.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age;
+  };
 
   const formatCPF = (value) => {
     // Remove tudo que não é dígito e limita a 11 caracteres
@@ -42,7 +60,7 @@ const Cadastro = () => {
     const { name, value } = e.target;
     let formattedValue = value;
 
-    if (name === 'cpf') {
+    if (name === 'cpf' || name === 'guardian_cpf') {
       formattedValue = formatCPF(value);
     } else if (name === 'telefone') {
       formattedValue = formatPhone(value);
@@ -52,6 +70,18 @@ const Cadastro = () => {
       ...formData,
       [name]: formattedValue
     });
+
+    // Verificar idade ao mudar data de nascimento
+    if (name === 'data_nascimento') {
+      const age = calculateAge(value);
+      if (age !== null) {
+        setIsMinor(age >= 16 && age < 18);
+        setIsTooYoung(age < 16);
+      } else {
+        setIsMinor(false);
+        setIsTooYoung(false);
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -63,21 +93,41 @@ const Cadastro = () => {
       return;
     }
 
+    if (isTooYoung) {
+      setError('Menores de 16 anos não podem se cadastrar.');
+      return;
+    }
+
+    if (isMinor && (!formData.guardian_name || !formData.guardian_cpf)) {
+      setError('Para menores entre 16 e 17 anos, informe o responsável.');
+      return;
+    }
+
     setLoading(true);
 
     try {
       // Remover formatação antes de enviar
       const cpfClean = formData.cpf.replace(/\D/g, '');
       const phoneClean = formData.telefone.replace(/\D/g, '');
+      const guardianCpfClean = formData.guardian_cpf ? formData.guardian_cpf.replace(/\D/g, '') : '';
 
-      const response = await api.post('/auth/register', {
+      const payload = {
         name: formData.nome,
         email: formData.email,
         password: formData.senha,
         password_confirmation: formData.confirmarSenha,
         phone: phoneClean,
-        cpf: cpfClean
-      });
+        cpf: cpfClean,
+        birth_date: formData.data_nascimento || null,
+        referral_code: formData.referral_code ? formData.referral_code.toUpperCase().trim() : null
+      };
+
+      if (isMinor && formData.guardian_name) {
+        payload.guardian_name = formData.guardian_name;
+        payload.guardian_cpf = guardianCpfClean;
+      }
+
+      const response = await api.post('/auth/register', payload);
 
       if (response.data.success) {
         localStorage.setItem('token', response.data.data.access_token);
@@ -192,6 +242,80 @@ const Cadastro = () => {
                 </div>
               </div>
             </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Data de Nascimento</label>
+                <div className="input-wrapper">
+                  <input
+                    type="date"
+                    name="data_nascimento"
+                    value={formData.data_nascimento}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            {isTooYoung && (
+              <div className="error-message" style={{color: '#E55F52', marginBottom: '1rem', padding: '0.75rem', background: 'rgba(229,95,82,0.1)', borderRadius: '8px', textAlign: 'center'}}>
+                Menores de 16 anos não podem se cadastrar na plataforma.
+              </div>
+            )}
+
+            {isMinor && !isTooYoung && (
+              <div style={{marginBottom: '1rem', padding: '0.75rem', background: 'rgba(74,159,216,0.1)', border: '1px solid rgba(74,159,216,0.3)', borderRadius: '8px'}}>
+                <p style={{color: '#4A9FD8', fontSize: '0.9rem', marginBottom: '0.75rem'}}>
+                  Para menores entre 16 e 17 anos é necessário informar um responsável (pai, mãe ou tutor).
+                </p>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Nome do Responsável *</label>
+                    <div className="input-wrapper">
+                      <input
+                        type="text"
+                        name="guardian_name"
+                        placeholder="Nome completo do responsável"
+                        value={formData.guardian_name}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="form-group">
+                    <label>CPF do Responsável *</label>
+                    <div className="input-wrapper">
+                      <input
+                        type="text"
+                        name="guardian_cpf"
+                        placeholder="000.000.000-00"
+                        value={formData.guardian_cpf}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Código de indicação (opcional)</label>
+                <div className="input-wrapper">
+                  <input
+                    type="text"
+                    name="referral_code"
+                    placeholder="Ex: AB12CD34"
+                    value={formData.referral_code}
+                    onChange={handleChange}
+                    style={{textTransform: 'uppercase'}}
+                  />
+                </div>
+              </div>
+            </div>
+
             <div className="form-row">
               <div className="form-group">
                 <label>{t('auth.password_label', 'Senha')}</label>
@@ -272,7 +396,7 @@ const Cadastro = () => {
                 <span>{t('auth.accept_terms_prefix', 'Li e aceito os')} <Link to="/termos">{t('auth.terms_of_use', 'Termos de Uso')}</Link> {t('auth.and', 'e')} <Link to="/privacidade">{t('auth.privacy_policy', 'Política de Privacidade')}</Link></span>
               </label>
             </div>
-            <button type="submit" className="btn-submit" disabled={!acceptTerms || loading}>
+            <button type="submit" className="btn-submit" disabled={!acceptTerms || loading || isTooYoung}>
               {loading ? t('auth.creating_account', 'Criando conta...') : t('auth.create_account_button', 'Criar Conta')}
               {!loading && (
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

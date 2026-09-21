@@ -7,3 +7,6 @@ use Illuminate\Support\Facades\Schedule;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote')->hourly();
+
+// Encerrar Vibes expiradas a cada 5 minutos
+Schedule::command('vibes:close-expired')->everyFiveMinutes();

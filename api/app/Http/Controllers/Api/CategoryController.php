@@ -100,7 +100,12 @@ class CategoryController extends Controller
                 ], 422);
             }
 
-            $category = Category::create($request->all());
+            $data = $request->all();
+            if (!\Schema::hasColumn('categories', 'meta_keywords')) {
+                unset($data['meta_keywords']);
+            }
+
+            $category = Category::create($data);
 
             Log::info('[CategoryController] Categoria criada', [
                 'category_id' => $category->id,
@@ -151,7 +156,12 @@ class CategoryController extends Controller
                 ], 422);
             }
 
-            $category->update($request->all());
+            $updateData = $request->all();
+            if (!\Schema::hasColumn('categories', 'meta_keywords')) {
+                unset($updateData['meta_keywords']);
+            }
+
+            $category->update($updateData);
 
             Log::info('[CategoryController] Categoria atualizada', [
                 'category_id' => $category->id,

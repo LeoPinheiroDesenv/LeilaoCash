@@ -22,7 +22,9 @@ export const DashboardUsuarioMinhaConta = () => {
     address: '',
     city: '',
     state: '',
-    zip_code: ''
+    zip_code: '',
+    guardian_name: '',
+    guardian_cpf: ''
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -50,7 +52,9 @@ export const DashboardUsuarioMinhaConta = () => {
           address: userData.address || '',
           city: userData.city || '',
           state: userData.state || '',
-          zip_code: userData.zip_code || ''
+          zip_code: userData.zip_code || '',
+          guardian_name: userData.guardian_name || '',
+          guardian_cpf: userData.guardian_cpf || ''
         });
       }
     } catch (error) {
@@ -351,6 +355,24 @@ export const DashboardUsuarioMinhaConta = () => {
               />
             </div>
           </div>
+          <div className="form-group">
+            <label>Responsável (menores 16-17 anos)</label>
+            <input 
+              type="text" 
+              value={formData.guardian_name || ''}
+              onChange={(e) => setFormData({...formData, guardian_name: e.target.value})}
+              placeholder="Nome do responsável"
+            />
+          </div>
+          <div className="form-group">
+            <label>CPF do Responsável</label>
+            <input 
+              type="text" 
+              value={formData.guardian_cpf || ''}
+              onChange={(e) => setFormData({...formData, guardian_cpf: formatCPF(e.target.value)})}
+              placeholder="000.000.000-00"
+            />
+          </div>
         </div>
         <button type="submit" className="btn-save" disabled={saving}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -579,8 +601,8 @@ export const DashboardUsuarioMeusLances = () => {
     <UserLayout>
       <div className="welcome-section">
         <div className="welcome-text">
-          <h1>Meus Lances</h1>
-          <p>Acompanhe todos os seus lances</p>
+          <h1>Meus Gets</h1>
+          <p>Acompanhe todos os seus Gets</p>
         </div>
       </div>
       <div className="bids-stats">
@@ -822,7 +844,7 @@ export const DashboardUsuarioMeuCashback = () => {
     <UserLayout>
       <div className="welcome-section">
         <div className="welcome-text">
-          <h1>Meu Cashback</h1>
+          <h1>Meu GetCoin</h1>
           <p>Gerencie seu saldo e histórico</p>
         </div>
       </div>

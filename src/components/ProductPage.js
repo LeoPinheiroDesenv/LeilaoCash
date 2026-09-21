@@ -8,7 +8,7 @@ import api from '../services/api';
 import './productPage.css';
 
 const ProductPage = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
   const { settings, getText } = useTheme();
@@ -27,6 +27,24 @@ const ProductPage = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [bids, setBids] = useState([]);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const handleKey = (e) => {
+      if (e.key === 'Escape') setLightboxOpen(false);
+      if (e.key === 'ArrowLeft') handlePrevImage();
+      if (e.key === 'ArrowRight') handleNextImage();
+    };
+    document.addEventListener('keydown', handleKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', handleKey);
+      document.body.style.overflow = '';
+    };
+  }, [lightboxOpen]);
   
   const prevBidRef = useRef(0);
   const preloadedImagesRef = useRef({});
@@ -72,14 +90,14 @@ const ProductPage = () => {
     try {
       if (!isPolling) setError(null);
       
-      const response = await api.get(`/products/public/${id}`);
+      const response = await api.get(`/products/public/${slug}`);
       if (response.data.success) {
         const newProductData = response.data.data;
         const newAuction = newProductData.auction || {};
         
         const newCurrentBid = parsePrice(newAuction.current_bid || newAuction.starting_bid || newProductData.price);
         
-        if (isPolling && prevBidRef.current > 0 && newCurrentBid > prevBidRef.current) {
+        if (isPolling && prevBidRef.current > 0 && newCurrentBid > prevBidRef.current && newAuction.current_bid) {
             setToastMessage(`${t('products.new_bid_notification')} ${formatPrice(newCurrentBid)}`);
             setShowToast(true);
             setTimeout(() => setShowToast(false), 3000);
@@ -110,7 +128,7 @@ const ProductPage = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    if (id) {
+    if (slug) {
       setLoading(true);
       loadProduct();
       
@@ -120,7 +138,7 @@ const ProductPage = () => {
       
       return () => clearInterval(interval);
     }
-  }, [id]);
+  }, [slug]);
 
   useEffect(() => {
     setCurrentImageIndex(0);
@@ -149,6 +167,69 @@ const ProductPage = () => {
 
     checkFavorite();
   }, [product?.id, isAuthenticated]);
+
+  // Carregar produtos relacionados
+  useEffect(() => {
+    const loadRelated = async () => {
+      if (!product?.id) return;
+      try {
+        const response = await api.get(`/products/public/${product.slug || product.id}/related`);
+        if (response.data.success) {
+          setRelatedProducts(response.data.data);
+        }
+      } catch (err) {
+        console.error('Erro ao carregar produtos relacionados:', err);
+      }
+    };
+    loadRelated();
+  }, [product?.id]);
+
+  // SEO: meta tags dinâmicas
+  useEffect(() => {
+    if (!product) return;
+    document.title = `${product.name} | VibeGet`;
+    
+    const setMeta = (name, content) => {
+      if (!content) return;
+      let el = document.querySelector(`meta[name="${name}"]`);
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute('name', name);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('content', content);
+    };
+
+    setMeta('description', product.description || `${product.name} - Leilão com cashback na VibeGet`);
+    
+    const keywords = [
+      product.meta_keywords,
+      product.name,
+      product.categoryModel?.name,
+      product.brandModel?.name,
+      'leilão', 'cashback', 'vibeget'
+    ].filter(Boolean).join(', ');
+    setMeta('keywords', keywords);
+
+    // Open Graph
+    const setOG = (prop, content) => {
+      if (!content) return;
+      let el = document.querySelector(`meta[property="${prop}"]`);
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute('property', prop);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('content', content);
+    };
+    setOG('og:title', product.name);
+    setOG('og:description', product.description || `Leilão de ${product.name} com cashback`);
+    setOG('og:image', product.image_url);
+    setOG('og:url', window.location.href);
+    setOG('og:type', 'product');
+
+    return () => { document.title = 'VibeGet'; };
+  }, [product]);
 
 
   const auction = product?.auction || {};
@@ -218,6 +299,10 @@ const ProductPage = () => {
 
   const currentBid = parsePrice(auction.current_bid || auction.starting_bid || product?.price);
   const minBid = currentBid + 0.5;
+  const isAuctionExpired = auction.end_date ? new Date(auction.end_date) <= new Date() : false;
+  const isAuctionActive = auction.status === 'active' && !isAuctionExpired;
+  // Gets ocultos: se Vibe ativa e current_bid não veio (backend oculta)
+  const isGetsHidden = isAuctionActive && !auction.current_bid;
   
   const formatWinnerName = (name) => {
       if (!name) return t('products.no_leader');
@@ -255,7 +340,7 @@ const ProductPage = () => {
     setBidMessage({ type: '', text: '' });
     
     if (!isAuthenticated) {
-      navigate('/login', { state: { from: `/produto/${id}` } });
+      navigate('/login', { state: { from: `/produto/${slug}` } });
       return;
     }
 
@@ -289,7 +374,7 @@ const ProductPage = () => {
 
   const handleFavorite = async () => {
     if (!isAuthenticated) {
-      navigate('/login', { state: { from: `/produto/${id}` } });
+      navigate('/login', { state: { from: `/produto/${slug}` } });
       return;
     }
 
@@ -320,7 +405,7 @@ const ProductPage = () => {
       
       if (error.response?.status === 401) {
         // Token expirado ou inválido
-        navigate('/login', { state: { from: `/produto/${id}` } });
+        navigate('/login', { state: { from: `/produto/${slug}` } });
       } else {
         alert(errorMessage);
       }
@@ -380,6 +465,7 @@ const ProductPage = () => {
   }
 
   return (
+    <>
       <main>
         {showToast && (
             <div className="toast-notification">
@@ -421,6 +507,18 @@ const ProductPage = () => {
                       {auction.cashback_percentage}% {t('products.cashback')}
                     </div>
                   )}
+                  <button
+                    className="fullscreen-btn"
+                    aria-label="Ver em tela cheia"
+                    onClick={() => setLightboxOpen(true)}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="15 3 21 3 21 9"></polyline>
+                      <polyline points="9 21 3 21 3 15"></polyline>
+                      <line x1="21" y1="3" x2="14" y2="10"></line>
+                      <line x1="3" y1="21" x2="10" y2="14"></line>
+                    </svg>
+                  </button>
                   {allImages.length > 1 && (
                     <>
                       <button 
@@ -605,24 +703,32 @@ const ProductPage = () => {
               )}
 
               {auction.end_date && (
-                <div className="timer-section">
+                <div className={`timer-section${isAuctionExpired ? ' expired' : ''}`}>
                   <div className="timer-label">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <circle cx="12" cy="12" r="10"/>
                       <polyline points="12 6 12 12 16 14"/>
                     </svg>
-                    {t('products.time_remaining')}
+                    {isAuctionExpired ? t('products.auction_ended') : t('products.time_remaining')}
                   </div>
-                  <div className="timer-display">
-                    <Countdown timeString={calculateTimeRemaining(auction.end_date)} displayMode="display" />
-                  </div>
+                  {!isAuctionExpired && (
+                    <div className="timer-display">
+                      <Countdown timeString={calculateTimeRemaining(auction.end_date)} displayMode="display" />
+                    </div>
+                  )}
                 </div>
               )}
 
               <div className="price-section">
                 <div className="price-group">
                   <p className="price-label">{t('products.current_bid')}</p>
-                  <p className="price-value">{formatPrice(currentBid)}</p>
+                  <p className="price-value">
+                    {isGetsHidden ? (
+                      <span style={{fontSize: '0.9rem', color: '#8da4bf'}}>🔒 Revelado ao encerrar</span>
+                    ) : (
+                      formatPrice(currentBid)
+                    )}
+                  </p>
                 </div>
                 <div className="price-group">
                   <p className="price-label">{t('products.product_price')}</p>
@@ -630,55 +736,88 @@ const ProductPage = () => {
                 </div>
               </div>
 
-              <div className="leader-section">
-                <div className="leader-avatar">
-                  <div className="avatar-placeholder">{currentLeader.charAt(0)}</div>
+              {isGetsHidden ? (
+                <div className="leader-section" style={{justifyContent: 'center'}}>
+                  <div className="bids-count" style={{margin: 0}}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                      <circle cx="9" cy="7" r="4"/>
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                    {auction.bids_count || 0} {t('products.bids')}
+                  </div>
+                  <p style={{color: '#8da4bf', fontSize: '0.85rem', marginLeft: '1rem'}}>
+                    O vencedor será revelado ao encerrar a Vibe
+                  </p>
                 </div>
-                <div className="leader-info">
-                  <p className="leader-name">{currentLeader}</p>
-                  <p className="leader-label">{t('products.current_leader')}</p>
+              ) : (
+                <div className="leader-section">
+                  <div className="leader-avatar">
+                    <div className="avatar-placeholder">{currentLeader.charAt(0)}</div>
+                  </div>
+                  <div className="leader-info">
+                    <p className="leader-name">{currentLeader}</p>
+                    <p className="leader-label">{t('products.current_leader')}</p>
+                  </div>
+                  <div className="bids-count">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                      <circle cx="9" cy="7" r="4"/>
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                    {auction.bids_count || 0} {t('products.bids')}
+                  </div>
                 </div>
-                <div className="bids-count">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                    <circle cx="9" cy="7" r="4"/>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              )}
+
+              {isAuctionActive ? (
+                <form onSubmit={handleBid} className="bid-form">
+                  <div className="bid-input-group">
+                    <span className="currency">R$</span>
+                    <input
+                      type="number"
+                      className="bid-input"
+                      placeholder="0,00"
+                      value={bidAmount}
+                      onChange={(e) => setBidAmount(e.target.value)}
+                      min={minBid}
+                      step="0.50"
+                      required
+                      disabled={bidding}
+                    />
+                    <button
+                      type="submit"
+                      className="btn-bid"
+                      disabled={bidding}
+                    >
+                      {bidding ? t('products.bidding') : t('products.place_bid')}
+                    </button>
+                  </div>
+                  <p className="bid-info">
+                    {isGetsHidden 
+                      ? `${t('products.min_bid')}: R$ ${parsePrice(auction.starting_bid || product?.price).toFixed(2).replace('.', ',')} | Valor do seu Get é secreto até o encerramento`
+                      : `${t('products.min_bid')}: R$ ${minBid.toFixed(2).replace('.', ',')} | ${t('products.increment')}: R$ 0,50`
+                    }
+                  </p>
+
+                  {bidMessage.text && (
+                      <div className={`alert alert-${bidMessage.type}`} style={{ marginTop: '1rem', padding: '0.8rem', fontSize: '0.9rem' }}>
+                          {bidMessage.text}
+                      </div>
+                  )}
+                </form>
+              ) : isAuctionExpired ? (
+                <div className="auction-ended-banner">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="15" y1="9" x2="9" y2="15"/>
+                    <line x1="9" y1="9" x2="15" y2="15"/>
                   </svg>
-                  {auction.bids_count || 0} {t('products.bids')}
+                  <span>{t('products.bidding_closed')}</span>
                 </div>
-              </div>
-
-              <form onSubmit={handleBid} className="bid-form">
-                <div className="bid-input-group">
-                  <span className="currency">R$</span>
-                  <input
-                    type="number"
-                    className="bid-input"
-                    placeholder="0,00"
-                    value={bidAmount}
-                    onChange={(e) => setBidAmount(e.target.value)}
-                    min={minBid}
-                    step="0.50"
-                    required
-                    disabled={bidding || auction.status !== 'active'}
-                  />
-                  <button
-                    type="submit"
-                    className="btn-bid"
-                    disabled={bidding || auction.status !== 'active'}
-                  >
-                    {bidding ? t('products.bidding') : t('products.place_bid')}
-                  </button>
-                </div>
-                <p className="bid-info">{t('products.min_bid')}: R$ {minBid.toFixed(2).replace('.', ',')} | {t('products.increment')}: R$ 0,50</p>
-
-                {bidMessage.text && (
-                    <div className={`alert alert-${bidMessage.type}`} style={{ marginTop: '1rem', padding: '0.8rem', fontSize: '0.9rem' }}>
-                        {bidMessage.text}
-                    </div>
-                )}
-              </form>
+              ) : null}
 
               <div className="action-buttons">
                 <button 
@@ -805,10 +944,82 @@ const ProductPage = () => {
             </div>
           </div>
 
-         
+          {/* Produtos Relacionados */}
+          {relatedProducts.length > 0 && (
+            <div className="related-products-section">
+              <h2 className="related-title">{t('products.related_products')}</h2>
+              <div className="related-grid">
+                {relatedProducts.map((rp) => {
+                  const rpImage = rp.image_url
+                    ? (rp.image_url.startsWith('http') ? rp.image_url : `${baseUrl}${rp.image_url}`)
+                    : defaultImage;
+                  const rpAuction = rp.auction || {};
+                  const rpCurrentBid = parsePrice(rpAuction.current_bid || rpAuction.starting_bid || rp.price);
+                  return (
+                    <Link to={`/produto/${rp.slug || rp.id}`} key={rp.id} className="related-card">
+                      <div className="related-card-image">
+                        <img
+                          src={rpImage}
+                          alt={rp.name}
+                          onError={(e) => { e.target.onerror = null; e.target.src = defaultImage; }}
+                        />
+                      </div>
+                      <div className="related-card-info">
+                        <h3>{rp.name}</h3>
+                        <span className="related-card-price">{formatPrice(rpCurrentBid)}</span>
+                        {rp.categoryModel?.name && (
+                          <span className="related-card-category">{rp.categoryModel.name}</span>
+                        )}
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           </div>
         </section>
       </main>
+
+      {/* Lightbox fullscreen */}
+      {lightboxOpen && (
+        <div className="lightbox-overlay" onClick={() => setLightboxOpen(false)}>
+          <button className="lightbox-close" onClick={() => setLightboxOpen(false)} aria-label="Fechar">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+          {allImages.length > 1 && (
+            <>
+              <button className="lightbox-nav lightbox-prev" onClick={(e) => { e.stopPropagation(); handlePrevImage(); }} aria-label="Anterior">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="15 18 9 12 15 6"/>
+                </svg>
+              </button>
+              <button className="lightbox-nav lightbox-next" onClick={(e) => { e.stopPropagation(); handleNextImage(); }} aria-label="Próxima">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="9 18 15 12 9 6"/>
+                </svg>
+              </button>
+            </>
+          )}
+          <img
+            src={currentImage}
+            alt={product.name}
+            className="lightbox-image"
+            onClick={(e) => e.stopPropagation()}
+            onError={(e) => { e.target.onerror = null; e.target.src = defaultImage; }}
+          />
+          {allImages.length > 1 && (
+            <div className="lightbox-counter">
+              {currentImageIndex + 1} / {allImages.length}
+            </div>
+          )}
+        </div>
+      )}
+    </>
   );
 };
 

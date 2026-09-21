@@ -38,6 +38,7 @@ const Produtos = () => {
     brand_id: '',
     product_model_id: '',
     specifications: {},
+    meta_keywords: '',
     is_active: true
   });
 
@@ -133,6 +134,7 @@ const Produtos = () => {
         brand_id: product.brand_id || '',
         product_model_id: product.product_model_id || '',
         specifications: product.specifications || {},
+        meta_keywords: product.meta_keywords || '',
         is_active: product.is_active !== undefined ? product.is_active : true
       });
       // Se tiver marca, carregar modelos
@@ -151,6 +153,7 @@ const Produtos = () => {
         brand_id: '',
         product_model_id: '',
         specifications: {},
+        meta_keywords: '',
         is_active: true
       });
       setModels([]);
@@ -222,6 +225,7 @@ const Produtos = () => {
       if (formData.brand_id) formDataToSend.append('brand_id', formData.brand_id);
       if (formData.product_model_id) formDataToSend.append('product_model_id', formData.product_model_id);
       formDataToSend.append('is_active', formData.is_active ? '1' : '0');
+      if (formData.meta_keywords) formDataToSend.append('meta_keywords', formData.meta_keywords);
       
       if (formData.image) {
         formDataToSend.append('image', formData.image);
@@ -484,6 +488,19 @@ const Produtos = () => {
                     rows="4"
                     className="form-textarea"
                   />
+                </div>
+
+                <div className="form-group">
+                  <label>Palavras-chave (SEO)</label>
+                  <input
+                    type="text"
+                    name="meta_keywords"
+                    value={formData.meta_keywords}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    placeholder="smartphone, celular, android, samsung (separadas por vírgula)"
+                  />
+                  <p className="form-help">Palavras-chave para melhorar a indexação nos buscadores</p>
                 </div>
 
                 <div className="form-row">

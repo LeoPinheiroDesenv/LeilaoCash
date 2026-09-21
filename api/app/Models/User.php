@@ -33,7 +33,13 @@ class User extends Authenticatable
         'is_active',
         'user_type',
         'permissions',
-        'auctions_won', // Adicionado campo para contagem de vitórias
+        'auctions_won',
+        'viber_level',
+        'guardian_name',
+        'guardian_cpf',
+        'referral_code',
+        'referred_by',
+        'referral_count',
     ];
 
     /**
@@ -62,8 +68,31 @@ class User extends Authenticatable
             'is_admin' => 'boolean',
             'is_active' => 'boolean',
             'permissions' => 'array',
-            'auctions_won' => 'integer', // Cast para inteiro
+            'auctions_won' => 'integer',
+            'referral_count' => 'integer',
         ];
+    }
+
+    /**
+     * Calcula e atualiza o nível do Viber com base em vibes vencidas
+     */
+    public function recalculateViberLevel(): string
+    {
+        $won = (int) $this->auctions_won;
+        $level = 'inscrito';
+
+        if ($won >= 15) $level = 'diamond';
+        elseif ($won >= 13) $level = 'platinum';
+        elseif ($won >= 10) $level = 'gold';
+        elseif ($won >= 5) $level = 'silver';
+        elseif ($won >= 1) $level = 'bronze';
+
+        if ($this->viber_level !== $level) {
+            $this->viber_level = $level;
+            $this->save();
+        }
+
+        return $level;
     }
 
     public function bids()

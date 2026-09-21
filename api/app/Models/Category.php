@@ -17,6 +17,7 @@ class Category extends Model
         'name_es',
         'slug',
         'description',
+        'meta_keywords',
         'icon',
         'is_active',
         'sort_order',

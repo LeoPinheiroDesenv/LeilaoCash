@@ -20,6 +20,12 @@ class BidController extends Controller
         try {
             $query = Bid::with(['user:id,name,email', 'auction:id,title,status', 'product:id,name']);
 
+            // Por padrão, só mostrar Gets de Vibes encerradas (regra de negócio)
+            // Admin pode filtrar por auction_id específica para ver de uma Vibe encerrada
+            $query->whereHas('auction', function ($q) {
+                $q->where('status', 'finished');
+            });
+
             // Filtros
             if ($request->has('user_id')) {
                 $query->where('user_id', $request->user_id);

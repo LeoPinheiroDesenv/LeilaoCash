@@ -46,6 +46,7 @@ Route::get('/health', function () {
 Route::get('/categories/public', [\App\Http\Controllers\Api\CategoryController::class, 'index']);
 Route::get('/products/public', [\App\Http\Controllers\Api\ProductController::class, 'index']);
 Route::get('/products/public/{id}', [\App\Http\Controllers\Api\ProductController::class, 'show']);
+Route::get('/products/public/{id}/related', [\App\Http\Controllers\Api\ProductController::class, 'related']);
 Route::get('/auctions/public', [\App\Http\Controllers\Api\AuctionController::class, 'index']);
 Route::get('/auctions/home', [\App\Http\Controllers\Api\AuctionController::class, 'home']); // Nova rota
 Route::get('/auctions/public/{id}', [\App\Http\Controllers\Api\AuctionController::class, 'show']);
@@ -146,6 +147,17 @@ Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
     // Bidding Routes (for all authenticated users)
     Route::post('/auctions/{id}/bids', [\App\Http\Controllers\Api\BidController::class, 'store']);
 
+    // GetCoin Marketplace (for all authenticated users)
+    Route::prefix('getcoin')->group(function () {
+        Route::get('/info', [\App\Http\Controllers\Api\GetcoinController::class, 'info']);
+        Route::get('/offers', [\App\Http\Controllers\Api\GetcoinController::class, 'listOffers']);
+        Route::post('/buy-vibeget', [\App\Http\Controllers\Api\GetcoinController::class, 'buyFromVibeget']);
+        Route::post('/offers', [\App\Http\Controllers\Api\GetcoinController::class, 'createOffer']);
+        Route::post('/offers/{id}/buy', [\App\Http\Controllers\Api\GetcoinController::class, 'buyOffer']);
+        Route::delete('/offers/{id}', [\App\Http\Controllers\Api\GetcoinController::class, 'cancelOffer']);
+        Route::get('/my-offers', [\App\Http\Controllers\Api\GetcoinController::class, 'myOffers']);
+    });
+
     // Favorites Routes (for all authenticated users)
     Route::prefix('favorites')->group(function () {
         Route::get('/', [\App\Http\Controllers\Api\FavoriteController::class, 'index']);
@@ -230,6 +242,8 @@ Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
             Route::get('/{id}', [\App\Http\Controllers\Api\AuctionController::class, 'show']);
             Route::put('/{id}', [\App\Http\Controllers\Api\AuctionController::class, 'update']);
             Route::delete('/{id}', [\App\Http\Controllers\Api\AuctionController::class, 'destroy']);
+            Route::post('/{id}/close', [\App\Http\Controllers\Api\AuctionController::class, 'closeVibe']);
+            Route::put('/{id}/post-sale', [\App\Http\Controllers\Api\AuctionController::class, 'updatePostSale']);
         });
 
         // Bid management

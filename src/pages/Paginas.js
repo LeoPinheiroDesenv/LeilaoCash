@@ -20,6 +20,15 @@ const Paginas = () => {
     sort_order: 0,
     is_active: true
   });
+  const [slugError, setSlugError] = useState('');
+
+  // Rotas fixas do sistema que não podem ser usadas como slug
+  const reservedSlugs = [
+    'login', 'cadastro', 'recuperar-senha', 'reset-password',
+    'dashboard', 'leiloes', 'produto', 'suba-de-nivel',
+    'como-funciona', 'contato', 'faq', 'termos', 'privacidade',
+    'regras', 'manual', 'p'
+  ];
 
   useEffect(() => { loadPages(); }, []);
 
@@ -45,6 +54,32 @@ const Paginas = () => {
     setEditingPage(null);
     setShowForm(false);
     setActiveTab('pt');
+    setSlugError('');
+  };
+
+  const validateSlug = (slug) => {
+    if (!slug) {
+      setSlugError('');
+      return true;
+    }
+    const normalized = slug.toLowerCase().trim();
+    if (reservedSlugs.includes(normalized)) {
+      setSlugError(`A URL "/${normalized}" é uma rota do sistema e não pode ser usada.`);
+      return false;
+    }
+    const duplicate = pages.find(p => p.slug === normalized && (!editingPage || p.id !== editingPage.id));
+    if (duplicate) {
+      setSlugError(`A URL "/${normalized}" já está em uso pela página "${duplicate.title}".`);
+      return false;
+    }
+    setSlugError('');
+    return true;
+  };
+
+  const handleSlugChange = (value) => {
+    const slug = value.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    setForm({ ...form, slug });
+    validateSlug(slug);
   };
 
   const handleEdit = (page) => {
@@ -73,6 +108,13 @@ const Paginas = () => {
     }
     if (!form.content_pt || form.content_pt.trim() === '') {
       setMessage({ type: 'error', text: 'O conteúdo em português é obrigatório.' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+      return;
+    }
+    // Validar slug antes de salvar
+    const slugToCheck = form.slug || form.title.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    if (!validateSlug(slugToCheck)) {
+      setMessage({ type: 'error', text: slugError || 'A URL informada já está em uso.' });
       setTimeout(() => setMessage({ type: '', text: '' }), 3000);
       return;
     }
@@ -200,8 +242,18 @@ const Paginas = () => {
               </div>
               <div className="form-group" style={{ flex: 1 }}>
                 <label>Slug (URL)</label>
-                <input type="text" className="text-input" value={form.slug}
-                  onChange={e => setForm({ ...form, slug: e.target.value })} placeholder="sobre-nos (auto)" />
+                <input type="text" className={`text-input ${slugError ? 'input-error' : ''}`} value={form.slug}
+                  onChange={e => handleSlugChange(e.target.value)} placeholder="sobre-nos (auto)" />
+                {slugError && (
+                  <span style={{ color: '#E55F52', fontSize: '0.8rem', marginTop: '0.3rem', display: 'block' }}>
+                    ⚠️ {slugError}
+                  </span>
+                )}
+                {form.slug && !slugError && (
+                  <span style={{ color: '#4A9FD8', fontSize: '0.8rem', marginTop: '0.3rem', display: 'block' }}>
+                    URL: /p/{form.slug}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -269,7 +321,7 @@ const Paginas = () => {
 
             {/* Botões */}
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-              <button className="btn-save" onClick={handleSave} disabled={saving}>
+              <button className="btn-save" onClick={handleSave} disabled={saving || !!slugError}>
                 {saving ? 'Salvando...' : (editingPage ? 'Salvar Alterações' : 'Criar Página')}
               </button>
               <button className="btn-cancel" onClick={resetForm}>Cancelar</button>

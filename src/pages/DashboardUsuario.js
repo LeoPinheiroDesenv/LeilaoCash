@@ -5,10 +5,12 @@ import UserLayout from '../components/UserLayout';
 import Modal from '../components/Modal';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import './DashboardUsuario.css';
 
 const DashboardUsuario = () => {
   const { user, updateUser } = useAuth();
+  const { settings } = useTheme();
   const [isBuyCreditsModalOpen, setIsBuyCreditsModalOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(null); // 'credit_card' or 'pix'
   const [creditAmount, setCreditAmount] = useState('');
@@ -101,7 +103,12 @@ const DashboardUsuario = () => {
         const response = await api.get(`/payments/${transactionId}/status`);
         if (response.data.success && response.data.data.status === 'completed') {
           stopPolling();
-          setPixSuccess('Pagamento aprovado! Seus créditos foram adicionados.');
+          const pct = parseFloat(settings?.pix_cashback_percentage || '10');
+          const bonus = (parseFloat(creditAmount) * pct / 100).toFixed(2);
+          const cashbackMsg = settings?.pix_cashback_enabled !== 'false'
+            ? ` + R$ ${bonus} em Getcoin!`
+            : '';
+          setPixSuccess(`Pagamento aprovado! Seus créditos foram adicionados${cashbackMsg}`);
           // Atualizar saldo do usuário no contexto
           const meResponse = await api.get('/auth/me');
           if (meResponse.data.success) {
@@ -121,6 +128,12 @@ const DashboardUsuario = () => {
   const handleGeneratePix = async () => {
     if (!creditAmount || creditAmount <= 0) {
       setPixError('Informe um valor válido para recarga.');
+      return;
+    }
+
+    const minCredit = parseFloat(settings?.min_credit_amount || '20');
+    if (parseFloat(creditAmount) < minCredit) {
+      setPixError(`O valor mínimo para recarga é R$ ${minCredit.toFixed(2).replace('.', ',')}.`);
       return;
     }
 
@@ -160,6 +173,12 @@ const DashboardUsuario = () => {
     
     if (!creditAmount || creditAmount <= 0) {
       setCardError('Informe um valor válido para recarga.');
+      return;
+    }
+
+    const minCreditCard = parseFloat(settings?.min_credit_amount || '20');
+    if (parseFloat(creditAmount) < minCreditCard) {
+      setCardError(`O valor mínimo para recarga é R$ ${minCreditCard.toFixed(2).replace('.', ',')}.`);
       return;
     }
 
@@ -212,14 +231,14 @@ const DashboardUsuario = () => {
     }
   };
 
-  // Função para calcular o nível do usuário
+  // Função para calcular o nível do Viber
   const getUserLevel = (wins) => {
-    if (!wins || wins < 5) return { name: 'Inscrito', icon: '📝', nextLevel: 5, color: '#9fb0c8' };
-    if (wins >= 14) return { name: 'Viber Platina', icon: '👑', nextLevel: null, color: '#e5e4e2' };
-    if (wins >= 12) return { name: 'Viber Diamante', icon: '💎', nextLevel: 14, color: '#b9f2ff' };
-    if (wins >= 9) return { name: 'Viber Ouro', icon: '🥇', nextLevel: 12, color: '#ffd700' };
-    if (wins >= 5) return { name: 'Viber Prata', icon: '🥈', nextLevel: 9, color: '#c0c0c0' };
-    return { name: 'Inscrito', icon: '📝', nextLevel: 5, color: '#9fb0c8' };
+    if (wins >= 15) return { name: 'Diamond', icon: '💎', nextLevel: null, color: '#b9f2ff' };
+    if (wins >= 13) return { name: 'Platinum', icon: '👑', nextLevel: 15, color: '#e5e4e2' };
+    if (wins >= 10) return { name: 'Gold', icon: '🥇', nextLevel: 13, color: '#ffd700' };
+    if (wins >= 5) return { name: 'Silver', icon: '🥈', nextLevel: 10, color: '#c0c0c0' };
+    if (wins >= 1) return { name: 'Bronze', icon: '🥉', nextLevel: 5, color: '#cd7f32' };
+    return { name: 'Inscrito', icon: '📝', nextLevel: 1, color: '#9fb0c8' };
   };
 
   const userLevel = getUserLevel(user?.auctions_won || 0);
@@ -239,6 +258,15 @@ const DashboardUsuario = () => {
                 <span>Comprar Créditos</span>
               </a>
             </div>
+
+            {user?.referral_code && (
+              <div style={{display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', background: 'rgba(74,159,216,0.08)', border: '1px solid rgba(74,159,216,0.2)', borderRadius: '10px', marginBottom: '1.5rem', flexWrap: 'wrap'}}>
+                <span style={{color: '#8da4bf', fontSize: '0.9rem'}}>Seu código de indicação:</span>
+                <code style={{background: 'rgba(255,255,255,0.1)', padding: '0.3rem 0.75rem', borderRadius: '6px', color: '#4A9FD8', fontWeight: '700', letterSpacing: '1px'}}>{user.referral_code}</code>
+                <button onClick={() => { navigator.clipboard.writeText(user.referral_code); alert('Código copiado!'); }} style={{padding: '0.3rem 0.75rem', background: 'rgba(74,159,216,0.15)', border: '1px solid rgba(74,159,216,0.3)', borderRadius: '6px', color: '#4A9FD8', cursor: 'pointer', fontSize: '0.8rem'}}>Copiar</button>
+                <span style={{color: '#8da4bf', fontSize: '0.8rem'}}>Indicações: {user.referral_count || 0}</span>
+              </div>
+            )}
             <div className="stats-grid">
               <div className="stat-card level-card" style={{ borderColor: userLevel.color }}>
                 <div className="stat-content">
@@ -248,7 +276,7 @@ const DashboardUsuario = () => {
                   </p>
                   <p className="stat-description">
                     {userLevel.nextLevel 
-                      ? `${userLevel.nextLevel - (user?.auctions_won || 0)} vitórias para o próximo nível`
+                      ? `${userLevel.nextLevel - (user?.auctions_won || 0)} Vibe(s) para o próximo nível`
                       : 'Você atingiu o nível máximo!'}
                   </p>
                 </div>
@@ -260,7 +288,7 @@ const DashboardUsuario = () => {
               </div>
               <div className="stat-card cashback-card">
                 <div className="stat-content">
-                  <p className="stat-label">Cashback Disponível</p>
+                  <p className="stat-label">GetCoin Disponível</p>
                   <p className="stat-value">R$ {user?.cashback_balance || '0.00'}</p>
                   <p className="stat-description">Disponível para uso</p>
                 </div>
@@ -275,7 +303,7 @@ const DashboardUsuario = () => {
                 <div className="stat-content">
                   <p className="stat-label">Saldo de Créditos</p>
                   <p className="stat-value">R$ {user?.balance || '0.00'}</p>
-                  <p className="stat-description">Disponível para lances</p>
+                  <p className="stat-description">Disponível para Gets</p>
                 </div>
                 <div className="stat-icon">
                   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -424,6 +452,31 @@ const DashboardUsuario = () => {
                           {loadingPix ? 'Gerando...' : 'Gerar Pix'}
                         </button>
                       </div>
+                      {/* Preview do Getcoin */}
+                      {settings?.pix_cashback_enabled !== 'false' && creditAmount > 0 && (() => {
+                        const pct = parseFloat(settings?.pix_cashback_percentage || '10');
+                        const bonus = (parseFloat(creditAmount) * pct / 100).toFixed(2);
+                        return (
+                          <div style={{
+                            marginTop: '0.75rem',
+                            padding: '0.75rem 1rem',
+                            background: 'rgba(74, 159, 216, 0.1)',
+                            border: '1px solid rgba(74, 159, 216, 0.3)',
+                            borderRadius: '8px',
+                            fontSize: '0.9rem',
+                            color: '#4A9FD8',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem'
+                          }}>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/>
+                              <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>
+                            </svg>
+                            Você receberá <strong style={{margin: '0 0.25rem'}}>R$ {bonus}</strong> em Getcoin ({pct}% de cashback)
+                          </div>
+                        );
+                      })()}
                     </div>
                   ) : pixData && (
                     <div className="pix-content">

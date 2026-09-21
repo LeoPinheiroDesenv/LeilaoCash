@@ -10,7 +10,7 @@ const DashboardAdminMarcas = () => {
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingBrand, setEditingBrand] = useState(null);
-  const [formData, setFormData] = useState({ name: '', is_active: true });
+  const [formData, setFormData] = useState({ name: '', meta_keywords: '', is_active: true });
   const [message, setMessage] = useState({ type: '', text: '' });
 
   useEffect(() => {
@@ -37,10 +37,10 @@ const DashboardAdminMarcas = () => {
   const handleOpenModal = (brand = null) => {
     if (brand) {
       setEditingBrand(brand);
-      setFormData({ name: brand.name, is_active: brand.is_active });
+      setFormData({ name: brand.name, meta_keywords: brand.meta_keywords || '', is_active: brand.is_active });
     } else {
       setEditingBrand(null);
-      setFormData({ name: '', is_active: true });
+      setFormData({ name: '', meta_keywords: '', is_active: true });
     }
     setShowModal(true);
     setMessage({ type: '', text: '' });
@@ -152,6 +152,17 @@ const DashboardAdminMarcas = () => {
               required 
               className="form-input"
             />
+          </div>
+          <div className="form-group">
+            <label>Palavras-chave (SEO)</label>
+            <input 
+              type="text" 
+              value={formData.meta_keywords} 
+              onChange={(e) => setFormData({...formData, meta_keywords: e.target.value})} 
+              className="form-input"
+              placeholder="apple, iphone, mac (separadas por vírgula)"
+            />
+            <p className="form-help" style={{ color: '#9fb0c8', fontSize: '0.8rem', marginTop: '0.25rem' }}>Palavras-chave para melhorar a indexação nos buscadores</p>
           </div>
           <div className="form-group checkbox-group">
             <label className="checkbox-label">

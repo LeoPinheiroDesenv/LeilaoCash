@@ -21,6 +21,7 @@ const Categorias = () => {
     name_es: '',
     slug: '',
     description: '',
+    meta_keywords: '',
     icon: '',
     is_active: true,
     sort_order: 0
@@ -60,6 +61,7 @@ const Categorias = () => {
         name_es: category.name_es || '',
         slug: category.slug || '',
         description: category.description || '',
+        meta_keywords: category.meta_keywords || '',
         icon: category.icon || '',
         is_active: category.is_active !== undefined ? category.is_active : true,
         sort_order: category.sort_order || 0
@@ -72,6 +74,7 @@ const Categorias = () => {
         name_es: '',
         slug: '',
         description: '',
+        meta_keywords: '',
         icon: '',
         is_active: true,
         sort_order: 0
@@ -337,6 +340,19 @@ const Categorias = () => {
                     rows="3"
                     className="form-textarea"
                   />
+                </div>
+
+                <div className="form-group form-group-full">
+                  <label>Palavras-chave (SEO)</label>
+                  <input
+                    type="text"
+                    name="meta_keywords"
+                    value={formData.meta_keywords}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    placeholder="eletrônicos, tecnologia, gadgets (separadas por vírgula)"
+                  />
+                  <p className="form-help">Palavras-chave para melhorar a indexação nos buscadores</p>
                 </div>
 
                 <div className="form-row">

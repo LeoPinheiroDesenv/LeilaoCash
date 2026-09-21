@@ -123,8 +123,16 @@ export const ThemeProvider = ({ children }) => {
     document.title = themeSettings.site_name || 'VibeGet - Leilões Online com Cashback';
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-      metaDescription.setAttribute('content', themeSettings.site_description || 'Leilões Online com Cashback');
+      metaDescription.setAttribute('content', themeSettings.site_description || 'Plataforma de leilões online com cashback');
     }
+    // Meta keywords
+    let metaKeywords = document.querySelector('meta[name="keywords"]');
+    if (!metaKeywords) {
+      metaKeywords = document.createElement('meta');
+      metaKeywords.setAttribute('name', 'keywords');
+      document.head.appendChild(metaKeywords);
+    }
+    metaKeywords.setAttribute('content', themeSettings.site_keywords || 'leilão online, cashback, leilão com cashback, comprar barato, descontos, vibeget');
     const favicon = document.querySelector('link[rel="icon"]');
     if (favicon && themeSettings.favicon_url) {
       favicon.href = `${API_BASE_URL}${themeSettings.favicon_url}`;
