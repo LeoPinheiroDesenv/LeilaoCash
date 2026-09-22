@@ -130,24 +130,9 @@ class BidController extends Controller
                 ], 400);
             }
 
-            // Se houver um vencedor anterior, devolver o saldo para ele (modelo tradicional)
-            if ($auction->winner_id) {
-                $previousWinner = \App\Models\User::find($auction->winner_id);
-                if ($previousWinner) {
-                    $previousWinner->balance += $auction->current_bid;
-                    $previousWinner->save();
-
-                    // Registrar transação de estorno
-                    Transaction::create([
-                        'user_id' => $previousWinner->id,
-                        'type' => 'refund',
-                        'amount' => $auction->current_bid,
-                        'status' => 'completed',
-                        'description' => 'Estorno de lance superado no leilão #' . $auction->id,
-                        'auction_id' => $auction->id
-                    ]);
-                }
-            }
+            // O Get é consumido ao ser superado (sem estorno intermediário).
+            // A compensação de 40% ao usuário superado só ocorre no fechamento da Vibe
+            // (ver CloseExpiredVibes::creditLosers).
 
             // Debitar saldo do usuário atual
             $user->balance -= $amount;

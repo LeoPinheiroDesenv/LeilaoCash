@@ -12,3 +12,4 @@ Referências:
 - `mem:suggested_commands` — comandos de dev (docker, artisan, npm).
 - `mem:infra_deploy` — como o deploy real acontece (manual, sem CI/CD) e hospedagem.
 - `mem:task_completion` — o que rodar (e o que NÃO existe) para validar uma tarefa concluída.
+- `mem:backend/ambiente_local_migrations` — drift de migrations no banco local (reconciliado 2026-09-21), o que fazer se `migrate:status` voltar a mostrar "Pending".

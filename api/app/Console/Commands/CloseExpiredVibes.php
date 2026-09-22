@@ -81,10 +81,16 @@ class CloseExpiredVibes extends Command
                 $vibe->post_sale_status = 'pending_contact';
             }
 
-            // Marcar o lance vencedor
-            Bid::where('auction_id', $vibe->id)->update(['is_winning' => false]);
+            // Marcar o lance vencedor via query builder direto nas duas linhas.
+            // NÃO usar $championBid->save() depois do update em massa acima: o
+            // objeto $championBid foi carregado com is_winning=true (valor real
+            // de quando o Get foi dado) e o update em massa não atualiza esse
+            // objeto em memória, então atribuir is_winning=true de novo não fica
+            // "dirty" para o Eloquent e o save() vira no-op — o campeão ficava
+            // com is_winning=false no banco e era creditado como perdedor.
+            Bid::where('auction_id', $vibe->id)->where('id', '!=', $championBid->id)->update(['is_winning' => false]);
+            Bid::where('id', $championBid->id)->update(['is_winning' => true]);
             $championBid->is_winning = true;
-            $championBid->save();
 
             // Atualizar auctions_won e nível do vencedor
             $winner = User::find($championBid->user_id);
@@ -109,7 +115,12 @@ class CloseExpiredVibes extends Command
     }
 
     /**
-     * Credita 40% do valor pago em R$ aos participantes que não venceram
+     * Credita 40% do valor pago em R$ aos participantes que não venceram.
+     *
+     * Esta é a ÚNICA compensação dada a um Get perdedor: o BidController não
+     * estorna o valor do Get quando ele é superado (o Get é consumido). Não
+     * reintroduzir estorno em BidController::store, ou o perdedor passa a
+     * receber 100% de volta em `balance` + estes 40% em `cashback_balance`.
      */
     private function creditLosers(Auction $vibe, ?Bid $championBid)
     {
