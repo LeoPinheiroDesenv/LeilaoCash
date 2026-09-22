@@ -67,6 +67,10 @@ Route::get('/pages/public/{slug}', [\App\Http\Controllers\Api\PageController::cl
 // Public routes - Translations (RENOMEADO PARA EVITAR CONFLITO)
 Route::get('/translations/public', [\App\Http\Controllers\Api\TranslationController::class, 'index']);
 
+// Public routes - Estados e Cidades (para selects de endereço)
+Route::get('/estados', [\App\Http\Controllers\Api\LocationController::class, 'estados']);
+Route::get('/estados/{siglaOuId}/cidades', [\App\Http\Controllers\Api\LocationController::class, 'cidades']);
+
 
 // Protected routes
 Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {

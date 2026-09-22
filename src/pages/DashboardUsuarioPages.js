@@ -4,6 +4,8 @@ import { useAuth } from '../contexts/AuthContext';
 import UserLayout from '../components/UserLayout';
 import Countdown from '../components/Countdown';
 import api from '../services/api';
+import { useViaCep } from '../hooks/useViaCep';
+import { useEstados, useCidades, fetchCidadesByEstado } from '../hooks/useLocations';
 import '../pages/DashboardUsuario.css';
 
 export const DashboardUsuarioMinhaConta = () => {
@@ -12,7 +14,8 @@ export const DashboardUsuarioMinhaConta = () => {
   const [saving, setSaving] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
-  
+  const { fetchAddressByCep, loading: cepLoading, error: cepError } = useViaCep();
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -26,6 +29,9 @@ export const DashboardUsuarioMinhaConta = () => {
     guardian_name: '',
     guardian_cpf: ''
   });
+
+  const estados = useEstados();
+  const cidades = useCidades(formData.state);
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -77,6 +83,37 @@ export const DashboardUsuarioMinhaConta = () => {
     const cleaned = value.replace(/\D/g, '').slice(0, 11);
     // Aplica a máscara (00) 00000 0000
     return cleaned.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2 $3');
+  };
+
+  const formatCEP = (value) => {
+    // Remove tudo que não é dígito e limita a 8 caracteres
+    const cleaned = value.replace(/\D/g, '').slice(0, 8);
+    // Aplica a máscara 00000-000
+    return cleaned.replace(/(\d{5})(\d)/, '$1-$2');
+  };
+
+  const handleCepChange = async (value) => {
+    const formatted = formatCEP(value);
+    setFormData(prev => ({ ...prev, zip_code: formatted }));
+
+    const cleaned = formatted.replace(/\D/g, '');
+    if (cleaned.length === 8) {
+      const endereco = await fetchAddressByCep(cleaned);
+      if (endereco) {
+        // Busca a cidade pelo código IBGE (mais confiável que casar por nome)
+        // na lista do próprio estado retornado, garantindo que o valor exista
+        // entre as opções do select.
+        const cidadesDoEstado = endereco.estado ? await fetchCidadesByEstado(endereco.estado) : [];
+        const cidadeEncontrada = cidadesDoEstado.find(c => String(c.id) === String(endereco.ibge));
+
+        setFormData(prev => ({
+          ...prev,
+          address: endereco.logradouro || prev.address,
+          state: endereco.estado || prev.state,
+          city: cidadeEncontrada?.nome || endereco.cidade || prev.city,
+        }));
+      }
+    }
   };
 
   const handleSaveProfile = async (e) => {
@@ -308,38 +345,49 @@ export const DashboardUsuarioMinhaConta = () => {
             />
           </div>
           <div className="form-group">
+            <label>CEP</label>
+            <input
+              type="text"
+              value={formData.zip_code}
+              onChange={(e) => handleCepChange(e.target.value)}
+              placeholder="00000-000"
+              maxLength="9"
+            />
+            {cepLoading && <small className="field-hint">Buscando endereço...</small>}
+            {!cepLoading && cepError && <small className="field-hint field-hint-error">{cepError}</small>}
+          </div>
+          <div className="form-group">
             <label>Endereço</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={formData.address}
               onChange={(e) => setFormData({...formData, address: e.target.value})}
             />
           </div>
           <div className="form-group">
+            <label>Estado</label>
+            <select
+              value={formData.state}
+              onChange={(e) => setFormData({...formData, state: e.target.value, city: ''})}
+            >
+              <option value="">Selecione...</option>
+              {estados.map(estado => (
+                <option key={estado.sigla} value={estado.sigla}>{estado.nome}</option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
             <label>Cidade</label>
-            <input 
-              type="text" 
+            <select
               value={formData.city}
               onChange={(e) => setFormData({...formData, city: e.target.value})}
-            />
-          </div>
-          <div className="form-group">
-            <label>Estado</label>
-            <input 
-              type="text" 
-              value={formData.state}
-              onChange={(e) => setFormData({...formData, state: e.target.value})}
-              maxLength="2"
-              placeholder="SP"
-            />
-          </div>
-          <div className="form-group">
-            <label>CEP</label>
-            <input 
-              type="text" 
-              value={formData.zip_code}
-              onChange={(e) => setFormData({...formData, zip_code: e.target.value})}
-            />
+              disabled={!formData.state}
+            >
+              <option value="">Selecione...</option>
+              {cidades.map(cidade => (
+                <option key={cidade.id} value={cidade.nome}>{cidade.nome}</option>
+              ))}
+            </select>
           </div>
           <div className="form-group">
             <label>CPF</label>

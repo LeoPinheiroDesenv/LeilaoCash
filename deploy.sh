@@ -32,6 +32,7 @@ echo "Deploying api/ to ${REMOTE_PATH}/api/..."
 rsync -avz \
   --exclude 'vendor/' \
   --exclude '.composer/' \
+  --exclude '.config/' \
     --exclude '.env.local' \
     --exclude '.env.production' \
     --exclude '.env.producao' \

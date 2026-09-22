@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../components/AdminLayout';
 import api from '../services/api';
+import { useViaCep } from '../hooks/useViaCep';
+import { useEstados, useCidades, fetchCidadesByEstado } from '../hooks/useLocations';
 import './Usuarios.css';
 
 const Usuarios = () => {
+  const { fetchAddressByCep, loading: cepLoading, error: cepError } = useViaCep();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -38,6 +41,9 @@ const Usuarios = () => {
     permissions: [],
     is_active: true
   });
+
+  const estados = useEstados();
+  const cidades = useCidades(formData.state);
 
   useEffect(() => {
     loadUsers();
@@ -164,6 +170,13 @@ const Usuarios = () => {
     return cleaned.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2 $3');
   };
 
+  const formatCEP = (value) => {
+    // Remove tudo que não é dígito e limita a 8 caracteres
+    const cleaned = value.replace(/\D/g, '').slice(0, 8);
+    // Aplica a máscara 00000-000
+    return cleaned.replace(/(\d{5})(\d)/, '$1-$2');
+  };
+
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     let formattedValue = value;
@@ -172,12 +185,37 @@ const Usuarios = () => {
       formattedValue = formatCPF(value);
     } else if (name === 'phone') {
       formattedValue = formatPhone(value);
+    } else if (name === 'zip_code') {
+      formattedValue = formatCEP(value);
     }
 
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : formattedValue
+      [name]: type === 'checkbox' ? checked : formattedValue,
+      // Trocar o estado manualmente invalida a cidade selecionada anteriormente
+      ...(name === 'state' ? { city: '' } : {})
     }));
+
+    if (name === 'zip_code') {
+      const cleaned = formattedValue.replace(/\D/g, '');
+      if (cleaned.length === 8) {
+        fetchAddressByCep(cleaned).then(async (endereco) => {
+          if (endereco) {
+            // Busca a cidade pelo código IBGE (mais confiável que casar por nome)
+            // para garantir que o valor exista entre as opções do select.
+            const cidadesDoEstado = endereco.estado ? await fetchCidadesByEstado(endereco.estado) : [];
+            const cidadeEncontrada = cidadesDoEstado.find(c => String(c.id) === String(endereco.ibge));
+
+            setFormData(prev => ({
+              ...prev,
+              address: endereco.logradouro || prev.address,
+              state: endereco.estado || prev.state,
+              city: cidadeEncontrada?.nome || endereco.cidade || prev.city,
+            }));
+          }
+        });
+      }
+    }
 
     // Limpar permissões se mudar para tipo que não precisa
     if (name === 'user_type' && value !== 'secondary') {
@@ -553,6 +591,21 @@ const Usuarios = () => {
                 </div>
 
                 <div className="form-group">
+                  <label>CEP</label>
+                  <input
+                    type="text"
+                    name="zip_code"
+                    value={formData.zip_code}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    placeholder="00000-000"
+                    maxLength={9}
+                  />
+                  {cepLoading && <small className="field-hint">Buscando endereço...</small>}
+                  {!cepLoading && cepError && <small className="field-hint field-hint-error">{cepError}</small>}
+                </div>
+
+                <div className="form-group">
                   <label>Endereço</label>
                   <input
                     type="text"
@@ -565,37 +618,33 @@ const Usuarios = () => {
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Cidade</label>
-                    <input
-                      type="text"
-                      name="city"
-                      value={formData.city}
-                      onChange={handleInputChange}
-                      className="form-input"
-                    />
-                  </div>
-                  <div className="form-group">
                     <label>Estado</label>
-                    <input
-                      type="text"
+                    <select
                       name="state"
                       value={formData.state}
                       onChange={handleInputChange}
-                      maxLength={2}
-                      className="form-input"
-                      placeholder="SP"
-                    />
+                      className="form-select"
+                    >
+                      <option value="">Selecione...</option>
+                      {estados.map(estado => (
+                        <option key={estado.sigla} value={estado.sigla}>{estado.nome}</option>
+                      ))}
+                    </select>
                   </div>
                   <div className="form-group">
-                    <label>CEP</label>
-                    <input
-                      type="text"
-                      name="zip_code"
-                      value={formData.zip_code}
+                    <label>Cidade</label>
+                    <select
+                      name="city"
+                      value={formData.city}
                       onChange={handleInputChange}
-                      className="form-input"
-                      placeholder="00000-000"
-                    />
+                      className="form-select"
+                      disabled={!formData.state}
+                    >
+                      <option value="">Selecione...</option>
+                      {cidades.map(cidade => (
+                        <option key={cidade.id} value={cidade.nome}>{cidade.nome}</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
