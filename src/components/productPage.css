@@ -392,6 +392,30 @@
   font-size: 0.875rem;
   margin: 0;
 }
+.bid-getcoin-option {
+  margin-top: 0.6rem;
+}
+.bid-getcoin-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #9fb0c8;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+.bid-getcoin-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #e55f52;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.bid-getcoin-summary {
+  margin: 0.4rem 0 0;
+  font-size: 0.875rem;
+  color: #e55f52;
+  font-weight: 600;
+}
 .action-buttons {
   display: flex;
   gap: 0.75rem;

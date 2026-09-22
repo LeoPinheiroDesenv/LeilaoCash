@@ -10,13 +10,14 @@ import './productPage.css';
 const ProductPage = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, updateUser } = useAuth();
   const { settings, getText } = useTheme();
   const { t } = useTranslation();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [bidAmount, setBidAmount] = useState('');
+  const [useGetcoin, setUseGetcoin] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isImageFading, setIsImageFading] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(true);
@@ -335,10 +336,18 @@ const ProductPage = () => {
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   };
 
+  // GetCoin pode cobrir no máximo metade do Get (regra: GetCoin usado não pode
+  // passar do valor pago em dinheiro no mesmo Get).
+  const parsedBidAmount = parseFloat(bidAmount) || 0;
+  const availableGetcoin = parseFloat(user?.cashback_balance) || 0;
+  const maxGetcoinForBid = Math.min(parsedBidAmount / 2, availableGetcoin);
+  const getcoinToUse = useGetcoin ? maxGetcoinForBid : 0;
+  const cashToUse = parsedBidAmount - getcoinToUse;
+
   const handleBid = async (e) => {
     e.preventDefault();
     setBidMessage({ type: '', text: '' });
-    
+
     if (!isAuthenticated) {
       navigate('/login', { state: { from: `/produto/${slug}` } });
       return;
@@ -348,15 +357,24 @@ const ProductPage = () => {
         setBidMessage({ type: 'error', text: t('products.not_in_auction') });
         return;
     }
-    
+
     try {
         setBidding(true);
-        const response = await api.post(`/auctions/${auction.id}/bids`, { 
-            amount: parseFloat(bidAmount) 
+        const response = await api.post(`/auctions/${auction.id}/bids`, {
+            amount: parsedBidAmount,
+            getcoin_amount: getcoinToUse
         });
 
         if (response.data.success) {
             setBidMessage({ type: 'success', text: t('products.bid_success') });
+            setUseGetcoin(false);
+            if (user) {
+                updateUser({
+                    ...user,
+                    balance: response.data.data.new_balance,
+                    cashback_balance: response.data.data.new_cashback_balance,
+                });
+            }
             await loadProduct();
         } else {
             setBidMessage({ type: 'error', text: response.data.message || t('products.bid_error_generic') });
@@ -796,11 +814,31 @@ const ProductPage = () => {
                     </button>
                   </div>
                   <p className="bid-info">
-                    {isGetsHidden 
+                    {isGetsHidden
                       ? `${t('products.min_bid')}: R$ ${parsePrice(auction.starting_bid || product?.price).toFixed(2).replace('.', ',')} | Valor do seu Get é secreto até o encerramento`
                       : `${t('products.min_bid')}: R$ ${minBid.toFixed(2).replace('.', ',')} | ${t('products.increment')}: R$ 0,50`
                     }
                   </p>
+
+                  {isAuthenticated && availableGetcoin > 0 && (
+                    <div className="bid-getcoin-option">
+                      <label className="bid-getcoin-checkbox">
+                        <input
+                          type="checkbox"
+                          checked={useGetcoin}
+                          onChange={(e) => setUseGetcoin(e.target.checked)}
+                          disabled={bidding || parsedBidAmount <= 0}
+                        />
+                        {getText('text_use_getcoin_in_bid', 'Usar meu GetCoin neste Get')}
+                        {' '}(saldo: {availableGetcoin.toFixed(2).replace('.', ',')} GetCoin)
+                      </label>
+                      {useGetcoin && parsedBidAmount > 0 && (
+                        <p className="bid-getcoin-summary">
+                          {getText('text_bid_split_summary', 'Você paga')}: R$ {cashToUse.toFixed(2).replace('.', ',')} {getText('text_in_cash', 'em dinheiro')} + {getcoinToUse.toFixed(2).replace('.', ',')} GetCoin
+                        </p>
+                      )}
+                    </div>
+                  )}
 
                   {bidMessage.text && (
                       <div className={`alert alert-${bidMessage.type}`} style={{ marginTop: '1rem', padding: '0.8rem', fontSize: '0.9rem' }}>

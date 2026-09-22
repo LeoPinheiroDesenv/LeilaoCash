@@ -132,8 +132,10 @@ class CloseExpiredVibes extends Command
             $user = User::find($bid->user_id);
             if (!$user) continue;
 
-            // 40% do valor do Get como cashback
-            $cashbackAmount = round($bid->amount * 0.40, 2);
+            // 40% do valor pago em DINHEIRO no Get como cashback (GetCoin já usado
+            // no próprio Get não entra nessa base — só o que saiu do bolso em R$).
+            $cashBase = $bid->cash_amount ?? $bid->amount;
+            $cashbackAmount = round($cashBase * 0.40, 2);
 
             if ($cashbackAmount > 0) {
                 $user->cashback_balance += $cashbackAmount;

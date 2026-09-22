@@ -499,9 +499,53 @@ const Configuracoes = () => {
     // Getcoin settings
     const pixCashbackEnabled = paymentSettings.find(s => s.key === 'pix_cashback_enabled')?.value ?? 'true';
     const pixCashbackPercentage = paymentSettings.find(s => s.key === 'pix_cashback_percentage')?.value ?? '10';
+    const welcomeBonusEnabled = paymentSettings.find(s => s.key === 'welcome_bonus_enabled')?.value ?? 'true';
+    const welcomeBonusGetcoin = paymentSettings.find(s => s.key === 'welcome_bonus_getcoin')?.value ?? '10';
 
     return (
       <div className="settings-section">
+        {/* Getcoin — Bônus de Boas-vindas */}
+        <h3>Getcoin — Bônus de Boas-vindas</h3>
+        <p className="section-description">
+          Quando ativado, todo novo usuário recebe automaticamente uma quantidade fixa de Getcoin ao concluir o cadastro.
+        </p>
+        <div className="settings-grid" style={{marginBottom: '2rem'}}>
+          <div className="setting-item">
+            <div className="setting-header">
+              <label className="setting-label">Ativar Getcoin de boas-vindas</label>
+              <span className="setting-key">welcome_bonus_enabled</span>
+            </div>
+            <select
+              value={welcomeBonusEnabled}
+              onChange={(e) => handleInputChange('welcome_bonus_enabled', e.target.value)}
+              className="text-input"
+            >
+              <option value="true">Sim — ativado</option>
+              <option value="false">Não — desativado</option>
+            </select>
+          </div>
+          <div className="setting-item">
+            <div className="setting-header">
+              <label className="setting-label">Quantidade de Getcoin no cadastro</label>
+              <span className="setting-key">welcome_bonus_getcoin</span>
+            </div>
+            <input
+              type="number"
+              min="0"
+              step="0.5"
+              value={welcomeBonusGetcoin}
+              onChange={(e) => handleInputChange('welcome_bonus_getcoin', e.target.value)}
+              className="text-input"
+              placeholder="10"
+            />
+            <p className="setting-help-text" style={{fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)', marginTop: '0.3rem'}}>
+              Quantidade de Getcoin creditada a cada novo cadastro.
+            </p>
+          </div>
+        </div>
+
+        <div className="settings-divider"></div>
+
         {/* Getcoin — Cashback em Pix */}
         <h3>Getcoin — Cashback em Recargas via Pix</h3>
         <p className="section-description">

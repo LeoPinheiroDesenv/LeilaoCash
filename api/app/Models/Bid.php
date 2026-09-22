@@ -15,6 +15,8 @@ class Bid extends Model
         'auction_id',
         'product_id',
         'amount',
+        'cash_amount',
+        'getcoin_amount',
         'is_winning',
         'ip_address',
         'user_agent'
@@ -22,6 +24,8 @@ class Bid extends Model
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'cash_amount' => 'decimal:2',
+        'getcoin_amount' => 'decimal:2',
         'is_winning' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',

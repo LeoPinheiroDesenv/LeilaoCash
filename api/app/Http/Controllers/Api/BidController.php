@@ -78,11 +78,25 @@ class BidController extends Controller
         $user = $request->user();
 
         // Validação
+        // 'amount' é o valor TOTAL do Get. 'getcoin_amount' (opcional) é a parte
+        // desse total paga com GetCoin (cashback_balance); o restante é pago em
+        // dinheiro (cash_amount). Regra de negócio: GetCoin usado não pode passar
+        // do valor pago em dinheiro no mesmo Get.
         $request->validate([
-            'amount' => 'required|numeric|min:0.01'
+            'amount' => 'required|numeric|min:0.01',
+            'getcoin_amount' => 'nullable|numeric|min:0',
         ]);
 
         $amount = (float) $request->amount;
+        $getcoinAmount = (float) ($request->getcoin_amount ?? 0);
+        $cashAmount = $amount - $getcoinAmount;
+
+        if ($getcoinAmount > $cashAmount) {
+            return response()->json([
+                'success' => false,
+                'message' => 'O valor em GetCoin não pode ser maior que o valor pago em dinheiro no mesmo Get.'
+            ], 400);
+        }
 
         DB::beginTransaction();
 
@@ -122,31 +136,55 @@ class BidController extends Controller
                 ], 400);
             }
 
-            // Verificar saldo do usuário
-            if ($user->balance < $amount) {
+            // Verificar saldo do usuário (dinheiro e, se usado, GetCoin)
+            if ($user->balance < $cashAmount) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Saldo insuficiente para realizar este lance.'
                 ], 400);
             }
+            if ($getcoinAmount > 0 && $user->cashback_balance < $getcoinAmount) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Saldo de GetCoin insuficiente para realizar este lance.'
+                ], 400);
+            }
 
             // O Get é consumido ao ser superado (sem estorno intermediário).
-            // A compensação de 40% ao usuário superado só ocorre no fechamento da Vibe
+            // A compensação de 40% ao usuário superado só ocorre no fechamento da Vibe,
+            // calculada sobre a parte paga em dinheiro (cash_amount), não sobre o GetCoin usado
             // (ver CloseExpiredVibes::creditLosers).
 
             // Debitar saldo do usuário atual
-            $user->balance -= $amount;
+            $user->balance -= $cashAmount;
+            if ($getcoinAmount > 0) {
+                $user->cashback_balance -= $getcoinAmount;
+            }
             $user->save();
 
-            // Registrar transação de débito
-            Transaction::create([
-                'user_id' => $user->id,
-                'type' => 'bid_purchase', // Corrigido de 'bid' para 'bid_purchase'
-                'amount' => $amount,
-                'status' => 'completed',
-                'description' => 'Lance no leilão #' . $auction->id,
-                'auction_id' => $auction->id
-            ]);
+            // Registrar transação de débito em dinheiro
+            if ($cashAmount > 0) {
+                Transaction::create([
+                    'user_id' => $user->id,
+                    'type' => 'bid_purchase', // Corrigido de 'bid' para 'bid_purchase'
+                    'amount' => $cashAmount,
+                    'status' => 'completed',
+                    'description' => 'Lance no leilão #' . $auction->id,
+                    'auction_id' => $auction->id
+                ]);
+            }
+
+            // Registrar transação de débito em GetCoin, se usado
+            if ($getcoinAmount > 0) {
+                Transaction::create([
+                    'user_id' => $user->id,
+                    'type' => 'bid_getcoin_purchase',
+                    'amount' => $getcoinAmount,
+                    'status' => 'completed',
+                    'description' => 'GetCoin usado no lance do leilão #' . $auction->id,
+                    'auction_id' => $auction->id
+                ]);
+            }
 
             // Criar o lance
             $bid = Bid::create([
@@ -154,6 +192,8 @@ class BidController extends Controller
                 'auction_id' => $auction->id,
                 'product_id' => $auction->product_id,
                 'amount' => $amount,
+                'cash_amount' => $cashAmount,
+                'getcoin_amount' => $getcoinAmount,
                 'is_winning' => true, // Temporariamente vencedor
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->userAgent()
@@ -179,7 +219,8 @@ class BidController extends Controller
                 'data' => [
                     'bid' => $bid,
                     'auction' => $auction,
-                    'new_balance' => $user->balance
+                    'new_balance' => $user->balance,
+                    'new_cashback_balance' => $user->cashback_balance
                 ]
             ]);
 

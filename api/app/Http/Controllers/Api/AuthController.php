@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Setting;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -82,6 +84,8 @@ class AuthController extends Controller
 
             $user = User::create($userData);
 
+            $this->applyWelcomeBonus($user);
+
             $token = $user->createToken('auth_token')->plainTextToken;
 
             return response()->json([
@@ -101,6 +105,29 @@ class AuthController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Credita o GetCoin de boas-vindas ao usuário recém-cadastrado.
+     */
+    private function applyWelcomeBonus(User $user)
+    {
+        $enabled = Setting::getValue('welcome_bonus_enabled', 'true');
+        if ($enabled !== 'true') return;
+
+        $bonusAmount = (float) Setting::getValue('welcome_bonus_getcoin', '10');
+        if ($bonusAmount <= 0) return;
+
+        $user->cashback_balance += $bonusAmount;
+        $user->save();
+
+        Transaction::create([
+            'user_id' => $user->id,
+            'type' => 'cashback',
+            'amount' => $bonusAmount,
+            'status' => 'completed',
+            'description' => "GetCoin de boas-vindas: {$bonusAmount}",
+        ]);
     }
 
     /**
