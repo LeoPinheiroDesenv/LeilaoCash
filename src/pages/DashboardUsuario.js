@@ -289,7 +289,7 @@ const DashboardUsuario = () => {
               <div className="stat-card cashback-card">
                 <div className="stat-content">
                   <p className="stat-label">GetCoin Disponível</p>
-                  <p className="stat-value">R$ {user?.cashback_balance || '0.00'}</p>
+                  <p className="stat-value">G$ {user?.cashback_balance || '0.00'}</p>
                   <p className="stat-description">Disponível para uso</p>
                 </div>
                 <div className="stat-icon">

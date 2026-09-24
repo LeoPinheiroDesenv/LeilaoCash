@@ -63,7 +63,7 @@ fi
 
 # 4) Seeders idempotentes (updateOrCreate / updateOrInsert)
 # Apenas seeders seguros para re-executar em produção
-SAFE_SEEDERS="TranslationSeeder TextSettingsSeeder LevelRulesSeeder"
+SAFE_SEEDERS="TranslationSeeder TextSettingsSeeder LevelRulesSeeder EstadoCidadeSeeder"
 
 echo ""
 echo "=== Running safe seeders ==="

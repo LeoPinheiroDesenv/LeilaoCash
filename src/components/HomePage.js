@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Hero from './Hero';
+import PegueAVisao from './PegueAVisao';
 import WhyChooseUs from './WhyChooseUs';
 import ProductSection from './ProductSection';
 import AuctionCard from './AuctionCard';
@@ -193,6 +194,7 @@ const HomePage = ({ searchTerm, onSearch }) => {
                     onSelectCategory={handleSelectCategory}
                     onSearch={onSearch}
                 />
+                <PegueAVisao />
                 <main>
                     <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
                         <p style={{ color: '#E55F52', marginBottom: '1rem' }}>{error}</p>
@@ -214,6 +216,7 @@ const HomePage = ({ searchTerm, onSearch }) => {
                 onSelectCategory={handleSelectCategory}
                 onSearch={onSearch}
             />
+            <PegueAVisao />
             <main>
                 {loading ? (
                     <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>

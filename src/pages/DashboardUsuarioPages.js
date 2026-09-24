@@ -656,19 +656,15 @@ export const DashboardUsuarioMeusLances = () => {
       <div className="bids-stats">
         <div className="bid-stat-card">
           <p className="stat-number">{stats.total}</p>
-          <p className="stat-label">Total de Lances</p>
+          <p className="stat-label">Total de Gets</p>
         </div>
         <div className="bid-stat-card">
           <p className="stat-number">{stats.winning}</p>
-          <p className="stat-label">Leilões Vencidos</p>
+          <p className="stat-label">Vibes Vencidas</p>
         </div>
         <div className="bid-stat-card">
           <p className="stat-number">{stats.active}</p>
-          <p className="stat-label">Lances Ativos</p>
-        </div>
-        <div className="bid-stat-card">
-          <p className="stat-number">{stats.leading}</p>
-          <p className="stat-label">Vencendo</p>
+          <p className="stat-label">Gets Ativos</p>
         </div>
       </div>
       <div className="bids-history-section">
@@ -677,7 +673,7 @@ export const DashboardUsuarioMeusLances = () => {
           <div style={{ padding: '2rem', textAlign: 'center', color: '#8da4bf' }}>
             <p>Você ainda não fez nenhum lance.</p>
             <Link to="/" style={{ color: '#4A9FD8', textDecoration: 'none', marginTop: '1rem', display: 'inline-block' }}>
-              Ver leilões disponíveis →
+              Ver Vibes disponíveis →
             </Link>
           </div>
         ) : (
@@ -938,7 +934,7 @@ export const DashboardUsuarioMeuCashback = () => {
         </svg>
         <div>
           <h4>Como funciona o Cashback?</h4>
-          <p>Você ganha cashback em cada lance dado! A porcentagem varia de 3% a 10% dependendo do leilão. O valor é creditado automaticamente após o encerramento do leilão e pode ser sacado via Pix.</p>
+          <p>Conforme você sobe de nível, aumenta o percentual de Cashback que você recebe na compra de créditos. Na indicação de novos inscritos é onde você mais ganha. E, ao participar de uma Vibe, mesmo que não seja o vencedor, você também ganha Cashback.</p>
         </div>
       </div>
       <div className="cashback-history-section">
