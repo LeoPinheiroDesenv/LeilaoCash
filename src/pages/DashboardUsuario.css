@@ -78,24 +78,6 @@
   gap: 16px;
 }
 
-.cashback-display {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: var(--color-text);
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.cashback-display svg {
-  width: 20px;
-  height: 20px;
-}
-
 .user-menu {
   display: flex;
   align-items: center;
@@ -1416,9 +1398,6 @@
   .header-actions {
     gap: 8px; /* Reduced gap */
   }
-  .cashback-display {
-    padding: 6px 10px;
-  }
   .user-menu {
     padding: 6px 10px;
   }
@@ -1458,13 +1437,11 @@
     justify-content: center;
     width: 100%; /* Take full width to center items */
   }
-  .cashback-display,
   .user-menu,
   .dashboard-header .btn-logout {
-    flex-grow: 1; /* Allow these items to grow and fill space */
+    flex-grow: 1;
     justify-content: center;
   }
-  .cashback-display span,
   .user-menu span {
     white-space: nowrap; /* Prevent text wrapping inside buttons/displays */
   }
@@ -1502,5 +1479,69 @@
   .copy-paste-input button {
     width: 100%;
     padding: 12px;
+  }
+}
+/* Meu GetCoin: atalhos para o Marketplace (comprar da VibeGet ou de outros Vibers) */
+.getcoin-buy-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(74, 159, 216, 0.1), rgba(74, 159, 216, 0.03));
+  border-radius: 16px;
+  border: 1px solid rgba(74, 159, 216, 0.25);
+  margin-bottom: 32px;
+}
+
+.getcoin-buy-card h4 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text);
+  font-family: var(--font-secondary, 'Roboto', system-ui, sans-serif);
+}
+
+.getcoin-buy-card p {
+  margin: 0;
+  font-size: 14px;
+  color: #9fb0c8;
+  line-height: 1.6;
+}
+
+.getcoin-buy-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-getcoin-buy {
+  padding: 12px 20px;
+  border-radius: 10px;
+  background: #4A9FD8;
+  border: 1px solid #4A9FD8;
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.btn-getcoin-buy:hover {
+  opacity: 0.9;
+}
+
+.btn-getcoin-buy.secondary {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(74, 159, 216, 0.4);
+  color: var(--color-text);
+}
+
+@media (max-width: 640px) {
+  .getcoin-buy-actions,
+  .btn-getcoin-buy {
+    width: 100%;
+    text-align: center;
   }
 }
