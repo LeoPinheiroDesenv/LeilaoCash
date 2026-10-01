@@ -22,6 +22,12 @@ class Bid extends Model
         'user_agent'
     ];
 
+    // Dados pessoais de quem deu o Get: ficam no banco, mas nunca saem na API
+    protected $hidden = [
+        'ip_address',
+        'user_agent',
+    ];
+
     protected $casts = [
         'amount' => 'decimal:2',
         'cash_amount' => 'decimal:2',

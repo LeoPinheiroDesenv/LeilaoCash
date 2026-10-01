@@ -109,15 +109,8 @@ class ProductController extends Controller
                 $product = $query->where('slug', $id)->firstOrFail();
             }
 
-            // Se a Vibe estiver ativa, ocultar Gets individuais (regra de negócio)
-            // Ninguém vê valores individuais até a Vibe encerrar
-            if ($product->auction && $product->auction->status === 'active') {
-                $auction = $product->auction;
-                // Remover bids individuais - manter apenas contagem e somatória
-                $product->auction->setRelation('bids', collect([]));
-                // Ocultar current_bid (maior Get) durante a Vibe ativa
-                $product->auction->makeHidden(['current_bid']);
-            }
+            // Ninguém vê os Gets, o maior Get nem quem está na frente até a Vibe encerrar
+            $product->auction?->hideDisputeData();
 
             return response()->json([
                 'success' => true,
@@ -425,6 +418,8 @@ class ProductController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->limit(4)
                 ->get();
+
+            $related->each(fn ($relatedProduct) => $relatedProduct->auction?->hideDisputeData());
 
             return response()->json([
                 'success' => true,

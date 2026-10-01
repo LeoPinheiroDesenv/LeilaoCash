@@ -5,9 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Auction;
 use App\Models\Product;
-use App\Models\User;
-use App\Models\Bid;
-use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
@@ -19,6 +16,20 @@ class AuctionController extends Controller
      * Listar todos os leilões
      */
     public function index(Request $request)
+    {
+        return $this->listAuctions($request, false);
+    }
+
+    /**
+     * Listar Vibes no site: sem o maior Get nem quem está na frente enquanto a
+     * Vibe não encerra, e do vencedor só o nome (nunca e-mail ou outros dados)
+     */
+    public function publicIndex(Request $request)
+    {
+        return $this->listAuctions($request, true);
+    }
+
+    private function listAuctions(Request $request, bool $public)
     {
         try {
             $query = Auction::query();
@@ -70,12 +81,16 @@ class AuctionController extends Controller
                 'products.categoryModel',
                 'products.brandModel',
                 'products.productModel',
-                'winner:id,name,email'
+                $public ? 'winner:id,name' : 'winner:id,name,email'
             ]);
 
             // Paginação
             $perPage = $request->get('per_page', 15);
             $auctions = $query->orderBy('created_at', 'desc')->paginate($perPage);
+
+            if ($public) {
+                $auctions->getCollection()->each->hideDisputeData();
+            }
 
             return response()->json([
                 'success' => true,
@@ -124,6 +139,10 @@ class AuctionController extends Controller
                 ->take(4)
                 ->get();
 
+            foreach ([$featured, $hot, $ending] as $vibes) {
+                $vibes->each->hideDisputeData();
+            }
+
             return response()->json([
                 'success' => true,
                 'data' => [
@@ -156,6 +175,31 @@ class AuctionController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => $auction
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Leilão não encontrado'
+            ], 404);
+        }
+    }
+
+    /**
+     * Obter uma Vibe para o site (mesmo sigilo de publicIndex)
+     */
+    public function publicShow($id)
+    {
+        try {
+            $auction = Auction::with([
+                'products.categoryModel',
+                'products.brandModel',
+                'products.productModel',
+                'winner:id,name'
+            ])->findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'data' => $auction->hideDisputeData()
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -336,31 +380,19 @@ class AuctionController extends Controller
                 }
             }
 
-            // Verificar se o status mudou para 'finished'
-            $oldStatus = $auction->status;
-            $newStatus = $request->status;
+            // Mudar o status para Finalizado encerra a Vibe pela regra única (Auction::close),
+            // a mesma do encerramento automático: não basta gravar o status
+            $closing = $request->status === 'finished' && $auction->status !== 'finished';
 
             // Atualizar outros campos
-            $updateData = $request->except('product_ids');
+            $updateData = $request->except($closing ? ['product_ids', 'status'] : ['product_ids']);
             if (!\Schema::hasColumn('auctions', 'meta_keywords')) {
                 unset($updateData['meta_keywords']);
             }
             $auction->update($updateData);
 
-            // Se o leilão foi finalizado e tem um vencedor, incrementar vitórias do usuário
-            if ($oldStatus !== 'finished' && $newStatus === 'finished' && $auction->winner_id) {
-                $winner = User::find($auction->winner_id);
-                if ($winner) {
-                    $winner->increment('auctions_won');
-                    Log::info('[AuctionController] Incrementado vitórias do usuário', [
-                        'user_id' => $winner->id,
-                        'auction_id' => $auction->id,
-                        'new_total' => $winner->auctions_won
-                    ]);
-                }
-
-                // Distribuir Cashback para os participantes não vencedores
-                $this->distributeCashback($auction);
+            if ($closing) {
+                $auction->close();
             }
 
             Log::info('[AuctionController] Leilão atualizado', [
@@ -441,91 +473,6 @@ class AuctionController extends Controller
     }
 
     /**
-     * Distribui cashback para os participantes do leilão (exceto o vencedor)
-     */
-    private function distributeCashback(Auction $auction)
-    {
-        try {
-            // Buscar todos os usuários que deram lances neste leilão
-            $bidders = Bid::where('auction_id', $auction->id)
-                        ->select('user_id')
-                        ->distinct()
-                        ->pluck('user_id');
-
-            foreach ($bidders as $userId) {
-                // Pular o vencedor (geralmente não recebe cashback dos lances, pois ganhou o produto)
-                if ($userId == $auction->winner_id) {
-                    continue;
-                }
-
-                $user = User::find($userId);
-                if (!$user) continue;
-
-                // Calcular total gasto pelo usuário neste leilão
-                $totalSpent = Bid::where('auction_id', $auction->id)
-                                ->where('user_id', $userId)
-                                ->sum('amount');
-
-                if ($totalSpent > 0) {
-                    $percentage = $this->calculateCashbackPercentage($user->auctions_won ?? 0);
-                    $cashbackAmount = $totalSpent * ($percentage / 100);
-
-                    // Creditar cashback
-                    $user->cashback_balance = ($user->cashback_balance ?? 0) + $cashbackAmount;
-                    $user->save();
-
-                    // Registrar transação
-                    Transaction::create([
-                        'user_id' => $user->id,
-                        'type' => 'cashback',
-                        'amount' => $cashbackAmount,
-                        'status' => 'completed',
-                        'description' => "Cashback de {$percentage}% referente ao leilão #{$auction->id} (Nível: " . $this->getLevelName($user->auctions_won ?? 0) . ")",
-                        'auction_id' => $auction->id
-                    ]);
-
-                    Log::info("[AuctionController] Cashback creditado", [
-                        'user_id' => $user->id,
-                        'auction_id' => $auction->id,
-                        'amount' => $cashbackAmount,
-                        'percentage' => $percentage,
-                        'level' => $this->getLevelName($user->auctions_won ?? 0)
-                    ]);
-                }
-            }
-        } catch (\Exception $e) {
-            Log::error('[AuctionController] Erro ao distribuir cashback', [
-                'auction_id' => $auction->id,
-                'error' => $e->getMessage()
-            ]);
-        }
-    }
-
-    /**
-     * Calcula a porcentagem de cashback baseada no número de vitórias
-     */
-    private function calculateCashbackPercentage($wins)
-    {
-        if ($wins >= 14) return 60; // Platina (14+)
-        if ($wins >= 12) return 50; // Diamante (12-13)
-        if ($wins >= 5)  return 45; // Prata (5-8) e Ouro (9-11)
-        return 40;                  // Base/Bronze (0-4)
-    }
-
-    /**
-     * Retorna o nome do nível baseado nas vitórias
-     */
-    private function getLevelName($wins)
-    {
-        if ($wins >= 15) return 'Diamond';
-        if ($wins >= 13) return 'Platinum';
-        if ($wins >= 10) return 'Gold';
-        if ($wins >= 5)  return 'Silver';
-        if ($wins >= 1)  return 'Bronze';
-        return 'Inscrito';
-    }
-
-    /**
      * Atualizar dados de pós-venda de uma Vibe encerrada
      */
     public function updatePostSale(Request $request, $id)
@@ -583,73 +530,12 @@ class AuctionController extends Controller
                 ], 422);
             }
 
-            // Usar o mesmo comando
-            \Artisan::call('vibes:close-expired', [], new \Symfony\Component\Console\Output\NullOutput());
-
-            // Se o comando não encerrou (porque não expirou), forçar
-            $auction->refresh();
-            if ($auction->status === 'active') {
-                // Forçar encerramento
-                $championBid = Bid::where('auction_id', $auction->id)
-                    ->orderByDesc('amount')
-                    ->first();
-
-                $totalGets = Bid::where('auction_id', $auction->id)->sum('amount');
-
-                $auction->status = 'finished';
-                if (\Schema::hasColumn('auctions', 'closed_at')) {
-                    $auction->closed_at = now();
-                    $auction->total_gets_amount = $totalGets;
-                }
-
-                if ($championBid) {
-                    $auction->winner_id = $championBid->user_id;
-                    $auction->current_bid = $championBid->amount;
-                    if (\Schema::hasColumn('auctions', 'champion_get_amount')) {
-                        $auction->champion_get_amount = $championBid->amount;
-                    }
-                    if (\Schema::hasColumn('auctions', 'post_sale_status')) {
-                        $auction->post_sale_status = 'pending_contact';
-                    }
-
-                    Bid::where('auction_id', $auction->id)->update(['is_winning' => false]);
-                    $championBid->is_winning = true;
-                    $championBid->save();
-
-                    $winner = User::find($championBid->user_id);
-                    if ($winner) {
-                        $winner->auctions_won = ($winner->auctions_won ?? 0) + 1;
-                        $winner->save();
-                        if (method_exists($winner, 'recalculateViberLevel')) {
-                            $winner->recalculateViberLevel();
-                        }
-                    }
-                }
-
-                $auction->save();
-
-                // Creditar perdedores
-                $losingBids = Bid::where('auction_id', $auction->id)
-                    ->where('is_winning', false)
-                    ->get();
-
-                foreach ($losingBids as $bid) {
-                    $user = User::find($bid->user_id);
-                    if (!$user) continue;
-                    $cashbackAmount = round($bid->amount * 0.40, 2);
-                    if ($cashbackAmount > 0) {
-                        $user->cashback_balance += $cashbackAmount;
-                        $user->save();
-                        Transaction::create([
-                            'user_id' => $user->id,
-                            'type' => 'cashback',
-                            'amount' => $cashbackAmount,
-                            'status' => 'completed',
-                            'description' => "GetCoin: 40% de retorno na Vibe \"{$auction->title}\"",
-                            'auction_id' => $auction->id,
-                        ]);
-                    }
-                }
+            // Encerra só esta Vibe, mesmo antes da data de fim, pela regra única
+            if (!$auction->close()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Esta Vibe já foi encerrada.'
+                ], 422);
             }
 
             return response()->json([

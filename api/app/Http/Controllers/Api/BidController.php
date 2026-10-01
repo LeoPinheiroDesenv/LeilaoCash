@@ -127,12 +127,13 @@ class BidController extends Controller
                 ], 400);
             }
 
-            // Verificar se o lance é maior que o atual
+            // Verificar se o lance é maior que o atual. A mensagem não traz o valor: o maior
+            // Get é sigiloso até a Vibe encerrar (regra do dono do produto)
             $currentBid = (float) ($auction->current_bid ?? $auction->starting_bid);
             if ($amount <= $currentBid) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'O valor do lance deve ser maior que o lance atual (R$ ' . number_format($currentBid, 2, ',', '.') . ').'
+                    'message' => 'Seu Get não foi aceito: ele precisa ser maior que o maior Get atual desta Vibe, que fica em sigilo até o encerramento. Tente um valor maior.'
                 ], 400);
             }
 
@@ -153,7 +154,7 @@ class BidController extends Controller
             // O Get é consumido ao ser superado (sem estorno intermediário).
             // A compensação de 40% ao usuário superado só ocorre no fechamento da Vibe,
             // calculada sobre a parte paga em dinheiro (cash_amount), não sobre o GetCoin usado
-            // (ver CloseExpiredVibes::creditLosers).
+            // (ver Auction::close / creditLosers).
 
             // Debitar saldo do usuário atual
             $user->balance -= $cashAmount;
