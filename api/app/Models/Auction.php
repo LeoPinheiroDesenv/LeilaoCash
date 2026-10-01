@@ -13,10 +13,20 @@ class Auction extends Model
     use HasFactory, SoftDeletes;
 
     /**
-     * Percentual da parte paga em R$ de cada Get perdedor que volta como GetCoin
-     * no encerramento da Vibe.
+     * Cashback (%) padrão de uma Vibe nova: percentual da parte paga em R$ de cada
+     * Get perdedor que volta como GetCoin no encerramento.
      */
-    public const LOSER_GETCOIN_RATE = 0.40;
+    public const DEFAULT_CASHBACK_PERCENTAGE = 40;
+
+    /**
+     * Incremento de Get padrão de uma Vibe nova (R$).
+     */
+    public const DEFAULT_BID_INCREMENT = 1.00;
+
+    /**
+     * Incremento mínimo, se a Vibe estiver com 0: o Get só precisa superar o maior.
+     */
+    private const MIN_BID_INCREMENT = 0.01;
 
     protected $fillable = [
         'title',
@@ -96,8 +106,9 @@ class Auction extends Model
      * vibes:close-expired, pelo botão "Encerrar Vibe" e pela troca de status para
      * Finalizado no admin:
      * - o maior Get é o Champion Get e o dono dele vence (vitória + nível Viber);
-     * - cada um dos outros Gets, inclusive os menores do próprio vencedor, recebe
-     *   40% em GetCoin da parte paga em R$ (o GetCoin usado no Get não entra).
+     * - cada um dos outros Gets, inclusive os menores do próprio vencedor, recebe em
+     *   GetCoin o Cashback (%) da Vibe sobre a parte paga em R$ (o GetCoin usado no
+     *   Get não entra).
      *
      * Retorna false, sem alterar nada, se a Vibe já estava finalizada ou cancelada:
      * assim o cron e o admin encerrando ao mesmo tempo não creditam duas vezes.
@@ -157,35 +168,105 @@ class Auction extends Model
     }
 
     /**
-     * Credita em GetCoin 40% da parte paga em R$ de cada Get que não venceu.
+     * Cancela a Vibe e devolve em GetCoin o valor total de cada Get (a parte paga em
+     * R$ e o GetCoin usado). Decisão do dono do produto: Get de Vibe cancelada vira
+     * GetCoin, não volta em R$.
+     *
+     * Retorna false, sem alterar nada, se a Vibe já estava finalizada ou cancelada:
+     * uma Vibe encerrada já teve vencedor e GetCoin creditados.
+     */
+    public function cancel(): bool
+    {
+        $cancelled = DB::transaction(function () {
+            $vibe = static::whereKey($this->id)->lockForUpdate()->first();
+            if (!$vibe || in_array($vibe->status, ['finished', 'cancelled'])) {
+                return null;
+            }
+
+            $vibe->status = 'cancelled';
+            $vibe->closed_at = now();
+            $vibe->winner_id = null;
+            $vibe->total_gets_amount = Bid::where('auction_id', $vibe->id)->sum('amount');
+            $vibe->save();
+
+            Bid::where('auction_id', $vibe->id)->update(['is_winning' => false]);
+
+            foreach (Bid::where('auction_id', $vibe->id)->get() as $bid) {
+                $vibe->creditGetcoin($bid->user_id, (float) $bid->amount, "GetCoin: devolução do Get na Vibe cancelada \"{$vibe->title}\"");
+            }
+
+            return $vibe;
+        });
+
+        if (!$cancelled) {
+            return false;
+        }
+
+        $this->setRawAttributes($cancelled->getAttributes(), true);
+        Log::info("[CancelVibe] Vibe #{$this->id} cancelada. Gets devolvidos em GetCoin: R$ {$this->total_gets_amount}");
+
+        return true;
+    }
+
+    /**
+     * Cashback (%) configurado na Vibe (decisão do dono do produto: vale o valor do
+     * campo, inclusive 0).
+     */
+    public function cashbackPercentage(): float
+    {
+        return (float) $this->cashback_percentage;
+    }
+
+    /**
+     * Quanto um Get precisa superar o maior Get da Vibe (Incremento de Get).
+     */
+    public function bidIncrement(): float
+    {
+        return (float) $this->bid_increment > 0 ? (float) $this->bid_increment : self::MIN_BID_INCREMENT;
+    }
+
+    /**
+     * Credita em GetCoin o Cashback (%) da Vibe sobre a parte paga em R$ de cada
+     * Get que não venceu.
      *
      * É a ÚNICA compensação de um Get perdedor: o BidController não estorna o Get
      * quando ele é superado (o Get é consumido). Não reintroduzir estorno no
-     * BidController, senão o perdedor recebe 100% em R$ + estes 40% em GetCoin.
+     * BidController, senão o perdedor recebe 100% em R$ + este Cashback em GetCoin.
      */
     private function creditLosers(): void
     {
+        $percentage = $this->cashbackPercentage();
+        $label = rtrim(rtrim(number_format($percentage, 2, ',', ''), '0'), ',');
+
         $losingBids = Bid::where('auction_id', $this->id)
             ->where('is_winning', false)
             ->get();
 
         foreach ($losingBids as $bid) {
             $cashBase = $bid->cash_amount ?? $bid->amount;
-            $getcoin = round($cashBase * self::LOSER_GETCOIN_RATE, 2);
-            // increment atômico: não perde um gasto de GetCoin feito ao mesmo tempo
-            if ($getcoin <= 0 || User::whereKey($bid->user_id)->increment('cashback_balance', $getcoin) === 0) {
-                continue;
-            }
-
-            Transaction::create([
-                'user_id' => $bid->user_id,
-                'type' => 'cashback',
-                'amount' => $getcoin,
-                'status' => 'completed',
-                'description' => "GetCoin: 40% de retorno na Vibe \"{$this->title}\"",
-                'auction_id' => $this->id,
-            ]);
+            $this->creditGetcoin($bid->user_id, round($cashBase * $percentage / 100, 2), "GetCoin: {$label}% de retorno na Vibe \"{$this->title}\"");
         }
+    }
+
+    /**
+     * Soma GetCoin ao saldo do usuário e registra no extrato do Meu GetCoin (que
+     * lista as transações do tipo cashback).
+     */
+    private function creditGetcoin(int $userId, float $amount, string $description): void
+    {
+        // increment atômico: não perde um gasto de GetCoin feito ao mesmo tempo
+        if ($amount <= 0 || User::whereKey($userId)->increment('cashback_balance', $amount) === 0) {
+            return;
+        }
+
+        Transaction::create([
+            'user_id' => $userId,
+            'type' => 'cashback',
+            'amount' => $amount,
+            'status' => 'completed',
+            'description' => $description,
+            'auction_id' => $this->id,
+        ]);
     }
 
     /**

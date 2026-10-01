@@ -8,5 +8,8 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote')->hourly();
 
+// Colocar no ar as Vibes agendadas cuja data de início chegou
+Schedule::command('vibes:activate-scheduled')->everyMinute();
+
 // Encerrar Vibes expiradas a cada 5 minutos
 Schedule::command('vibes:close-expired')->everyFiveMinutes();

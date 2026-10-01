@@ -127,13 +127,17 @@ class BidController extends Controller
                 ], 400);
             }
 
-            // Verificar se o lance é maior que o atual. A mensagem não traz o valor: o maior
-            // Get é sigiloso até a Vibe encerrar (regra do dono do produto)
+            // O Get precisa superar o maior Get atual em pelo menos o Incremento de Get da
+            // Vibe (comparado em centavos). A mensagem não traz o valor: o maior Get é
+            // sigiloso até a Vibe encerrar (regra do dono do produto)
             $currentBid = (float) ($auction->current_bid ?? $auction->starting_bid);
-            if ($amount <= $currentBid) {
+            $increment = $auction->bidIncrement();
+            if (round($amount * 100) < round(($currentBid + $increment) * 100)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Seu Get não foi aceito: ele precisa ser maior que o maior Get atual desta Vibe, que fica em sigilo até o encerramento. Tente um valor maior.'
+                    'message' => 'Seu Get não foi aceito: ele precisa superar o maior Get atual desta Vibe em pelo menos R$ '
+                        . number_format($increment, 2, ',', '.')
+                        . ', e o maior Get fica em sigilo até o encerramento. Tente um valor maior.'
                 ], 400);
             }
 

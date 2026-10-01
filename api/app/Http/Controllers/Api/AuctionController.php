@@ -266,9 +266,9 @@ class AuctionController extends Controller
                     'end_date' => $request->end_date,
                     'starting_bid' => $request->starting_bid,
                     'current_bid' => $request->starting_bid,
-                    'bid_increment' => $request->bid_increment ?? 1.00,
+                    'bid_increment' => $request->bid_increment ?? Auction::DEFAULT_BID_INCREMENT,
                     'min_bids' => $request->min_bids ?? 0,
-                    'cashback_percentage' => $request->cashback_percentage ?? 0,
+                    'cashback_percentage' => $request->cashback_percentage ?? Auction::DEFAULT_CASHBACK_PERCENTAGE,
                 ];
 
                 if (\Schema::hasColumn('auctions', 'meta_keywords') && $request->has('meta_keywords')) {
@@ -343,6 +343,15 @@ class AuctionController extends Controller
                 ], 422);
             }
 
+            // Encerrada e cancelada já tiveram o GetCoin creditado: uma não vira a outra
+            $finalStatuses = ['finished', 'cancelled'];
+            if (in_array($auction->status, $finalStatuses) && in_array($request->status, $finalStatuses) && $request->status !== $auction->status) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Uma Vibe encerrada não pode ser cancelada, nem uma cancelada pode ser encerrada.',
+                ], 422);
+            }
+
             // Se está atualizando produtos
             if ($request->has('product_ids')) {
                 $productIds = $request->product_ids;
@@ -380,19 +389,30 @@ class AuctionController extends Controller
                 }
             }
 
-            // Mudar o status para Finalizado encerra a Vibe pela regra única (Auction::close),
-            // a mesma do encerramento automático: não basta gravar o status
+            // Mudar o status para Finalizado ou Cancelado passa pelas regras de Auction::close
+            // (vencedor + Cashback aos perdedores) e Auction::cancel (Gets devolvidos em
+            // GetCoin): não basta gravar o status
             $closing = $request->status === 'finished' && $auction->status !== 'finished';
+            $cancelling = $request->status === 'cancelled' && $auction->status !== 'cancelled';
 
             // Atualizar outros campos
-            $updateData = $request->except($closing ? ['product_ids', 'status'] : ['product_ids']);
+            $updateData = $request->except($closing || $cancelling ? ['product_ids', 'status'] : ['product_ids']);
             if (!\Schema::hasColumn('auctions', 'meta_keywords')) {
                 unset($updateData['meta_keywords']);
+            }
+            // Colunas NOT NULL: campo apagado no formulário volta ao padrão em vez de dar erro de SQL
+            $defaults = ['cashback_percentage' => Auction::DEFAULT_CASHBACK_PERCENTAGE, 'bid_increment' => Auction::DEFAULT_BID_INCREMENT];
+            foreach ($defaults as $field => $default) {
+                if (array_key_exists($field, $updateData) && $updateData[$field] === null) {
+                    $updateData[$field] = $default;
+                }
             }
             $auction->update($updateData);
 
             if ($closing) {
                 $auction->close();
+            } elseif ($cancelling) {
+                $auction->cancel();
             }
 
             Log::info('[AuctionController] Leilão atualizado', [

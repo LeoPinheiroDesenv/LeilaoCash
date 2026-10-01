@@ -7,6 +7,9 @@ import Countdown from './Countdown';
 import api from '../services/api';
 import './productPage.css';
 
+// Incremento de Get da Vibe: o backend só aceita um Get que supere o maior Get em pelo menos esse valor
+const bidIncrementOf = (auction) => (parseFloat(auction?.bid_increment) > 0 ? parseFloat(auction.bid_increment) : 0.01);
+
 const ProductPage = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -112,7 +115,7 @@ const ProductPage = () => {
           setBids(newAuction.bids);
         }
         
-        const minBid = newCurrentBid + 0.5;
+        const minBid = newCurrentBid + bidIncrementOf(newAuction);
         if (!bidAmount || parseFloat(bidAmount) < minBid) {
             setBidAmount(minBid.toFixed(2));
         }
@@ -299,7 +302,8 @@ const ProductPage = () => {
   };
 
   const currentBid = parsePrice(auction.current_bid || auction.starting_bid || product?.price);
-  const minBid = currentBid + 0.5;
+  const bidIncrement = bidIncrementOf(auction);
+  const minBid = currentBid + bidIncrement;
   const isAuctionExpired = auction.end_date ? new Date(auction.end_date) <= new Date() : false;
   const isAuctionActive = auction.status === 'active' && !isAuctionExpired;
   // Gets ocultos: se Vibe ativa e current_bid não veio (backend oculta)
@@ -801,7 +805,7 @@ const ProductPage = () => {
                       value={bidAmount}
                       onChange={(e) => setBidAmount(e.target.value)}
                       min={minBid}
-                      step="0.50"
+                      step="0.01"
                       required
                       disabled={bidding}
                     />
@@ -815,8 +819,8 @@ const ProductPage = () => {
                   </div>
                   <p className="bid-info">
                     {isGetsHidden
-                      ? `${t('products.min_bid')}: R$ ${parsePrice(auction.starting_bid || product?.price).toFixed(2).replace('.', ',')} | Valor do seu Get é secreto até o encerramento`
-                      : `${t('products.min_bid')}: R$ ${minBid.toFixed(2).replace('.', ',')} | ${t('products.increment')}: R$ 0,50`
+                      ? `${t('products.min_bid')}: R$ ${minBid.toFixed(2).replace('.', ',')} | ${t('products.increment')}: R$ ${bidIncrement.toFixed(2).replace('.', ',')} | Valor do seu Get é secreto até o encerramento`
+                      : `${t('products.min_bid')}: R$ ${minBid.toFixed(2).replace('.', ',')} | ${t('products.increment')}: R$ ${bidIncrement.toFixed(2).replace('.', ',')}`
                     }
                   </p>
 

@@ -33,7 +33,7 @@ const Leiloes = () => {
     starting_bid: '',
     bid_increment: '1.00',
     min_bids: '0',
-    cashback_percentage: '0',
+    cashback_percentage: '40',
     product_ids: []
   });
 
@@ -105,7 +105,7 @@ const Leiloes = () => {
         starting_bid: auction.starting_bid || '',
         bid_increment: auction.bid_increment || '1.00',
         min_bids: auction.min_bids || '0',
-        cashback_percentage: auction.cashback_percentage || '0',
+        cashback_percentage: auction.cashback_percentage ?? '40',
         product_ids: auction.products ? auction.products.map(p => p.id) : []
       });
     } else {
@@ -120,7 +120,7 @@ const Leiloes = () => {
         starting_bid: '',
         bid_increment: '1.00',
         min_bids: '0',
-        cashback_percentage: '0',
+        cashback_percentage: '40',
         product_ids: []
       });
     }
@@ -653,7 +653,7 @@ const Leiloes = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Cashback (%)</label>
+                  <label>Cashback (%) para quem não vence</label>
                   <input
                     type="number"
                     name="cashback_percentage"
@@ -663,7 +663,7 @@ const Leiloes = () => {
                     max="100"
                     step="0.1"
                     className="form-input"
-                    placeholder="0"
+                    placeholder="40"
                   />
                 </div>
 
