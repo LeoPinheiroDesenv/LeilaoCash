@@ -29,8 +29,11 @@ fi
 
 # 2) api/ -> domains/vibeget.net/public_html/api/
 echo "Deploying api/ to ${REMOTE_PATH}/api/..."
+# storage/ fica de fora: são logs, sessões, cache e uploads do próprio servidor
+# (antes, o laravel.log local sobrescrevia o log de produção a cada deploy)
 rsync -avz \
   --exclude 'vendor/' \
+  --exclude 'storage/' \
   --exclude '.composer/' \
   --exclude '.config/' \
     --exclude '.env.local' \
