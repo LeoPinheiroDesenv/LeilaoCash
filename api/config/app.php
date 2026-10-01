@@ -56,6 +56,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Frontend URL
+    |--------------------------------------------------------------------------
+    |
+    | Endereço do site (React) usado nos links enviados por e-mail, como o de
+    | redefinição de senha. O padrão é o domínio de produção; em ambiente
+    | local defina FRONTEND_URL=http://localhost:3000 no .env.
+    |
+    */
+
+    'frontend_url' => env('FRONTEND_URL', 'https://vibeget.net'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

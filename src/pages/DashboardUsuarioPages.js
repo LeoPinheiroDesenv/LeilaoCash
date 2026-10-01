@@ -489,8 +489,7 @@ export const DashboardUsuarioMeusLances = () => {
   const [stats, setStats] = useState({
     total: 0,
     winning: 0,
-    active: 0,
-    leading: 0
+    active: 0
   });
   const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, per_page: 15, total: 0 });
 
@@ -514,25 +513,13 @@ export const DashboardUsuarioMeusLances = () => {
           total: response.data.data.total || 0
         });
 
-        // Calcular estatísticas dos dados retornados (página atual)
-        // Nota: Para estatísticas totais precisaríamos de uma API separada ou usar o total da paginação
-        const total = response.data.data.total || pagination.total || bidsData.length;
-        const winning = bidsData.filter(b => b.is_winning).length;
-        const activeAuctions = bidsData.filter(b => {
-          const auction = b.auction;
-          if (!auction) return false;
-          return auction.status === 'active';
-        }).length;
-        const leading = bidsData.filter(b => {
-          const auction = b.auction;
-          if (!auction) return false;
-          if (auction.status !== 'active') return false;
-          const currentBid = parseFloat(auction.current_bid || auction.starting_bid || 0);
-          const myBid = parseFloat(b.amount);
-          return myBid >= currentBid;
-        }).length;
-
-        setStats({ total, winning, active: activeAuctions, leading });
+        // Estatísticas calculadas pela API sobre todos os Gets do usuário (não só a página atual)
+        const apiStats = response.data.stats || {};
+        setStats({
+          total: apiStats.total ?? response.data.data.total ?? bidsData.length,
+          winning: apiStats.vibes_won ?? 0,
+          active: apiStats.active ?? 0
+        });
       }
     } catch (error) {
       console.error('Erro ao carregar lances:', error);
@@ -607,17 +594,13 @@ export const DashboardUsuarioMeusLances = () => {
     return null;
   };
 
+  // Durante a disputa ninguém sabe qual é o maior Get (nem se o seu está na frente):
+  // o resultado só aparece depois que a Vibe encerra
   const getBidStatus = (bid) => {
-    if (!bid.auction) return 'Finalizado';
-    if (bid.auction.status === 'finished') return 'Finalizado';
-    if (bid.is_winning) return 'Vencendo';
-    
-    const auction = bid.auction;
-    const currentBid = parseFloat(auction.current_bid || auction.starting_bid || 0);
-    const myBid = parseFloat(bid.amount);
-    
-    if (myBid >= currentBid) return 'Vencendo';
-    return 'Superado';
+    if (!bid.auction) return 'Encerrada';
+    if (bid.auction.status === 'cancelled') return 'Cancelada';
+    if (bid.auction.status === 'finished') return bid.is_winning ? 'Champion Get' : 'Encerrada';
+    return 'Em disputa';
   };
 
   const calculateTimeRemaining = (endDate) => {
@@ -639,7 +622,7 @@ export const DashboardUsuarioMeusLances = () => {
     return (
       <UserLayout>
         <div style={{ padding: '4rem 2rem', textAlign: 'center' }}>
-          <p style={{ color: '#8da4bf' }}>Carregando seus lances...</p>
+          <p style={{ color: '#8da4bf' }}>Carregando seus Gets...</p>
         </div>
       </UserLayout>
     );
@@ -668,10 +651,10 @@ export const DashboardUsuarioMeusLances = () => {
         </div>
       </div>
       <div className="bids-history-section">
-        <h3>Histórico de Lances</h3>
+        <h3>Histórico de Gets</h3>
         {bids.length === 0 ? (
           <div style={{ padding: '2rem', textAlign: 'center', color: '#8da4bf' }}>
-            <p>Você ainda não fez nenhum lance.</p>
+            <p>Você ainda não deu nenhum Get.</p>
             <Link to="/" style={{ color: '#4A9FD8', textDecoration: 'none', marginTop: '1rem', display: 'inline-block' }}>
               Ver Vibes disponíveis →
             </Link>
@@ -687,7 +670,7 @@ export const DashboardUsuarioMeusLances = () => {
                       <div className="bid-info-main">
                         <div className="bid-title-section">
                           <h4>{getProductName(bid)}</h4>
-                          <p className="bid-date">Lance em {formatDate(bid.created_at)}</p>
+                          <p className="bid-date">Get em {formatDate(bid.created_at)}</p>
                         </div>
                         <div className="bid-status-badge">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -699,15 +682,17 @@ export const DashboardUsuarioMeusLances = () => {
                       </div>
                       <div className="bid-values">
                         <div className="bid-value-item">
-                          <p className="bid-value-label">Seu lance</p>
+                          <p className="bid-value-label">Seu Get</p>
                           <p className="bid-value-amount">{formatPrice(bid.amount)}</p>
                         </div>
-                        <div className="bid-value-item">
-                          <p className="bid-value-label">Lance atual</p>
-                          <p className="bid-value-amount">
-                            {formatPrice(bid.auction?.current_bid || bid.auction?.starting_bid || 0)}
-                          </p>
-                        </div>
+                        {bid.auction?.status === 'finished' && (
+                          <div className="bid-value-item">
+                            <p className="bid-value-label">Champion Get</p>
+                            <p className="bid-value-amount">
+                              {formatPrice(bid.auction.current_bid || 0)}
+                            </p>
+                          </div>
+                        )}
                         {bid.auction?.end_date && bid.auction.status === 'active' && (
                           <div className="bid-timer">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -721,7 +706,7 @@ export const DashboardUsuarioMeusLances = () => {
                     </div>
                   </div>
                   {getProductId(bid) && (
-                    <Link to={`/produto/${getProductId(bid)}`} className="btn-ver-leilao-bid">Ver Leilão</Link>
+                    <Link to={`/produto/${getProductId(bid)}`} className="btn-ver-leilao-bid">Ver Vibe</Link>
                   )}
                 </div>
               ))}
@@ -841,8 +826,8 @@ export const DashboardUsuarioMeuCashback = () => {
     }
   };
 
-  const formatPrice = (price) => {
-    return `R$ ${parseFloat(price || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const formatGetcoin = (amount) => {
+    return `G$ ${parseFloat(amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
   const formatDate = (dateString) => {
@@ -909,7 +894,7 @@ export const DashboardUsuarioMeuCashback = () => {
       <div className="cashback-balance-section">
         <div className="balance-card-main">
           <p className="balance-label">Saldo Disponível</p>
-          <p className="balance-amount">{formatPrice(balance.cashback_balance)}</p>
+          <p className="balance-amount">{formatGetcoin(balance.cashback_balance)}</p>
         </div>
         <div className="balance-cards-secondary">
           <div className="balance-card-secondary">
@@ -919,12 +904,22 @@ export const DashboardUsuarioMeuCashback = () => {
             </svg>
             <div>
               <p className="balance-secondary-label">Total Recebido</p>
-              <p className="balance-secondary-amount">{formatPrice(totalReceived)}</p>
+              <p className="balance-secondary-amount">{formatGetcoin(totalReceived)}</p>
             </div>
           </div>
 
         </div>
 
+      </div>
+      <div className="getcoin-buy-card">
+        <div>
+          <h4>Comprar GetCoin</h4>
+          <p>Compre GetCoin direto da VibeGet ou de outros Vibers, pagando com o seu saldo em R$.</p>
+        </div>
+        <div className="getcoin-buy-actions">
+          <Link to="/dashboard/getcoin-marketplace?aba=vibeget" className="btn-getcoin-buy">Comprar da VibeGet</Link>
+          <Link to="/dashboard/getcoin-marketplace?aba=vibers" className="btn-getcoin-buy secondary">Comprar de outros Vibers</Link>
+        </div>
       </div>
       <div className="info-card">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -968,7 +963,7 @@ export const DashboardUsuarioMeuCashback = () => {
                     <p className="history-date">{formatDate(item.created_at)}</p>
                   </div>
                   <div className={`history-amount ${item.type === 'cashback' ? 'credit' : 'debit'}`}>
-                    {item.type === 'cashback' ? '+' : '-'} {formatPrice(item.amount)}
+                    {item.type === 'cashback' ? '+' : '-'} {formatGetcoin(item.amount)}
                   </div>
                 </div>
               ))}

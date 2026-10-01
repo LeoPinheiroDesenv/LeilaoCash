@@ -29,6 +29,18 @@ const Login = () => {
     }
   }, [isAuthenticated, user, navigate, from]);
 
+  // Aviso quando o usuário cai aqui porque o token expirou (ver api.js)
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem('session_expired')) {
+        sessionStorage.removeItem('session_expired');
+        setError('Sua sessão expirou. Faça login novamente para continuar.');
+      }
+    } catch (e) {
+      // sessionStorage indisponível: segue sem o aviso
+    }
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');

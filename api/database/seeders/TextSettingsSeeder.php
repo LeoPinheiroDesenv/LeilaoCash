@@ -104,7 +104,7 @@ class TextSettingsSeeder extends Seeder
             'text_contact_error_generic' => ['value' => 'Erro ao enviar mensagem. Tente novamente.', 'desc' => 'Erro genérico ao enviar formulário'],
             'text_contact_info_title' => ['value' => 'Outras Formas de Contato', 'desc' => 'Título da caixa de informações de contato'],
             'text_contact_email_label' => ['value' => 'E-mail', 'desc' => 'Label E-mail na seção de contato'],
-            'text_contact_email_value' => ['value' => 'contato@VibeGet.com', 'desc' => 'Endereço de e-mail exibido na seção de contato'],
+            'text_contact_email_value' => ['value' => 'contato@vibeget.net', 'desc' => 'Endereço de e-mail exibido na seção de contato'],
             'text_contact_phone_label' => ['value' => 'Telefone', 'desc' => 'Label Telefone na seção de contato'],
             'text_contact_phone_value' => ['value' => '+55 (11) 3000-0000', 'desc' => 'Número de telefone exibido na seção de contato'],
             'text_contact_address_label' => ['value' => 'Endereço', 'desc' => 'Label Endereço na seção de contato'],

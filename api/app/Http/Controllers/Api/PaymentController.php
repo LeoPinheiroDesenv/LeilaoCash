@@ -51,7 +51,7 @@ class PaymentController extends Controller
             // Montar payload
             $payload = [
                 'transaction_amount' => (float) $amount,
-                'description' => 'Recarga de Créditos - LeilaoCash',
+                'description' => 'Recarga de Créditos - VibeGet',
                 'payment_method_id' => 'pix',
                 'payer' => [
                     'email' => $user->email,
@@ -227,7 +227,7 @@ class PaymentController extends Controller
             $payload = [
                 'transaction_amount' => (float) $amount,
                 'token' => $token,
-                'description' => 'Recarga de Créditos - LeilaoCash',
+                'description' => 'Recarga de Créditos - VibeGet',
                 'installments' => (int) $request->input('installments'),
                 'payment_method_id' => $request->input('payment_method_id'),
                 'payer' => [

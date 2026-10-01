@@ -23,7 +23,7 @@ const UserLayout = ({ children }) => {
     { path: '/dashboard/minha-conta', label: 'Minha Conta', icon: 'account' },
     { path: '/dashboard/meus-lances', label: 'Meus Gets', icon: 'bids' },
     { path: '/dashboard/meu-cashback', label: 'Meu GetCoin', icon: 'cashback' },
-    { path: '/dashboard/getcoin-marketplace', label: 'Marketplace', icon: 'marketplace' }
+    { path: '/dashboard/getcoin-marketplace', label: 'Comprar GetCoin', icon: 'marketplace' }
   ];
 
   const getIcon = (iconName) => {

@@ -33,7 +33,7 @@ class PasswordResetMail extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: 'Redefinição de Senha - LeilaoCash',
+            subject: 'Redefinição de Senha - VibeGet',
         );
     }
 

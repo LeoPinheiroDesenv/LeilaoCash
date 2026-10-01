@@ -68,7 +68,7 @@
             <p><a href="{{ $resetUrl }}">{{ $resetUrl }}</a></p>
         </div>
         <div class="footer">
-            <p>&copy; {{ date('Y') }} LeilaoCash. Todos os direitos reservados.</p>
+            <p>&copy; {{ date('Y') }} VibeGet. Todos os direitos reservados.</p>
         </div>
     </div>
 </body>

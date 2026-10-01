@@ -14,7 +14,6 @@ import Contato from './pages/Contato';
 import FAQ from './pages/FAQ';
 import Termos from './pages/Termos';
 import Privacidade from './pages/Privacidade';
-import Regras from './pages/Regras';
 import RecuperarSenha from './pages/RecuperarSenha';
 import ResetPassword from './pages/ResetPassword';
 import SubaDeNivel from './pages/SubaDeNivel';
@@ -201,7 +200,8 @@ function App() {
             <Route path="/faq" element={<Layout onSearch={handleSearch}><FAQ /></Layout>} />
             <Route path="/termos" element={<Layout onSearch={handleSearch}><Termos /></Layout>} />
             <Route path="/privacidade" element={<Layout onSearch={handleSearch}><Privacidade /></Layout>} />
-            <Route path="/regras" element={<Layout onSearch={handleSearch}><Regras /></Layout>} />
+            {/* Página de Regras removida (Ajustes Finais 2026): links antigos vão para os Termos */}
+            <Route path="/regras" element={<Navigate to="/termos" replace />} />
             <Route path="/manual" element={<Layout onSearch={handleSearch}><Manual /></Layout>} />
             <Route path="/p/:slug" element={<Layout onSearch={handleSearch}><CustomPage /></Layout>} />
           </Routes>

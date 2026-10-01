@@ -68,6 +68,33 @@ api.interceptors.request.use(
   }
 );
 
+// Evento disparado quando a API confirma que o token não vale mais (ex.: expirou —
+// SANCTUM_EXPIRATION é de 7 dias). O AuthContext escuta e leva o usuário ao login.
+export const SESSION_EXPIRED_EVENT = 'auth:session-expired';
+
+const expireSession = () => {
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('user');
+  try {
+    sessionStorage.setItem('session_expired', '1');
+  } catch (e) {
+    // sessionStorage indisponível: o login só não mostra o aviso
+  }
+  window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
+};
+
+// Confere o token com /auth/me (uma verificação por vez); se a API responder 401,
+// o interceptor abaixo encerra a sessão
+let sessionCheck = null;
+const checkSession = () => {
+  if (!sessionCheck) {
+    sessionCheck = api.get('/auth/me')
+      .catch(() => {})
+      .finally(() => { sessionCheck = null; });
+  }
+  return sessionCheck;
+};
+
 // Interceptor para tratar erros de autenticação
 api.interceptors.response.use(
   (response) => response,
@@ -80,13 +107,18 @@ api.interceptors.response.use(
       const isRegisterRequest = url.includes('/auth/register');
       // Adicionando /products à lista de rotas públicas que não devem forçar logout
       const isPublicRoute = url.includes('/public') || url.includes('/categories') || url.includes('/health') || url.includes('/products');
-      
-      // Não fazer logout em requisições de validação, autenticação ou rotas públicas
-      if (isAuthMeRequest || isLoginRequest || isRegisterRequest || isPublicRoute) {
-        // Apenas loga o erro, não faz logout
-        if (isAuthMeRequest) {
-          console.warn('Falha ao validar token com /auth/me');
+
+      // /auth/me é a verificação do token: 401 com token enviado = sessão expirada/revogada
+      if (isAuthMeRequest) {
+        console.warn('Falha ao validar token com /auth/me');
+        if (error.config?.headers?.Authorization) {
+          expireSession();
         }
+        return Promise.reject(error);
+      }
+
+      // Não fazer logout em requisições de autenticação ou rotas públicas
+      if (isLoginRequest || isRegisterRequest || isPublicRoute) {
         return Promise.reject(error);
       }
       
@@ -115,11 +147,12 @@ api.interceptors.response.use(
       });
       
       if (isProtectedRoute) {
-        // Em rotas protegidas, tentar validar o token antes de fazer logout
+        // Em rotas protegidas, validar o token antes de fazer logout
         if (token) {
-          // Verificar se o token ainda existe antes de remover
-          console.warn('[API Interceptor] Erro 401 em rota protegida, mas token ainda existe. Pode ser erro temporário. Deixando componente tratar.');
-          // Não fazer logout imediato, deixar o componente tratar
+          // Se /auth/me também recusar o token, a sessão é encerrada e o usuário vai
+          // para o login; se for erro temporário, o componente trata o erro normalmente
+          console.warn('[API Interceptor] Erro 401 em rota protegida. Validando token com /auth/me.');
+          checkSession();
           return Promise.reject(error);
         }
       }

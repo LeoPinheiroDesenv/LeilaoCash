@@ -237,7 +237,9 @@ const Categorias = () => {
                     <p className="category-description">{category.description}</p>
                   )}
                   <div className="category-footer">
-                    <span className="category-order">Ordem: {category.sort_order}</span>
+                    <span className="category-order">
+                      Ordem: {category.sort_order} · Produtos: {category.products_total_count ?? 0}
+                    </span>
                     <div className="category-actions">
                       <button
                         className="btn-icon"

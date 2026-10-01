@@ -141,7 +141,6 @@ const Configuracoes = () => {
         ensureSettingExists('content', 'page_contato', 'Conteúdo da página Contato');
         ensureSettingExists('content', 'page_termos', 'Conteúdo da página Termos de Uso');
         ensureSettingExists('content', 'page_privacidade', 'Conteúdo da página Privacidade');
-        ensureSettingExists('content', 'page_regras', 'Conteúdo da página Regras');
         ensureSettingExists('content', 'page_faq', 'Conteúdo da página FAQ');
         ensureSettingExists('content', 'page_suba_de_nivel', 'Conteúdo da página Suba de Nível');
 
@@ -662,7 +661,6 @@ const Configuracoes = () => {
     { id: 'how_it_works', label: '📖 Como Funciona', type: 'translation', description: 'Conteúdo da página institucional' },
     { id: 'terms', label: '📜 Termos de Uso', type: 'translation', description: 'Conteúdo dos termos e condições' },
     { id: 'privacy', label: '🔒 Privacidade', type: 'translation', description: 'Conteúdo da política de privacidade' },
-    { id: 'rules', label: '⚖️ Regras', type: 'translation', description: 'Conteúdo das regras dos leilões' },
     { id: 'faq', label: '❓ FAQ', type: 'translation', description: 'Conteúdo de perguntas frequentes' },
     { id: 'level_up', label: '🚀 Suba de Nível', type: 'translation', description: 'Conteúdo do sistema de níveis' }
   ];

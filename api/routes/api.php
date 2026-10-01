@@ -115,9 +115,32 @@ Route::middleware(['debug.auth', 'auth:sanctum'])->group(function () {
             $perPage = $request->get('per_page', 15);
             $bids = $query->paginate($perPage);
 
+            // Sigilo durante a disputa: enquanto a Vibe não encerra, ninguém sabe qual é o
+            // maior Get — nem se o próprio Get está na frente (mesma regra do ProductController)
+            $bids->getCollection()->each(function ($bid) {
+                if ($bid->auction && $bid->auction->status !== 'finished') {
+                    $bid->auction->makeHidden(['current_bid']);
+                    $bid->makeHidden(['is_winning']);
+                }
+            });
+
+            $userId = $request->user()->id;
+            $stats = [
+                'total' => \App\Models\Bid::where('user_id', $userId)->count(),
+                'vibes_won' => \App\Models\Bid::where('user_id', $userId)
+                    ->where('is_winning', true)
+                    ->whereHas('auction', fn ($q) => $q->where('status', 'finished'))
+                    ->distinct()
+                    ->count('auction_id'),
+                'active' => \App\Models\Bid::where('user_id', $userId)
+                    ->whereHas('auction', fn ($q) => $q->where('status', 'active'))
+                    ->count(),
+            ];
+
             return response()->json([
                 'success' => true,
-                'data' => $bids
+                'data' => $bids,
+                'stats' => $stats,
             ]);
         });
 

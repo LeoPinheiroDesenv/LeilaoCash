@@ -347,7 +347,7 @@ class AuthController extends Controller
         );
 
         // URL para o frontend
-        $resetUrl = config('app.frontend_url', 'http://localhost:3000') . "/reset-password?token={$token}&email=" . urlencode($request->email);
+        $resetUrl = rtrim(config('app.frontend_url'), '/') . "/reset-password?token={$token}&email=" . urlencode($request->email);
 
         try {
             Mail::to($user->email)->send(new PasswordResetMail($resetUrl));

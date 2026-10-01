@@ -125,6 +125,13 @@ const DashboardUsuario = () => {
     }, 5000); // Verifica a cada 5 segundos
   };
 
+  // 401 = token expirado: o api.js encerra a sessão e leva ao login; aqui só explica o motivo
+  const paymentErrorMessage = (error, fallback) => (
+    error.response?.status === 401
+      ? 'Sua sessão expirou. Faça login novamente para continuar.'
+      : error.response?.data?.message || fallback
+  );
+
   const handleGeneratePix = async () => {
     if (!creditAmount || creditAmount <= 0) {
       setPixError('Informe um valor válido para recarga.');
@@ -153,7 +160,7 @@ const DashboardUsuario = () => {
       }
     } catch (error) {
       console.error('Erro ao gerar Pix:', error);
-      setPixError(error.response?.data?.message || 'Erro ao processar pagamento. Verifique as configurações do Mercado Pago.');
+      setPixError(paymentErrorMessage(error, 'Erro ao processar pagamento. Verifique as configurações do Mercado Pago.'));
     } finally {
       setLoadingPix(false);
     }
@@ -225,7 +232,7 @@ const DashboardUsuario = () => {
       }
     } catch (error) {
       console.error('Erro no pagamento com cartão:', error);
-      setCardError(error.response?.data?.message || 'Erro ao processar pagamento. Verifique os dados do cartão.');
+      setCardError(paymentErrorMessage(error, 'Erro ao processar pagamento. Verifique os dados do cartão.'));
     } finally {
       setLoadingCard(false);
     }

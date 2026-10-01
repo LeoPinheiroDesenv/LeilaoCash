@@ -42,22 +42,33 @@ rsync -avz \
   "${LOCAL_ROOT}/api/" \
   "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/api/"
 
+# Limpa cache de configuração (se existir) para o Laravel ler o config/ e o .env atualizados
+ssh -p ${REMOTE_PORT} ${REMOTE_USER}@${REMOTE_HOST} \
+  "cd ${REMOTE_PATH}/api && php artisan config:clear"
+
 # 3) Migrations pendentes — roda cada uma individualmente
+# No Laravel 11 o migrate:status lista "<migration> ....... Pending" (não há mais a tabela "| No |")
 echo ""
 echo "=== Checking pending migrations ==="
 PENDING=$(ssh -p ${REMOTE_PORT} ${REMOTE_USER}@${REMOTE_HOST} \
   "cd ${REMOTE_PATH}/api && php artisan migrate:status --no-ansi" \
-  | grep '| No ' | awk -F'|' '{gsub(/^[ \t]+|[ \t]+$/, "", $3); print $3}')
+  | awk '$NF == "Pending" {print $1}')
 
+FAILED_MIGRATIONS=""
 if [ -z "$PENDING" ]; then
   echo "No pending migrations."
 else
-  echo "$PENDING" | while IFS= read -r MIGRATION; do
+  echo "$PENDING" | sed 's/^/  pending: /'
+  # Uma migration com falha não interrompe as demais; a lista sai no final do deploy
+  while IFS= read -r MIGRATION; do
     FILE="database/migrations/${MIGRATION}.php"
     echo "  -> Running: ${MIGRATION}"
-    ssh -p ${REMOTE_PORT} ${REMOTE_USER}@${REMOTE_HOST} \
-      "cd ${REMOTE_PATH}/api && php artisan migrate --path=${FILE} --force"
-  done
+    if ! ssh -p ${REMOTE_PORT} ${REMOTE_USER}@${REMOTE_HOST} \
+      "cd ${REMOTE_PATH}/api && php artisan migrate --path=${FILE} --force"; then
+      echo "  !! Falhou: ${MIGRATION}"
+      FAILED_MIGRATIONS="${FAILED_MIGRATIONS} ${MIGRATION}"
+    fi
+  done <<< "$PENDING"
   echo "Migrations done."
 fi
 
@@ -83,3 +94,12 @@ echo "Manual synced."
 
 echo ""
 echo "=== Deploy complete ==="
+
+if [ -n "$FAILED_MIGRATIONS" ]; then
+  echo ""
+  echo "ATENÇÃO: migrations que falharam (conferir com 'php artisan migrate:status' no servidor):"
+  for MIGRATION in $FAILED_MIGRATIONS; do
+    echo "  - ${MIGRATION}"
+  done
+  exit 1
+fi

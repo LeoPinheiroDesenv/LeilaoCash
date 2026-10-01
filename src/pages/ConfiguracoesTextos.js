@@ -46,7 +46,6 @@ const ConfiguracoesTextos = ({ activeGroup }) => {
         ensureSettingExists('content', 'page_contato', 'Conteúdo da página Contato');
         ensureSettingExists('content', 'page_termos', 'Conteúdo da página Termos de Uso');
         ensureSettingExists('content', 'page_privacidade', 'Conteúdo da página Privacidade');
-        ensureSettingExists('content', 'page_regras', 'Conteúdo da página Regras');
         ensureSettingExists('content', 'page_faq', 'Conteúdo da página FAQ');
         ensureSettingExists('content', 'page_suba_de_nivel', 'Conteúdo da página Suba de Nível');
         

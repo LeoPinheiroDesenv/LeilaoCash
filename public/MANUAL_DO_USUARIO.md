@@ -49,7 +49,6 @@ Ao clicar em um produto, você verá:
 - **FAQ**: perguntas frequentes
 - **Termos de Uso**: regras de uso da plataforma
 - **Política de Privacidade**: como seus dados são tratados
-- **Regras**: regras dos leilões
 
 ### Página de Contato
 
@@ -85,9 +84,12 @@ Na tela de login, clique em **"Esqueceu a senha?"**. Informe seu e-mail e você 
 Após fazer login, acesse **"Meu Painel"** no menu. Lá você encontra:
 
 - **Minha Conta**: seus dados pessoais
-- **Meus Lances**: histórico de todos os lances que você deu
-- **Meu Cashback**: saldo de cashback e histórico
+- **Meus Gets**: histórico de todos os Gets que você deu. Enquanto a Vibe está em disputa o Get aparece como **"Em disputa"** — o maior Get só é revelado quando a Vibe encerra (o seu aparece como **"Champion Get"** se tiver vencido)
+- **Meu GetCoin**: saldo de GetCoin (G$), extrato e atalhos para comprar GetCoin
+- **Comprar GetCoin**: compre GetCoin da VibeGet (preço fixo) ou de ofertas de outros Vibers; Vibers a partir do nível Bronze também podem vender
 - **Meus Favoritos**: produtos que você favoritou
+
+Por segurança, o login expira após 7 dias. Quando isso acontece, o site pede para você entrar de novo.
 
 ---
 
@@ -115,6 +117,8 @@ Gerencie as categorias de produtos (ex: Notebook, Celular, etc.):
 - Defina o nome, ícone (emoji) e ordem de exibição
 - Preencha os campos **"Nome em Inglês"** e **"Nome em Espanhol"** para que a categoria apareça traduzida quando o visitante trocar o idioma do site
 - Ative ou desative categorias
+- Não é possível ter duas categorias com o mesmo nome
+- Uma categoria só pode ser excluída quando não tiver nenhum produto cadastrado — o card mostra a quantidade de produtos (inclusive os sem Vibe ativa). Mova os produtos para outra categoria antes de excluir
 
 ### Marcas
 
@@ -251,7 +255,6 @@ Se você não preencher o inglês ou espanhol, o site mostrará o texto em portu
 | 📖 Como Funciona | /como-funciona |
 | 📜 Termos de Uso | /termos |
 | 🔒 Privacidade | /privacidade |
-| ⚖️ Regras | /regras |
 | ❓ FAQ | /faq |
 | 🚀 Suba de Nível | /suba-de-nivel |
 

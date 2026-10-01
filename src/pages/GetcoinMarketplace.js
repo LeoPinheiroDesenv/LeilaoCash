@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import UserLayout from '../components/UserLayout';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
@@ -15,7 +16,9 @@ const GetcoinMarketplace = () => {
   const [buying, setBuying] = useState(false);
   const [showSellForm, setShowSellForm] = useState(false);
   const [sellData, setSellData] = useState({ amount: '', price_per_unit: '0.50' });
-  const [activeTab, setActiveTab] = useState('buy'); // buy, offers, my-offers
+  const [searchParams] = useSearchParams();
+  // ?aba=vibers abre direto nas ofertas de outros Vibers (atalho da tela Meu GetCoin)
+  const [activeTab, setActiveTab] = useState(searchParams.get('aba') === 'vibers' ? 'offers' : 'buy'); // buy, offers, my-offers
 
   const loadData = useCallback(async () => {
     try {
@@ -154,7 +157,7 @@ const GetcoinMarketplace = () => {
           <p className="stat-label">Ofertas de Vibers</p>
         </div>
         <div className="bid-stat-card">
-          <p className="stat-number">R$ {user?.cashback_balance || '0.00'}</p>
+          <p className="stat-number">G$ {user?.cashback_balance || '0.00'}</p>
           <p className="stat-label">Seu GetCoin</p>
         </div>
         <div className="bid-stat-card">

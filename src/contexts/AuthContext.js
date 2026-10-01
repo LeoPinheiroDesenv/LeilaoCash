@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { authService } from '../services/api';
+import { authService, SESSION_EXPIRED_EVENT } from '../services/api';
 import { startTokenRefresh, stopTokenRefresh } from '../utils/tokenRefresh';
 
 const AuthContext = createContext();
@@ -16,6 +16,19 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Token recusado pela API (expirado/revogado): o api.js já limpou o localStorage;
+  // aqui zera o estado para as rotas protegidas redirecionarem ao login
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      setUser(null);
+      setIsAuthenticated(false);
+      stopTokenRefresh();
+    };
+
+    window.addEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired);
+    return () => window.removeEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired);
+  }, []);
 
   // Verificar autenticação ao carregar
   useEffect(() => {

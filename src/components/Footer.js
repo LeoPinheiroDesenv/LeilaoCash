@@ -84,7 +84,6 @@ const Footer = ({ onSearch }) => {
               <ul>
                 <li><Link to="/termos">{t('footer.terms')}</Link></li>
                 <li><Link to="/privacidade">{t('footer.privacy')}</Link></li>
-                <li><Link to="/regras">{t('footer.rules')}</Link></li>
                 {legalLinkPages.map(page => (
                   <li key={page.id}><Link to={`/p/${page.slug}`}>{getPageTitle(page)}</Link></li>
                 ))}
@@ -93,7 +92,7 @@ const Footer = ({ onSearch }) => {
             <div className="footer-col">
               <h4>{t('footer.contact')}</h4>
               <ul>
-                <li><a href={`mailto:${getText('contact_email', 'contato@leilaocash.com')}`}>{getText('contact_email', 'contato@leilaocash.com')}</a></li>
+                <li><a href={`mailto:${getText('text_contact_email_value', 'contato@vibeget.net')}`}>{getText('text_contact_email_value', 'contato@vibeget.net')}</a></li>
               </ul>
               <ul>
                 <li>

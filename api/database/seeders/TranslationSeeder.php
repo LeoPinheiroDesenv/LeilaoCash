@@ -9,6 +9,11 @@ class TranslationSeeder extends Seeder
 {
     public function run(): void
     {
+        // Textos jurídicos enviados pelo cliente (Ajustes Finais 2026), só em português:
+        // usados também em EN/ES até existir uma tradução revisada
+        $termosDeUso = file_get_contents(__DIR__ . '/data/termos_de_uso.html');
+        $politicaDePrivacidade = file_get_contents(__DIR__ . '/data/politica_de_privacidade.html');
+
         $translations = [
             // Header
             ['group' => 'header', 'key' => 'home', 'text_pt' => 'Início', 'text_en' => 'Home', 'text_es' => 'Inicio'],
@@ -356,8 +361,8 @@ class TranslationSeeder extends Seeder
 </ul>
 </div>'],
             ['group' => 'contact', 'key' => 'content', 'text_pt' => '<h1>Fale Conosco</h1><p>Entre em contato conosco...</p>', 'text_en' => '<h1>Contact Us</h1><p>Get in touch with us...</p>', 'text_es' => '<h1>Contáctanos</h1><p>Ponte en contacto con nosotros...</p>'],
-            ['group' => 'terms', 'key' => 'content', 'text_pt' => '<h1>Termos de Uso</h1><p>Termos de uso...</p>', 'text_en' => '<h1>Terms of Use</h1><p>Terms of use...</p>', 'text_es' => '<h1>Términos de Uso</h1><p>Términos de uso...</p>'],
-            ['group' => 'privacy', 'key' => 'content', 'text_pt' => '<h1>Política de Privacidade</h1><p>Política de privacidade...</p>', 'text_en' => '<h1>Privacy Policy</h1><p>Privacy policy...</p>', 'text_es' => '<h1>Política de Privacidad</h1><p>Política de privacidad...</p>'],
+            ['group' => 'terms', 'key' => 'content', 'text_pt' => $termosDeUso, 'text_en' => $termosDeUso, 'text_es' => $termosDeUso],
+            ['group' => 'privacy', 'key' => 'content', 'text_pt' => $politicaDePrivacidade, 'text_en' => $politicaDePrivacidade, 'text_es' => $politicaDePrivacidade],
             ['group' => 'rules', 'key' => 'content', 'text_pt' => '<h1>Regras</h1><p>Regras do leilão...</p>', 'text_en' => '<h1>Rules</h1><p>Auction rules...</p>', 'text_es' => '<h1>Reglas</h1><p>Reglas de la subasta...</p>'],
             ['group' => 'faq', 'key' => 'content', 'text_pt' => '<h1>Perguntas Frequentes</h1>
 <h3>Menor de 18 anos pode fazer o cadastro?</h3>

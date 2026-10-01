@@ -155,7 +155,7 @@ const Contato = () => {
                 <div className="info-icon">📧</div>
                 <div>
                   <div className="info-label">{t('contact.info_email_label')}</div>
-                  <div className="info-value">{getText('text_contact_email_value', 'contato@leilaocash.com')}</div>
+                  <div className="info-value">{getText('text_contact_email_value', 'contato@vibeget.net')}</div>
                 </div>
               </div>
 

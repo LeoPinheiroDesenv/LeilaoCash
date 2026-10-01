@@ -7,20 +7,47 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class CategoryController extends Controller
 {
+    private const VALIDATION_MESSAGES = [
+        'name.required' => 'Informe o nome da categoria.',
+        'name.unique' => 'Já existe uma categoria com esse nome.',
+        'slug.unique' => 'Esse slug já está em uso por outra categoria.',
+        'icon.max' => 'O ícone deve ter no máximo 50 caracteres.',
+    ];
+
+    /**
+     * Campos da categoria vindos da requisição, limitados às colunas que existem
+     * na tabela — evita erro de SQL se o banco estiver com migration pendente
+     * (ex.: name_en/name_es/meta_keywords ainda não criadas em produção).
+     */
+    private function categoryData(Request $request): array
+    {
+        $columns = Schema::getColumnListing('categories');
+
+        return collect($request->only((new Category)->getFillable()))
+            ->only($columns)
+            ->all();
+    }
+
     /**
      * Listar todas as categorias
      */
     public function index(Request $request)
     {
         try {
-            $query = Category::query()->withCount(['products' => function($q) {
-                $q->whereHas('auction', function($aq) {
-                    $aq->where('status', 'active');
-                });
-            }]);
+            // products_count: só produtos com Vibe ativa (filtro público de categorias)
+            // products_total_count: todos os produtos cadastrados (o que bloqueia a exclusão no admin)
+            $query = Category::query()->withCount([
+                'products' => function($q) {
+                    $q->whereHas('auction', function($aq) {
+                        $aq->where('status', 'active');
+                    });
+                },
+                'products as products_total_count',
+            ]);
             // Filtros
             if ($request->has('search')) {
                 $search = $request->search;
@@ -84,13 +111,13 @@ class CategoryController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:255',
-                'slug' => 'nullable|string|max:255|unique:categories,slug',
+                'name' => 'required|string|max:255|unique:categories,name,NULL,id,deleted_at,NULL',
+                'slug' => 'nullable|string|max:255|unique:categories,slug,NULL,id,deleted_at,NULL',
                 'description' => 'nullable|string',
                 'icon' => 'nullable|string|max:50',
                 'is_active' => 'boolean',
                 'sort_order' => 'nullable|integer|min:0',
-            ]);
+            ], self::VALIDATION_MESSAGES);
 
             if ($validator->fails()) {
                 return response()->json([
@@ -100,12 +127,7 @@ class CategoryController extends Controller
                 ], 422);
             }
 
-            $data = $request->all();
-            if (!\Schema::hasColumn('categories', 'meta_keywords')) {
-                unset($data['meta_keywords']);
-            }
-
-            $category = Category::create($data);
+            $category = Category::create($this->categoryData($request));
 
             Log::info('[CategoryController] Categoria criada', [
                 'category_id' => $category->id,
@@ -139,14 +161,21 @@ class CategoryController extends Controller
         try {
             $category = Category::findOrFail($id);
 
+            // Só checa nome duplicado quando o nome muda, para não travar a edição
+            // de categorias antigas que já tenham nomes repetidos
+            $nameRule = 'sometimes|required|string|max:255';
+            if ($request->has('name') && $request->name !== $category->name) {
+                $nameRule .= '|unique:categories,name,' . $id . ',id,deleted_at,NULL';
+            }
+
             $validator = Validator::make($request->all(), [
-                'name' => 'sometimes|required|string|max:255',
-                'slug' => 'nullable|string|max:255|unique:categories,slug,' . $id,
+                'name' => $nameRule,
+                'slug' => 'nullable|string|max:255|unique:categories,slug,' . $id . ',id,deleted_at,NULL',
                 'description' => 'nullable|string',
                 'icon' => 'nullable|string|max:50',
                 'is_active' => 'boolean',
                 'sort_order' => 'nullable|integer|min:0',
-            ]);
+            ], self::VALIDATION_MESSAGES);
 
             if ($validator->fails()) {
                 return response()->json([
@@ -156,12 +185,7 @@ class CategoryController extends Controller
                 ], 422);
             }
 
-            $updateData = $request->all();
-            if (!\Schema::hasColumn('categories', 'meta_keywords')) {
-                unset($updateData['meta_keywords']);
-            }
-
-            $category->update($updateData);
+            $category->update($this->categoryData($request));
 
             Log::info('[CategoryController] Categoria atualizada', [
                 'category_id' => $category->id,
@@ -195,11 +219,12 @@ class CategoryController extends Controller
         try {
             $category = Category::findOrFail($id);
 
-            // Verificar se há produtos usando esta categoria
-            if ($category->products()->count() > 0) {
+            // Verificar se há produtos usando esta categoria (inclusive produtos sem Vibe ativa)
+            $productsCount = $category->products()->count();
+            if ($productsCount > 0) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Não é possível deletar uma categoria que possui produtos associados',
+                    'message' => "Não é possível excluir: a categoria possui {$productsCount} produto(s) cadastrado(s), mesmo que sem Vibe ativa. Mova esses produtos para outra categoria ou exclua-os antes.",
                 ], 422);
             }
 

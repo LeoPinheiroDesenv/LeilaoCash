@@ -175,7 +175,6 @@ export const ThemeProvider = ({ children }) => {
     if (key === 'page_contato') translationKey = 'contact.content';
     if (key === 'page_termos') translationKey = 'terms.content';
     if (key === 'page_privacidade') translationKey = 'privacy.content';
-    if (key === 'page_regras') translationKey = 'rules.content';
     if (key === 'page_faq') translationKey = 'faq.content';
     if (key === 'page_suba_de_nivel') translationKey = 'level_up.content'; // Se existir no seeder
 
