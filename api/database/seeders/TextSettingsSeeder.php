@@ -169,8 +169,10 @@ class TextSettingsSeeder extends Seeder
             'text_new_bid_notification' => ['value' => 'Novo lance! Valor atual:', 'desc' => 'Notificação Novo Lance'],
         ];
 
+        // firstOrCreate: o deploy roda este seeder a cada publicação e não pode
+        // sobrescrever textos e cores alterados pelo painel admin.
         foreach ($texts as $key => $data) {
-            Setting::updateOrCreate(
+            Setting::firstOrCreate(
                 ['key' => $key],
                 [
                     'value' => $data['value'],
@@ -206,7 +208,7 @@ class TextSettingsSeeder extends Seeder
         ];
 
         foreach ($colors as $color) {
-            Setting::updateOrCreate(
+            Setting::firstOrCreate(
                 ['key' => $color['key']],
                 [
                     'value' => $color['value'],

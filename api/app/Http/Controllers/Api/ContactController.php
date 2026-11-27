@@ -20,7 +20,7 @@ class ContactController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
-            'subject' => 'required|string|max:255',
+            'subject' => 'nullable|string|max:255',
             'message' => 'required|string|max:5000',
         ], [
             'name.required' => 'O nome é obrigatório.',
@@ -29,7 +29,6 @@ class ContactController extends Controller
             'email.required' => 'O e-mail é obrigatório.',
             'email.email' => 'O e-mail deve ser válido.',
             'email.max' => 'O e-mail não pode exceder 255 caracteres.',
-            'subject.required' => 'O assunto é obrigatório.',
             'subject.string' => 'O assunto deve ser um texto.',
             'subject.max' => 'O assunto não pode exceder 255 caracteres.',
             'message.required' => 'A mensagem é obrigatória.',
@@ -50,7 +49,7 @@ class ContactController extends Controller
             $contact = Contact::create([
                 'name' => $request->name,
                 'email' => $request->email,
-                'subject' => $request->subject,
+                'subject' => $request->filled('subject') ? $request->subject : 'Contato pelo site',
                 'message' => $request->message,
                 'status' => 'novo',
                 'ip_address' => $request->ip(),
