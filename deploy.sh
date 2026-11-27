@@ -75,7 +75,8 @@ else
   echo "Migrations done."
 fi
 
-# 4) Seeders idempotentes (updateOrCreate / updateOrInsert)
+# 4) Seeders que só criam o que falta (firstOrCreate): nunca sobrescrevem textos editados no painel.
+#    Para mudar um texto que já existe em produção, use uma migration (ver TranslationSeeder::applyKeys).
 # Apenas seeders seguros para re-executar em produção
 SAFE_SEEDERS="TranslationSeeder TextSettingsSeeder LevelRulesSeeder EstadoCidadeSeeder"
 

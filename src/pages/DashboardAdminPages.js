@@ -741,13 +741,14 @@ export const DashboardAdminContatos = () => {
       const response = await api.get(`/contacts?${params.toString()}`);
       if (response.data.success) {
         setContacts(response.data.data.data || response.data.data);
-        if (response.data.data.pagination) {
-          setPagination({
-            current_page: response.data.data.pagination.current_page,
-            last_page: response.data.data.pagination.last_page,
-            per_page: response.data.data.pagination.per_page,
-            total: response.data.data.pagination.total
-          });
+        // A API devolve a paginação no nível de cima (response.data.pagination)
+        const pg = response.data.pagination || response.data.data.pagination;
+        if (pg) {
+          setPagination(prev => ({
+            ...prev,
+            last_page: pg.last_page,
+            total: pg.total
+          }));
         }
       }
     } catch (error) {

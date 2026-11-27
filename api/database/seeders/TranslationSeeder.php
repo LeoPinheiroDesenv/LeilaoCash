@@ -7,7 +7,42 @@ use App\Models\Translation;
 
 class TranslationSeeder extends Seeder
 {
+    /**
+     * Cria só as traduções que ainda não existem no banco.
+     *
+     * O deploy roda este seeder a cada publicação. Antes ele usava updateOrCreate
+     * e sobrescrevia os textos editados pelo painel admin, por isso ajustes já
+     * feitos "voltavam" ao texto antigo. Para mudar um texto que já existe em
+     * produção, altere aqui E crie uma migration que chame
+     * TranslationSeeder::applyKeys([...]) com as chaves alteradas.
+     */
     public function run(): void
+    {
+        foreach (self::translations() as $t) {
+            Translation::firstOrCreate(
+                ['group' => $t['group'], 'key' => $t['key']],
+                $t
+            );
+        }
+    }
+
+    /**
+     * Sobrescreve no banco as chaves informadas ("grupo.chave") com o texto deste seeder.
+     * Usado por migrations, que rodam uma única vez em cada ambiente.
+     */
+    public static function applyKeys(array $keys): void
+    {
+        foreach (self::translations() as $t) {
+            if (in_array($t['group'] . '.' . $t['key'], $keys, true)) {
+                Translation::updateOrCreate(
+                    ['group' => $t['group'], 'key' => $t['key']],
+                    $t
+                );
+            }
+        }
+    }
+
+    public static function translations(): array
     {
         // Textos jurídicos enviados pelo cliente (Ajustes Finais 2026), só em português:
         // usados também em EN/ES até existir uma tradução revisada
@@ -203,13 +238,13 @@ class TranslationSeeder extends Seeder
             ['group' => 'how_it_works', 'key' => 'content', 'text_pt' => '<div class="page-content">
 <h1>Bem-vindo à VibeGet!</h1>
 <h2>A forma inteligente e instigante de adquirir produtos.</h2>
-<p>Você acaba de descobrir uma plataforma diferente, cheia de vantagens e com segurança para você arrematar eletrônicos e produtos premium com até 90% de economia.</p>
+<p>Você acaba de descobrir uma plataforma diferente, cheia de vantagens e com segurança para você adquirir eletrônicos e produtos premium com até 90% de economia.</p>
 
 <h2>Passo a Passo</h2>
 
 <div class="step">
 <h3>1. Cadastre-se e ganhe</h3>
-<p>Faça seu cadastro gratuito e rápido. Ao entrar, você já ganha Cashback de boas-vindas para ajudar a compor a sua melhor estratégia.</p>
+<p>Faça seu cadastro gratuito e rápido. Ao entrar, você já ganha GetCoin de boas-vindas para ajudar a compor a sua melhor estratégia.</p>
 </div>
 
 <div class="step">
@@ -218,24 +253,24 @@ class TranslationSeeder extends Seeder
 </div>
 
 <div class="step">
-<h3>3. Verifique o lance mínimo</h3>
-<p>Cada produto possui um valor mínimo estipulado para o "Get" (o seu lance), que costuma ser pelo menos 200 vezes menor que o valor original do produto.</p>
+<h3>3. Verifique o Get mínimo</h3>
+<p>O valor de Get mínimo varia conforme o valor do produto, essa informação consta na Vibe.</p>
 </div>
 
 <div class="step">
-<h3>4. Monte sua estratégia (Use seu Cashback!)</h3>
-<p>O grande diferencial da VibeGet é que você pode usar o seu saldo de Cashback para turbinar o seu Get! Você pode utilizar de Cashback até o mesmo valor que for pagar em dinheiro (R$).</p>
-<p><strong>Exemplo:</strong> Se você der um Get de R$ 3,95 em dinheiro, pode adicionar mais R$ 3,95 do seu saldo de Cashback. Seu Get total na disputa será de R$ 7,90!</p>
+<h3>4. Monte sua estratégia (Use seu GetCoin!)</h3>
+<p>O grande diferencial da VibeGet é que você pode usar o seu saldo de GetCoin para turbinar o seu Get! Você pode utilizar de GetCoin até o mesmo valor que for pagar em dinheiro (R$).</p>
+<p><strong>Exemplo:</strong> Se você der um Get de R$ 3,95 em dinheiro, pode adicionar mais R$ 3,95 do seu saldo de GetCoin. Seu Get total na disputa será de R$ 7,90!</p>
 </div>
 
 <div class="step">
 <h3>5. Faça o pagamento</h3>
-<p>Pague a parte em dinheiro (R$) do seu GET de forma rápida via Pix ou Cartão.</p>
+<p>Utilize seu saldo em reais e/ou GetCoins, que você tem na plataforma.</p>
 </div>
 
 <div class="step">
 <h3>6. Aguarde o resultado</h3>
-<p>O prazo para o encerramento da Vibe é de 1 a 15 dias ou até atingir a quantidade mínima de lances. O vencedor é aquele que der o GET mais alto!</p>
+<p>O prazo para o encerramento da Vibe é de 1 a 15 dias ou até atingir a quantidade mínima de Gets. O vencedor é aquele que der o GET mais alto!</p>
 </div>
 
 <div class="step">
@@ -244,7 +279,7 @@ class TranslationSeeder extends Seeder
 </div>
 
 <h2>E se eu não vencer a Vibe? (Cashback Garantido)</h2>
-<p>Na VibeGet, você nunca sai de mãos vazias. Se o seu Get não for o vencedor, você recebe <strong>40% do valor pago em R$</strong> de volta como Cashback diretamente na sua conta, para utilizar nas próximas Vibes na plataforma!</p>
+<p>Na VibeGet, você nunca sai de mãos vazias. Se o seu Get não for o vencedor, você recebe <strong>40% do valor pago em R$</strong> de volta em GetCoin diretamente na sua conta, para utilizar nas próximas Vibes na plataforma!</p>
 
 <h2>Por que escolher a VibeGet?</h2>
 <ul>
@@ -256,13 +291,13 @@ class TranslationSeeder extends Seeder
 </div>', 'text_en' => '<div class="page-content">
 <h1>Welcome to VibeGet!</h1>
 <h2>The smart and exciting way to acquire products.</h2>
-<p>You have just discovered a unique platform, full of advantages and security for you to win electronics and premium products with up to 90% savings.</p>
+<p>You have just discovered a unique platform, full of advantages and security for you to acquire electronics and premium products with up to 90% savings.</p>
 
 <h2>Step by Step</h2>
 
 <div class="step">
 <h3>1. Sign up and earn</h3>
-<p>Create your free and quick account. Upon joining, you already earn a welcome Cashback bonus to help you build your best strategy.</p>
+<p>Create your free and quick account. Upon joining, you already earn a welcome GetCoin bonus to help you build your best strategy.</p>
 </div>
 
 <div class="step">
@@ -271,24 +306,24 @@ class TranslationSeeder extends Seeder
 </div>
 
 <div class="step">
-<h3>3. Check the minimum bid</h3>
-<p>Each product has a minimum value set for the "Get" (your bid), which is usually at least 200 times less than the original product value.</p>
+<h3>3. Check the minimum Get</h3>
+<p>The minimum Get value varies according to the product value; this information is shown in the Vibe.</p>
 </div>
 
 <div class="step">
-<h3>4. Build your strategy (Use your Cashback!)</h3>
-<p>The great advantage of VibeGet is that you can use your Cashback balance to boost your Get! You can use Cashback up to the same amount you pay in cash (R$).</p>
-<p><strong>Example:</strong> If you place a Get of R$ 3.95 in cash, you can add another R$ 3.95 from your Cashback balance. Your total Get in the contest will be R$ 7.90!</p>
+<h3>4. Build your strategy (Use your GetCoin!)</h3>
+<p>The great advantage of VibeGet is that you can use your GetCoin balance to boost your Get! You can use GetCoin up to the same amount you pay in cash (R$).</p>
+<p><strong>Example:</strong> If you place a Get of R$ 3.95 in cash, you can add another R$ 3.95 from your GetCoin balance. Your total Get in the contest will be R$ 7.90!</p>
 </div>
 
 <div class="step">
 <h3>5. Make the payment</h3>
-<p>Pay the cash portion (R$) of your GET quickly via Pix or Card.</p>
+<p>Use your balance in reais and/or the GetCoins you have on the platform.</p>
 </div>
 
 <div class="step">
 <h3>6. Wait for the result</h3>
-<p>The Vibe closing period is 1 to 15 days or until it reaches the minimum number of bids. The winner is the one with the highest GET!</p>
+<p>The Vibe closing period is 1 to 15 days or until it reaches the minimum number of Gets. The winner is the one with the highest GET!</p>
 </div>
 
 <div class="step">
@@ -297,7 +332,7 @@ class TranslationSeeder extends Seeder
 </div>
 
 <h2>What if I do not win the Vibe? (Guaranteed Cashback)</h2>
-<p>At VibeGet, you never leave empty-handed. If your Get is not the winner, you receive <strong>40% of the amount paid in R$</strong> back as Cashback directly to your account, to use in the next Vibes on the platform!</p>
+<p>At VibeGet, you never leave empty-handed. If your Get is not the winner, you receive <strong>40% of the amount paid in R$</strong> back in GetCoin directly to your account, to use in the next Vibes on the platform!</p>
 
 <h2>Why choose VibeGet?</h2>
 <ul>
@@ -309,13 +344,13 @@ class TranslationSeeder extends Seeder
 </div>', 'text_es' => '<div class="page-content">
 <h1>¡Bienvenido a VibeGet!</h1>
 <h2>La forma inteligente y emocionante de adquirir productos.</h2>
-<p>Acabas de descubrir una plataforma diferente, llena de ventajas y seguridad para que consigas electrónicos y productos premium con hasta un 90% de ahorro.</p>
+<p>Acabas de descubrir una plataforma diferente, llena de ventajas y seguridad para que adquieras electrónicos y productos premium con hasta un 90% de ahorro.</p>
 
 <h2>Paso a Paso</h2>
 
 <div class="step">
 <h3>1. Regístrate y gana</h3>
-<p>Crea tu cuenta gratuita y rápida. Al ingresar, ya recibes un bono de Cashback de bienvenida para ayudarte a armar tu mejor estrategia.</p>
+<p>Crea tu cuenta gratuita y rápida. Al ingresar, ya recibes un bono de GetCoin de bienvenida para ayudarte a armar tu mejor estrategia.</p>
 </div>
 
 <div class="step">
@@ -325,18 +360,18 @@ class TranslationSeeder extends Seeder
 
 <div class="step">
 <h3>3. Verifica el Get mínimo</h3>
-<p>Cada producto tiene un valor mínimo estipulado para el "Get" (tu puja), que suele ser al menos 200 veces menor que el valor original del producto.</p>
+<p>El valor del Get mínimo varía según el valor del producto; esta información consta en la Vibe.</p>
 </div>
 
 <div class="step">
-<h3>4. Arma tu estrategia (¡Usa tu Cashback!)</h3>
-<p>El gran diferencial de VibeGet es que puedes usar tu saldo de Cashback para potenciar tu Get. Puedes usar Cashback hasta el mismo monto que pagues en efectivo (R$).</p>
-<p><strong>Ejemplo:</strong> Si das un Get de R$ 3,95 en efectivo, puedes agregar otros R$ 3,95 de tu saldo de Cashback. ¡Tu Get total en la disputa será de R$ 7,90!</p>
+<h3>4. Arma tu estrategia (¡Usa tu GetCoin!)</h3>
+<p>El gran diferencial de VibeGet es que puedes usar tu saldo de GetCoin para potenciar tu Get. Puedes usar GetCoin hasta el mismo monto que pagues en efectivo (R$).</p>
+<p><strong>Ejemplo:</strong> Si das un Get de R$ 3,95 en efectivo, puedes agregar otros R$ 3,95 de tu saldo de GetCoin. ¡Tu Get total en la disputa será de R$ 7,90!</p>
 </div>
 
 <div class="step">
 <h3>5. Realiza el pago</h3>
-<p>Paga la parte en efectivo (R$) de tu GET de forma rápida vía Pix o Tarjeta.</p>
+<p>Utiliza tu saldo en reales y/o los GetCoins que tienes en la plataforma.</p>
 </div>
 
 <div class="step">
@@ -350,7 +385,7 @@ class TranslationSeeder extends Seeder
 </div>
 
 <h2>¿Y si no gano la Vibe? (Cashback Garantizado)</h2>
-<p>En VibeGet, nunca te vas con las manos vacías. Si tu Get no es el ganador, recibes <strong>40% del valor pagado en R$</strong> como Cashback directamente en tu cuenta, ¡para usar en las próximas Vibes en la plataforma!</p>
+<p>En VibeGet, nunca te vas con las manos vacías. Si tu Get no es el ganador, recibes <strong>40% del valor pagado en R$</strong> en GetCoin directamente en tu cuenta, ¡para usar en las próximas Vibes en la plataforma!</p>
 
 <h2>¿Por qué elegir VibeGet?</h2>
 <ul>
@@ -369,13 +404,13 @@ class TranslationSeeder extends Seeder
 <p>Para quem tem de 16 a 17 anos, <strong>sim</strong>, porém é necessário acrescentar um responsável maior de 18 anos (pai, mãe ou tutor). Para menores de 16 anos <strong>não é possível</strong>.</p>
 
 <h3>O que é GetCoin?</h3>
-<p>GetCoin é o saldo de cashback que você acumula na plataforma. Ele pode ser usado para turbinar seus Gets (lances) nas Vibes. <strong>GetCoin NÃO pode ser sacado</strong>, apenas utilizado dentro do website.</p>
+<p>GetCoin é o saldo de cashback que você acumula na plataforma. Ele pode ser usado para turbinar seus Gets nas Vibes. <strong>GetCoin NÃO pode ser sacado</strong>, apenas utilizado dentro do website.</p>
 
 <h3>Como funciona a indicação?</h3>
 <p>Cada Viber possui um código de indicação. Quando alguém se cadastra usando seu código e faz o primeiro crédito, você ganha GetCoins automaticamente (a quantidade depende do seu nível).</p>
 
 <h3>Como uso o GetCoin nos Gets?</h3>
-<p>Ao dar um Get (lance), você pode utilizar GetCoin até o mesmo valor que pagar em dinheiro (R$). Exemplo: Get de R$ 3,95 em dinheiro + R$ 3,95 em GetCoin = Get total de R$ 7,90!</p>
+<p>Ao dar um Get, você pode utilizar GetCoin até o mesmo valor que pagar em dinheiro (R$). Exemplo: Get de R$ 3,95 em dinheiro + R$ 3,95 em GetCoin = Get total de R$ 7,90!</p>
 
 <h3>O que acontece se eu não vencer a Vibe?</h3>
 <p>Você recebe 40% do valor pago em R$ de volta como GetCoin na sua conta, para usar nas próximas Vibes.</p>
@@ -384,7 +419,7 @@ class TranslationSeeder extends Seeder
 <p>Não. Durante uma Vibe ativa, ninguém tem acesso aos valores individuais dos Gets. Essa informação só é revelada após o encerramento.</p>
 
 <h3>Qual o valor mínimo do Get?</h3>
-<p>O valor mínimo é aproximadamente 200 vezes menor que o valor do produto. Essa proporção pode variar de produto para produto.</p>
+<p>O valor de Get mínimo varia conforme o valor do produto, essa informação consta na Vibe.</p>
 
 <h3>Posso vender GetCoin para outros Vibers?</h3>
 <p>Sim, a partir do nível Bronze (venceu pelo menos 1 Vibe). A negociação é livre no Marketplace dentro do site.</p>', 'text_en' => '<h1>Frequently Asked Questions</h1>
@@ -392,7 +427,7 @@ class TranslationSeeder extends Seeder
 <p>For ages 16-17, <strong>yes</strong>, but a guardian over 18 (parent or tutor) is required. Under 16 is <strong>not allowed</strong>.</p>
 
 <h3>What is GetCoin?</h3>
-<p>GetCoin is the cashback balance you accumulate on the platform. It can be used to boost your Gets (bids) in Vibes. <strong>GetCoin CANNOT be withdrawn</strong>, only used within the website.</p>
+<p>GetCoin is the cashback balance you accumulate on the platform. It can be used to boost your Gets in Vibes. <strong>GetCoin CANNOT be withdrawn</strong>, only used within the website.</p>
 
 <h3>How does the referral work?</h3>
 <p>Each Viber has a referral code. When someone signs up with your code and makes their first deposit, you earn GetCoins automatically.</p>
@@ -408,70 +443,145 @@ class TranslationSeeder extends Seeder
 <h3>¿Qué pasa si no gano la Vibe?</h3>
 <p>Recibes 40% del valor pagado en R$ como GetCoin para usar en las próximas Vibes.</p>'],
             ['group' => 'level_up', 'key' => 'content', 'text_pt' => '<div class="page-content">
-<h1>Suba de Nível e torne-se um Viber Oficial!</h1>
-
-<h2>Como funciona a evolução na plataforma</h2>
+<h1>Suba de Nível e torne-se um Viber!</h1>
+<p>Na VibeGet, quanto mais você participa e vence, mais GetCoins você ganha. Além do nível inicial (Inscrito), são 5 níveis de Vibers.</p>
 
 <div class="level-card">
-<h3>Nível 1 — Iniciante (Explorador)</h3>
-<p>Assim que você se cadastra na plataforma de forma gratuita, você recebe bônus de Cashback para iniciar sua jornada.</p>
-<p>Neste nível, você pode participar de qualquer Vibe, acumular Cashback (seja pelas disputas não vencidas ou indicando amigos) e montar suas estratégias combinando R$ e saldo bônus.</p>
+<h3>Inscrito</h3>
+<p>No 1º crédito, você ganha o mesmo valor em GetCoin.</p>
+<p>Ganha 5% em GetCoin para cada Get em R$ (reais).</p>
+<p>Para cada indicação em que a pessoa indicada fizer crédito em R$ (reais), quem indicou ganha 50 GetCoins.</p>
 </div>
 
 <div class="level-card">
-<h3>Nível 2 — Viber (O Campeão)</h3>
-<p><strong>Como alcançar:</strong> Para subir de nível e ganhar o status de Viber, você precisa arrematar o seu primeiro Champion Get (ou seja, vencer a sua primeira Vibe!).</p>
-<p>Ser um Viber significa que você dominou a estratégia da plataforma, utilizou seu saldo de forma inteligente e superou as ofertas dos outros participantes para levar um produto premium para casa.</p>
+<h3>Bronze — venceu pelo menos 1 Vibe</h3>
+<p>Passa a ter o privilégio de vender GetCoin.</p>
+<p>Passa a ganhar 10% em GetCoin para cada Get em R$ (reais).</p>
+<p>Para cada indicação em que a pessoa indicada fizer crédito em R$ (reais), quem indicou ganha 60 GetCoins.</p>
+</div>
+
+<div class="level-card">
+<h3>Silver — venceu pelo menos 5 Vibes</h3>
+<p>Passa a ganhar 15% em GetCoin para cada Get em R$ (reais).</p>
+<p>Para cada indicação em que a pessoa indicada fizer crédito em R$ (reais), quem indicou ganha 70 GetCoins.</p>
+</div>
+
+<div class="level-card">
+<h3>Gold — venceu pelo menos 10 Vibes</h3>
+<p>Passa a ganhar 20% em GetCoin para cada Get em R$ (reais).</p>
+<p>Para cada indicação em que a pessoa indicada fizer crédito em R$ (reais), quem indicou ganha 80 GetCoins.</p>
+</div>
+
+<div class="level-card">
+<h3>Platinum — venceu pelo menos 13 Vibes</h3>
+<p>Passa a ganhar 20% em GetCoin para cada Get em R$ (reais).</p>
+<p>Para cada indicação em que a pessoa indicada fizer crédito em R$ (reais), quem indicou ganha 80 GetCoins.</p>
+</div>
+
+<div class="level-card">
+<h3>Diamond — venceu pelo menos 15 Vibes</h3>
+<p>Passa a ganhar 25% em GetCoin para cada Get em R$ (reais).</p>
+<p>Para cada indicação em que a pessoa indicada fizer crédito em R$ (reais), quem indicou ganha 100 GetCoins.</p>
 </div>
 
 <h2>Dicas para subir de nível mais rápido</h2>
 <ol>
-<li><strong>Acumule Cashback:</strong> Aproveite os 40% de retorno nas Vibes em que você não venceu.</li>
-<li><strong>Dobre seu poder de fogo:</strong> Lembre-se que você pode igualar o valor do seu lance em dinheiro utilizando o seu Cashback. Isso aumenta drasticamente o valor do seu "Get" e suas chances de conseguir um "Champion Get".</li>
+<li><strong>Acumule GetCoin:</strong> Aproveite os 40% de CashBack nas Vibes em que você não venceu.</li>
+<li><strong>Dobre seu poder de fogo:</strong> Lembre-se que você pode igualar o valor do seu Get em dinheiro utilizando os seus GetCoins. Isso aumenta drasticamente o valor do seu "Get" e suas chances de conseguir um "Champion Get".</li>
 </ol>
 </div>', 'text_en' => '<div class="page-content">
-<h1>Level Up and become an Official Viber!</h1>
-
-<h2>How the evolution works on the platform</h2>
+<h1>Level Up and become a Viber!</h1>
+<p>At VibeGet, the more you take part and win, the more GetCoins you earn. Besides the starting level (Registered), there are 5 Viber levels.</p>
 
 <div class="level-card">
-<h3>Level 1 — Beginner (Explorer)</h3>
-<p>As soon as you sign up for free on the platform, you receive a Cashback bonus to start your journey.</p>
-<p>At this level, you can participate in any Vibe, accumulate Cashback (from non-winning contests or by referring friends) and build your strategies combining R$ and bonus balance.</p>
+<h3>Registered</h3>
+<p>On your first deposit, you get the same amount in GetCoin.</p>
+<p>You earn 5% in GetCoin for every Get paid in R$ (reais).</p>
+<p>For each referral who makes a deposit in R$ (reais), the referrer earns 50 GetCoins.</p>
 </div>
 
 <div class="level-card">
-<h3>Level 2 — Viber (The Champion)</h3>
-<p><strong>How to achieve:</strong> To level up and earn the Viber status, you need to win your first Champion Get (that is, win your first Vibe!).</p>
-<p>Being a Viber means you have mastered the platform strategy, used your balance wisely and outbid other participants to take a premium product home.</p>
+<h3>Bronze — won at least 1 Vibe</h3>
+<p>You can now sell GetCoin.</p>
+<p>You earn 10% in GetCoin for every Get paid in R$ (reais).</p>
+<p>For each referral who makes a deposit in R$ (reais), the referrer earns 60 GetCoins.</p>
+</div>
+
+<div class="level-card">
+<h3>Silver — won at least 5 Vibes</h3>
+<p>You earn 15% in GetCoin for every Get paid in R$ (reais).</p>
+<p>For each referral who makes a deposit in R$ (reais), the referrer earns 70 GetCoins.</p>
+</div>
+
+<div class="level-card">
+<h3>Gold — won at least 10 Vibes</h3>
+<p>You earn 20% in GetCoin for every Get paid in R$ (reais).</p>
+<p>For each referral who makes a deposit in R$ (reais), the referrer earns 80 GetCoins.</p>
+</div>
+
+<div class="level-card">
+<h3>Platinum — won at least 13 Vibes</h3>
+<p>You earn 20% in GetCoin for every Get paid in R$ (reais).</p>
+<p>For each referral who makes a deposit in R$ (reais), the referrer earns 80 GetCoins.</p>
+</div>
+
+<div class="level-card">
+<h3>Diamond — won at least 15 Vibes</h3>
+<p>You earn 25% in GetCoin for every Get paid in R$ (reais).</p>
+<p>For each referral who makes a deposit in R$ (reais), the referrer earns 100 GetCoins.</p>
 </div>
 
 <h2>Tips to level up faster</h2>
 <ol>
-<li><strong>Accumulate Cashback:</strong> Take advantage of the 40% return on Vibes you did not win.</li>
-<li><strong>Double your firepower:</strong> Remember you can match your cash bid amount using your Cashback. This drastically increases your "Get" value and your chances of achieving a "Champion Get".</li>
+<li><strong>Accumulate GetCoin:</strong> Take advantage of the 40% CashBack on Vibes you did not win.</li>
+<li><strong>Double your firepower:</strong> Remember you can match your cash Get amount using your GetCoins. This drastically increases your "Get" value and your chances of achieving a "Champion Get".</li>
 </ol>
 </div>', 'text_es' => '<div class="page-content">
-<h1>¡Sube de Nivel y conviértete en un Viber Oficial!</h1>
-
-<h2>Cómo funciona la evolución en la plataforma</h2>
+<h1>¡Sube de Nivel y conviértete en un Viber!</h1>
+<p>En VibeGet, cuanto más participas y ganas, más GetCoins recibes. Además del nivel inicial (Inscrito), hay 5 niveles de Vibers.</p>
 
 <div class="level-card">
-<h3>Nivel 1 — Principiante (Explorador)</h3>
-<p>Tan pronto como te registras gratuitamente en la plataforma, recibes un bono de Cashback para comenzar tu viaje.</p>
-<p>En este nivel, puedes participar en cualquier Vibe, acumular Cashback (por disputas no ganadas o invitando amigos) y armar tus estrategias combinando R$ y saldo de bono.</p>
+<h3>Inscrito</h3>
+<p>En tu 1er crédito, recibes el mismo valor en GetCoin.</p>
+<p>Ganas 5% en GetCoin por cada Get en R$ (reales).</p>
+<p>Por cada referido que haga un crédito en R$ (reales), quien lo refirió gana 50 GetCoins.</p>
 </div>
 
 <div class="level-card">
-<h3>Nivel 2 — Viber (El Campeón)</h3>
-<p><strong>Cómo lograrlo:</strong> Para subir de nivel y ganar el estatus de Viber, necesitas obtener tu primer Champion Get (¡es decir, ganar tu primera Vibe!).</p>
-<p>Ser un Viber significa que dominaste la estrategia de la plataforma, usaste tu saldo de forma inteligente y superaste las ofertas de otros participantes para llevarte un producto premium a casa.</p>
+<h3>Bronze — ganó al menos 1 Vibe</h3>
+<p>Pasas a tener el privilegio de vender GetCoin.</p>
+<p>Pasas a ganar 10% en GetCoin por cada Get en R$ (reales).</p>
+<p>Por cada referido que haga un crédito en R$ (reales), quien lo refirió gana 60 GetCoins.</p>
+</div>
+
+<div class="level-card">
+<h3>Silver — ganó al menos 5 Vibes</h3>
+<p>Pasas a ganar 15% en GetCoin por cada Get en R$ (reales).</p>
+<p>Por cada referido que haga un crédito en R$ (reales), quien lo refirió gana 70 GetCoins.</p>
+</div>
+
+<div class="level-card">
+<h3>Gold — ganó al menos 10 Vibes</h3>
+<p>Pasas a ganar 20% en GetCoin por cada Get en R$ (reales).</p>
+<p>Por cada referido que haga un crédito en R$ (reales), quien lo refirió gana 80 GetCoins.</p>
+</div>
+
+<div class="level-card">
+<h3>Platinum — ganó al menos 13 Vibes</h3>
+<p>Pasas a ganar 20% en GetCoin por cada Get en R$ (reales).</p>
+<p>Por cada referido que haga un crédito en R$ (reales), quien lo refirió gana 80 GetCoins.</p>
+</div>
+
+<div class="level-card">
+<h3>Diamond — ganó al menos 15 Vibes</h3>
+<p>Pasas a ganar 25% en GetCoin por cada Get en R$ (reales).</p>
+<p>Por cada referido que haga un crédito en R$ (reales), quien lo refirió gana 100 GetCoins.</p>
 </div>
 
 <h2>Consejos para subir de nivel más rápido</h2>
 <ol>
-<li><strong>Acumula Cashback:</strong> Aprovecha el 40% de retorno en las Vibes que no ganaste.</li>
-<li><strong>Duplica tu poder:</strong> Recuerda que puedes igualar el valor de tu puja en efectivo usando tu Cashback. Esto aumenta drásticamente el valor de tu "Get" y tus chances de lograr un "Champion Get".</li>
+<li><strong>Acumula GetCoin:</strong> Aprovecha el 40% de CashBack en las Vibes que no ganaste.</li>
+<li><strong>Duplica tu poder:</strong> Recuerda que puedes igualar el valor de tu Get en efectivo usando tus GetCoins. Esto aumenta drásticamente el valor de tu "Get" y tus chances de lograr un "Champion Get".</li>
 </ol>
 </div>'],
 
@@ -538,11 +648,6 @@ class TranslationSeeder extends Seeder
             ['group' => 'common', 'key' => 'no_content', 'text_pt' => 'Nenhum conteúdo disponível para esta página no momento.', 'text_en' => 'No content available for this page at the moment.', 'text_es' => 'No hay contenido disponible para esta página en este momento.'],
         ];
 
-        foreach ($translations as $t) {
-            Translation::updateOrCreate(
-                ['group' => $t['group'], 'key' => $t['key']],
-                $t
-            );
-        }
+        return $translations;
     }
 }

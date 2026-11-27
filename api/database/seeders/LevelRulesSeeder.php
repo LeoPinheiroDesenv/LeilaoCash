@@ -59,13 +59,21 @@ class LevelRulesSeeder extends Seeder
             </style>
         ';
 
-        DB::table('settings')->updateOrInsert(
-            ['key' => 'page_suba_de_nivel'],
+        // Só cria se não existir: o deploy roda este seeder a cada publicação e não
+        // pode sobrescrever o que foi editado no painel. (A página Suba de Nível usa
+        // a tradução level_up.content do TranslationSeeder; esta chave é o fallback.)
+        if (DB::table('settings')->where('key', 'page_suba_de_nivel')->exists()) {
+            return;
+        }
+
+        DB::table('settings')->insert(
             [
+                'key' => 'page_suba_de_nivel',
                 'value' => $content,
                 'type' => 'html',
                 'group' => 'content',
                 'description' => 'Conteúdo da página Suba de Nível atualizado com as novas regras',
+                'created_at' => now(),
                 'updated_at' => now()
             ]
         );

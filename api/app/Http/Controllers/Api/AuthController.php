@@ -349,6 +349,11 @@ class AuthController extends Controller
         // URL para o frontend
         $resetUrl = rtrim(config('app.frontend_url'), '/') . "/reset-password?token={$token}&email=" . urlencode($request->email);
 
+        // Com MAIL_MAILER=log (ou array) o e-mail só vai para o log e nunca chega ao usuário
+        if (in_array(config('mail.default'), ['log', 'array'], true)) {
+            Log::warning('Redefinição de senha: MAIL_MAILER=' . config('mail.default') . ', o e-mail não será entregue. Configure o SMTP no .env do servidor.');
+        }
+
         try {
             Mail::to($user->email)->send(new PasswordResetMail($resetUrl));
         } catch (\Exception $e) {
